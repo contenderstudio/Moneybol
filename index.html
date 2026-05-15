@@ -28,6 +28,31 @@
   window._fbDb   = db;
   window._fbFns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword, fbSignOut, onAuthStateChanged, updateProfile, doc, getDoc, setDoc, updateDoc };
 
+  // Expose direct callable functions so non-module scripts can call them
+  window.firebaseSignIn = async (email, pass) => {
+    return await signInWithEmailAndPassword(auth, email, pass);
+  };
+
+  window.firebaseSignUp = async (email, pass, name) => {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    await setDoc(doc(db, 'users', cred.user.uid), { name, email, favs: [], createdAt: Date.now() });
+    return cred;
+  };
+
+  window.firebaseSignOut = async () => {
+    await signOut(auth);
+  };
+
+  window.firebaseLoadFavs = async (uid) => {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? (snap.data().favs || []) : [];
+  };
+
+  window.firebaseSaveFavs = async (uid, favs) => {
+    await updateDoc(doc(db, 'users', uid), { favs });
+  };
+
   // Auth state listener — fires on page load and on sign in/out
   onAuthStateChanged(auth, async (user) => {
     if(user){
@@ -38,8 +63,7 @@
 
       // Load favs from Firestore
       try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        window.favIds = snap.exists() ? (snap.data().favs || []) : [];
+        window.favIds = await window.firebaseLoadFavs(user.uid);
       } catch(e) {
         window.favIds = [];
       }
@@ -1387,8 +1411,7 @@ async function doSignIn(){
   if(!email||!pass){ setAuthError('Please fill in all fields.'); return; }
   try {
     setAuthError('Signing in…');
-    const { signInWithEmailAndPassword } = window._fbFns;
-    await signInWithEmailAndPassword(window._fbAuth, email, pass);
+    await window.firebaseSignIn(email, pass);
     // onAuthStateChanged handles the rest
   } catch(e) {
     const msg = e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
@@ -1409,11 +1432,7 @@ async function doSignUp(){
   if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ setAuthError('Please enter a valid email.'); return; }
   try {
     setAuthError('Creating account…');
-    const { createUserWithEmailAndPassword, updateProfile, doc, setDoc } = window._fbFns;
-    const cred = await createUserWithEmailAndPassword(window._fbAuth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-    // Create user document in Firestore
-    await setDoc(doc(window._fbDb, 'users', cred.user.uid), { name, email, favs: [], createdAt: Date.now() });
+    await window.firebaseSignUp(email, pass, name);
     toast('Account created! Welcome to MONEYBOL ✓');
     // onAuthStateChanged handles the rest
   } catch(e) {
@@ -1440,9 +1459,9 @@ function continueAsGuest(){
 
 async function signOut(){
   try {
-    await window._fbAuth.signOut();
+    await window.firebaseSignOut();
   } catch(e){ console.warn('signOut error:', e); }
-  // onAuthStateChanged will handle clearing state and showing overlay
+  // onAuthStateChanged handles clearing state and showing overlay
 }
 
 function handleUserAction(){
@@ -34426,10 +34445,9 @@ let draggingFavName = null;
 let favDragClickBlockUntil = 0;
 
 const saveFavs = async () => {
-  if(currentUser && window._fbDb && window._fbFns){
+  if(currentUser && window.firebaseSaveFavs){
     try {
-      const { doc, updateDoc } = window._fbFns;
-      await updateDoc(doc(window._fbDb, 'users', currentUser.uid), { favs: favIds });
+      await window.firebaseSaveFavs(currentUser.uid, favIds);
     } catch(e) {
       console.warn('saveFavs error:', e);
     }

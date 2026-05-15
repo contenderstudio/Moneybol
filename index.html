@@ -4,6 +4,59 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MONEYBOL</title>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyC1fMCgCIAKbQtibxhLtt0PvG4GnzW7fcg",
+    authDomain: "moneybol.firebaseapp.com",
+    projectId: "moneybol",
+    storageBucket: "moneybol.firebasestorage.app",
+    messagingSenderId: "361270372733",
+    appId: "1:361270372733:web:6e16591904afb984f70414"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // Expose to global scope for use in non-module scripts
+  window._fbAuth = auth;
+  window._fbDb   = db;
+  window._fbFns  = { createUserWithEmailAndPassword, signInWithEmailAndPassword, fbSignOut, onAuthStateChanged, updateProfile, doc, getDoc, setDoc, updateDoc };
+
+  // Auth state listener — fires on page load and on sign in/out
+  onAuthStateChanged(auth, async (user) => {
+    if(user){
+      // Signed in
+      const name = user.displayName || user.email.split('@')[0];
+      const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+      window.currentUser = { uid: user.uid, email: user.email, name, initials };
+
+      // Load favs from Firestore
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        window.favIds = snap.exists() ? (snap.data().favs || []) : [];
+      } catch(e) {
+        window.favIds = [];
+      }
+
+      document.getElementById('auth-overlay').style.display = 'none';
+      window.updateSidebarUser?.();
+      if(!window.dataLoaded){ window.bootData?.(); }
+      window.toast?.('Welcome back, ' + name + ' 👋');
+    } else {
+      // Signed out
+      window.currentUser = null;
+      window.favIds = [];
+      window.updateSidebarUser?.();
+      document.getElementById('auth-overlay').style.display = 'flex';
+    }
+  });
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700;800;900&family=Roboto:wght@400;500;600;700&family=Ultra&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1308,14 +1361,8 @@ async function sbFetch(path){
 /* ════ STATE ════ */
 let allPlayers={},allMatches={},competitionsData=[];
 let loadedComps=new Set();
-/* ════ AUTH SYSTEM ════ */
-let currentUser = null; // { email, name, initials }
-
-/* User store — keyed by email in localStorage */
-function getUsers(){ return JSON.parse(localStorage.getItem('mb_users')||'{}'); }
-function saveUsers(u){ localStorage.setItem('mb_users',JSON.stringify(u)); }
-function getUserData(email,key){ const u=getUsers()[email]||{};return u[key]||null; }
-function setUserData(email,key,val){ const u=getUsers();if(!u[email])u[email]={};u[email][key]=val;saveUsers(u); }
+/* ════ AUTH SYSTEM (Firebase) ════ */
+let currentUser = null; // { uid, email, name, initials }
 
 function authTab(tab){
   document.getElementById('auth-signin').style.display=tab==='signin'?'block':'none';
@@ -1327,67 +1374,77 @@ function authTab(tab){
 
 function setAuthError(msg){ document.getElementById('auth-error').textContent=msg; }
 
-function doSignIn(){
+async function doSignIn(){
   const email=document.getElementById('si-email').value.trim().toLowerCase();
   const pass=document.getElementById('si-pass').value;
   if(!email||!pass){ setAuthError('Please fill in all fields.'); return; }
-  const users=getUsers();
-  if(!users[email]){ setAuthError('No account found. Create one first.'); return; }
-  if(users[email].password!==btoa(pass)){ setAuthError('Incorrect password.'); return; }
-  loginUser(email, users[email].name);
+  try {
+    setAuthError('Signing in…');
+    const { signInWithEmailAndPassword } = window._fbFns;
+    await signInWithEmailAndPassword(window._fbAuth, email, pass);
+    // onAuthStateChanged handles the rest
+  } catch(e) {
+    const msg = e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
+      ? 'Incorrect email or password.'
+      : e.code==='auth/too-many-requests'
+      ? 'Too many attempts. Try again later.'
+      : 'Sign in failed. Please try again.';
+    setAuthError(msg);
+  }
 }
 
-function doSignUp(){
+async function doSignUp(){
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-email').value.trim().toLowerCase();
   const pass=document.getElementById('su-pass').value;
   if(!name||!email||!pass){ setAuthError('Please fill in all fields.'); return; }
   if(pass.length<6){ setAuthError('Password must be at least 6 characters.'); return; }
   if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ setAuthError('Please enter a valid email.'); return; }
-  const users=getUsers();
-  if(users[email]){ setAuthError('An account with this email already exists.'); return; }
-  users[email]={name,password:btoa(pass),favs:[],createdAt:Date.now()};
-  saveUsers(users);
-  loginUser(email,name);
-  toast('Account created! Welcome to MONEYBOL ✓');
-}
-
-function loginUser(email,name){
-  currentUser={email,name,initials:name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)};
-  localStorage.setItem('mb_session',JSON.stringify(currentUser));
-  favIds=getUserData(email,'favs')||[];
-  const overlay2=document.getElementById('auth-overlay');
-  if(overlay2) overlay2.style.display='none';
-  updateSidebarUser();
-  dataLoaded=false; // reset so bootData runs fresh
-  bootData();
-  toast('Welcome back, '+name+' 👋');
+  try {
+    setAuthError('Creating account…');
+    const { createUserWithEmailAndPassword, updateProfile, doc, setDoc } = window._fbFns;
+    const cred = await createUserWithEmailAndPassword(window._fbAuth, email, pass);
+    await updateProfile(cred.user, { displayName: name });
+    // Create user document in Firestore
+    await setDoc(doc(window._fbDb, 'users', cred.user.uid), { name, email, favs: [], createdAt: Date.now() });
+    toast('Account created! Welcome to MONEYBOL ✓');
+    // onAuthStateChanged handles the rest
+  } catch(e) {
+    const msg = e.code==='auth/email-already-in-use'
+      ? 'An account with this email already exists.'
+      : e.code==='auth/invalid-email'
+      ? 'Please enter a valid email address.'
+      : e.code==='auth/weak-password'
+      ? 'Password must be at least 6 characters.'
+      : 'Sign up failed. Please try again.';
+    setAuthError(msg);
+  }
 }
 
 function continueAsGuest(){
   currentUser=null;
-  localStorage.removeItem('mb_session');
   favIds=[];
   const overlay=document.getElementById('auth-overlay');
   if(overlay) overlay.style.display='none';
   updateSidebarUser();
-  dataLoaded=false; // reset so bootData runs fresh
+  dataLoaded=false;
   bootData();
 }
 
-function signOut(){
+async function signOut(){
+  try {
+    const { fbSignOut } = window._fbFns;
+    await fbSignOut(window._fbAuth);
+  } catch(_){}
   currentUser=null;
-  localStorage.removeItem('mb_session');
   favIds=[];
   compareIds=[];
-  dataLoaded=false;  // force fresh data load on next sign-in
-  // Clear all player data so new competitions load cleanly
+  dataLoaded=false;
   Object.keys(allPlayers).forEach(k=>delete allPlayers[k]);
   Object.keys(allMatches).forEach(k=>delete allMatches[k]);
   loadedComps.clear();
   competitionsData=[];
   updateSidebarUser();
-  document.getElementById('auth-overlay').style.display='flex';
   toast('Signed out');
 }
 
@@ -1420,16 +1477,8 @@ function updateSidebarUser(){
 }
 
 function checkSession(){
-  const s=localStorage.getItem('mb_session');
-  if(s){
-    try{
-      currentUser=JSON.parse(s);
-      favIds=getUserData(currentUser.email,'favs')||[];
-      document.getElementById('auth-overlay').style.display='none';
-      updateSidebarUser();
-      return true; // bootData() called by boot()
-    }catch(_){ localStorage.removeItem('mb_session'); }
-  }
+  // Firebase handles session persistence automatically via onAuthStateChanged
+  // Return false so boot() shows the overlay; Firebase will hide it when ready
   return false;
 }
 
@@ -34379,11 +34428,15 @@ function viewP(name){
 let draggingFavName = null;
 let favDragClickBlockUntil = 0;
 
-const saveFavs=()=>{
-  if(currentUser){
-    setUserData(currentUser.email,'favs',favIds);
+const saveFavs = async () => {
+  if(currentUser && window._fbDb && window._fbFns){
+    try {
+      const { doc, updateDoc } = window._fbFns;
+      await updateDoc(doc(window._fbDb, 'users', currentUser.uid), { favs: favIds });
+    } catch(e) {
+      console.warn('saveFavs error:', e);
+    }
   }
-  // Guest: no persistence — intentional
 };
 
 function reorderFavs(fromName, toName, placeAfter=false){
@@ -35509,13 +35562,10 @@ async function bootData(){
 }
 
 function boot(){
-  // If session exists → load data immediately
-  if(checkSession()){
-    bootData();
-  } else {
-    // Show auth modal, data loads after successful auth
-    document.getElementById('auth-overlay').style.display='flex';
-  }
+  // Firebase's onAuthStateChanged (in the module script above) handles
+  // session restore and overlay hiding automatically.
+  // Just show the overlay while Firebase checks auth state.
+  document.getElementById('auth-overlay').style.display='flex';
 }
 
 

@@ -287,6 +287,7 @@ table.ht tbody tr:hover{background:#232323}
 .cp-hero{
   position:relative;min-height:200px;background:#1a1a1a;
   display:flex;align-items:center;overflow:hidden;
+  padding-left:24px;
 }
 .cp-hero-bg{
   position:absolute;inset:0;
@@ -295,9 +296,10 @@ table.ht tbody tr:hover{background:#232323}
 /* player photo — left side, contained square that fills hero height */
 .cp-crest-circle{
   position:relative;flex-shrink:0;
-  width:200px;height:200px;
-  border-radius:0;
-  background:#111;
+  width:160px;height:160px;
+  border-radius:50%;
+  background:#555;
+  border:2px solid rgba(255,255,255,0.12);
   z-index:1;
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;
@@ -307,7 +309,7 @@ table.ht tbody tr:hover{background:#232323}
   position:relative;z-index:2;
   padding:24px 24px 24px 24px;flex:1;
 }
-.cp-name{font-family:var(--f);font-size:46px;font-weight:900;line-height:1;letter-spacing:-1px;color:#fff}
+.cp-name{font-family:var(--f);font-size:46px;font-weight:300;line-height:1;letter-spacing:-1px;color:#fff}
 .cp-num{font-family:var(--f);font-size:28px;font-weight:400;color:#878787;margin-left:10px;vertical-align:baseline}
 .cp-age{font-size:17px;color:#878787;margin:8px 0 4px}
 .cp-pos{font-size:13px;color:#878787}
@@ -323,13 +325,13 @@ table.ht tbody tr:hover{background:#232323}
 }
 .cps{padding:22px 10px 18px;text-align:center;border-right:1px solid rgba(255,255,255,.06)}
 .cps:last-child{border-right:none}
-.cps-val{font-family:var(--f);font-size:36px;font-weight:800;display:block;line-height:1;margin-bottom:4px;color:#fff}
+.cps-val{font-family:var(--f);font-size:36px;font-weight:300;display:block;line-height:1;margin-bottom:4px;color:#fff}
 .cps-avg{font-size:13px;color:rgba(255,255,255,.3);margin-bottom:8px;letter-spacing:.3px}
-.cps-nm{font-family:var(--f);font-size:14px;font-weight:700;color:rgba(255,255,255,.7);letter-spacing:.2px}
+.cps-nm{font-family:var(--f);font-size:14px;font-weight:300;color:rgba(255,255,255,.7);letter-spacing:.2px}
 
 /* pages */
-.sr-wrap{padding:0;width:100%}
-.sr-lbl{font-family:var(--f);font-size:14px;font-weight:700;color:#878787;margin-bottom:14px}
+.sr-wrap{padding:20px 0 0;width:100%}
+.sr-lbl{font-family:var(--f);font-size:14px;font-weight:700;color:#878787;margin-bottom:14px;padding-left:16px}
 .sr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;padding:16px;align-items:start;width:100%;box-sizing:border-box}
 .comp-wrap{padding:20px}
 .comp-hdr{font-family:var(--f);font-size:20px;font-weight:800;margin-bottom:16px}
@@ -360,6 +362,24 @@ table.ht tbody tr:hover{background:#232323}
 .fp-range-label{font-family:var(--f);font-size:13px;color:#878787;width:60px;flex-shrink:0}
 .fp-range input[type=range]{flex:1;accent-color:var(--g);height:4px;cursor:pointer}
 .fp-range-val{font-family:var(--f);font-size:13px;font-weight:700;color:var(--g);width:40px;text-align:right;flex-shrink:0}
+/* ═══ LIVE DRAFT ═══ */
+.dp-row{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border2);transition:background .12s;user-select:none}
+.dp-row:hover{background:#1e2a1e}
+.dp-row.in-board{opacity:.35;pointer-events:none}
+.db-row{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border2);cursor:grab;transition:background .12s,transform .12s;user-select:none;position:relative}
+.db-row:active{cursor:grabbing}
+.db-row:hover{background:#1a2a1a}
+.db-row.dragging{opacity:0;pointer-events:none}
+.db-row.ghost{opacity:.25;background:#1a2a1a;border:1px dashed rgba(0,230,118,.3)}
+.db-row.drag-over-top{border-top:2px solid var(--g);padding-top:18px}
+.db-row.drag-over-bot{border-bottom:2px solid var(--g);padding-bottom:18px}
+.db-rank{font-family:var(--f);font-size:13px;font-weight:700;color:#555;width:22px;flex-shrink:0;text-align:right}
+.db-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222}
+.db-name{font-family:var(--f);font-size:13px;font-weight:300;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-meta{font-family:var(--f);font-size:12px;color:#555;white-space:nowrap}
+.db-remove{background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;transition:color .15s;line-height:1}
+.db-remove:hover{color:#e05a2b}
+.db-grab{color:#3a3a3a;font-size:14px;flex-shrink:0;cursor:grab}
 .fp-footer{padding:16px 20px;border-top:1px solid #2a2a2a;display:flex;gap:10px;position:sticky;bottom:0;background:#1a1a1a}
 .fp-apply{flex:1;font-family:var(--f);font-size:14px;font-weight:800;padding:11px;background:var(--g);color:#000;border:none;border-radius:5px;cursor:pointer}
 .fp-apply:hover{background:#00c060}
@@ -790,16 +810,16 @@ table.ht tbody tr:hover{background:#232323}
 <div class="pg" id="pg-favs">
   <div class="topbar">
     <span class="tb-bk" onclick="back()">&lt; BACK</span>
-    <div class="tb-sb"><span style="color:#878787;font-size:13px">🔍</span><input type="text" id="fsi" onkeydown="if(event.key==='Enter')searchFrom('fsi')"></div>
-    <button class="tb-btn tb-dk" onclick="searchFrom('fsi')">SEARCH</button>
-    <button class="tb-btn tb-ot">⚙ FILTER</button>
+    <div class="tb-sb"><span style="color:#878787;font-size:13px">🔍</span><input type="text" id="fsi" oninput="renderFavs()" onkeydown="if(event.key==='Escape'){this.value='';renderFavs()}" placeholder="Search favourites…"></div>
+    <button class="tb-btn tb-dk" onclick="renderFavs()">SEARCH</button>
+    <button class="tb-btn tb-ot" id="favs-filter-btn" onclick="openFavsFilter()" style="transition:background .15s,color .15s">⚙ FILTER</button>
     
   </div>
   <div class="favs-wrap">
     <div class="favs-hdr">
       <div>
         <div class="favs-title">FAVOURITE PLAYERS</div>
-        <div style="margin-top:4px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;color:#878787">DRAG CARDS TO REORDER</div>
+        <div style="margin-top:4px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;color:#878787">DRAG TO REORDER · STAR TO REMOVE</div>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="favs-view-toggle">
@@ -1070,11 +1090,190 @@ table.ht tbody tr:hover{background:#232323}
       </div>
 
     </div>
-    <div style="border-top:1px solid #222;padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
-      <div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px">BUILT BY <strong style="color:#878787">CONTENDER STUDIO</strong> · © 2026</div>
-      <div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.3px">Data: StatsBomb Open Data</div>
+    <div style="border-top:1px solid #222;padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px">BUILT BY <strong style="color:#878787">CONTENDER STUDIO</strong> · © 2026</div><a href="https://www.contender.studio" target="_blank" rel="noopener" style="font-family:var(--fb);font-size:12px;color:#878787;text-decoration:underline;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a></div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <a onclick="go('terms')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
+        <a onclick="go('privacy')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
+        <a onclick="go('contact')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+        <div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.3px">Data: StatsBomb Open Data</div>
+      </div>
     </div>
 
+  </div>
+</div>
+
+
+<!-- TERMS OF USE -->
+<div class="pg" id="pg-terms">
+  <div class="topbar"><span class="tb-bk" onclick="go('about')">&lt; BACK</span></div>
+  <div style="max-width:760px;margin:0 auto;padding:36px 28px 60px">
+    <h1 style="font-family:var(--f);font-size:32px;font-weight:900;letter-spacing:1px;color:#fff;margin-bottom:6px">TERMS OF USE</h1>
+    <div style="font-family:var(--f);font-size:13px;color:var(--t3);letter-spacing:.5px;margin-bottom:32px">Last updated: May 2026</div>
+
+    <div style="display:flex;flex-direction:column;gap:28px">
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">1. GENERAL PLATFORM DISCLAIMER</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">MoneyBol is an experimental AI-assisted football scouting and roster intelligence platform created for research, educational, and informational purposes. The platform uses publicly available and/or third-party football data sources to generate player insights, rankings, and analysis. MoneyBol does not guarantee the accuracy, completeness, or reliability of any data, projections, evaluations, or recommendations presented on the platform.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">2. AI LIMITATION DISCLAIMER</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">AI-generated insights and scouting outputs are intended to support human decision-making only and should not be relied upon as the sole basis for recruitment, contracting, valuation, or player development decisions.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">3. DATA & THIRD-PARTY SOURCES</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">Player statistics, metadata, and related information displayed on MoneyBol may originate from publicly available, open-source, or third-party datasets. All trademarks, league names, club names, and player likenesses remain the property of their respective owners.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">4. INDEPENDENCE & NO AFFILIATION</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">MoneyBol is an independent platform and is not affiliated with, endorsed by, or officially connected to any football club, league, federation, player agency, or data provider unless explicitly stated.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">5. NO WARRANTIES & LIMITATION OF LIABILITY</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">By using this platform, users acknowledge that all information is provided "as is" without warranties of any kind. MoneyBol, Contender Studio, and JSNJAY DESIGN INC. shall not be liable for any losses, damages, or decisions arising from the use of the platform or its outputs.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">6. INTELLECTUAL PROPERTY</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">All platform design, branding, visual systems, and proprietary workflows are the intellectual property of Contender Studio and JSNJAY DESIGN INC. Unauthorized reproduction or redistribution is prohibited.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">7. QUESTIONS</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">Questions about these terms? <span onclick="go('contact')" style="color:var(--g);cursor:pointer;font-weight:600">Get in touch with us.</span></p>
+      </div>
+
+    </div>
+
+    <div style="border-top:1px solid #222;padding-top:20px;margin-top:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px">BUILT BY <strong style="color:#878787">CONTENDER STUDIO</strong> · © 2026</div><a href="https://www.contender.studio" target="_blank" rel="noopener" style="font-family:var(--fb);font-size:12px;color:#878787;text-decoration:underline;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a></div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <a onclick="go('terms')" style="font-family:var(--f);font-size:13px;color:var(--g);letter-spacing:.5px;cursor:pointer;text-decoration:none">TERMS OF USE</a>
+        <a onclick="go('privacy')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
+        <a onclick="go('contact')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PRIVACY POLICY -->
+<div class="pg" id="pg-privacy">
+  <div class="topbar"><span class="tb-bk" onclick="go('about')">&lt; BACK</span></div>
+  <div style="max-width:760px;margin:0 auto;padding:36px 28px 60px">
+    <h1 style="font-family:var(--f);font-size:32px;font-weight:900;letter-spacing:1px;color:#fff;margin-bottom:6px">PRIVACY POLICY</h1>
+    <div style="font-family:var(--f);font-size:13px;color:var(--t3);letter-spacing:.5px;margin-bottom:32px">Last updated: May 2026</div>
+
+    <div style="display:flex;flex-direction:column;gap:28px">
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">1. PLATFORM PURPOSE</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">MoneyBol is an experimental AI-assisted football scouting and roster intelligence platform created for research, educational, and informational purposes. The platform uses publicly available and/or third-party football data sources to generate player insights, rankings, and analysis.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">2. AI-GENERATED CONTENT</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">AI-generated insights and scouting outputs are intended to support human decision-making only and should not be relied upon as the sole basis for recruitment, contracting, valuation, or player development decisions. MoneyBol does not guarantee the accuracy, completeness, or reliability of any data, projections, evaluations, or recommendations presented on the platform.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">3. DATA SOURCES & THIRD-PARTY CONTENT</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">Player statistics, metadata, and related information displayed on MoneyBol may originate from publicly available, open-source, or third-party datasets. All trademarks, league names, club names, and player likenesses remain the property of their respective owners. MoneyBol makes no claim of ownership over any third-party data or content.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">4. INDEPENDENCE & NO AFFILIATION</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">MoneyBol is an independent platform and is not affiliated with, endorsed by, or officially connected to any football club, league, federation, player agency, or data provider unless explicitly stated.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">5. NO WARRANTIES & LIABILITY</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">By using this platform, users acknowledge that all information is provided "as is" without warranties of any kind. MoneyBol, Contender Studio, and JSNJAY DESIGN INC. shall not be liable for any losses, damages, or decisions arising from the use of the platform or its outputs.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">6. INTELLECTUAL PROPERTY</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">All platform design, branding, visual systems, and proprietary workflows are the intellectual property of Contender Studio and JSNJAY DESIGN INC. Unauthorized reproduction or redistribution is prohibited.</p>
+      </div>
+
+      <div>
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--g);margin-bottom:8px">7. CONTACT</div>
+        <p style="font-size:14px;color:var(--t2);line-height:1.75;margin:0">For privacy-related questions or concerns, please <span onclick="go('contact')" style="color:var(--g);cursor:pointer;font-weight:600">contact us</span>.</p>
+      </div>
+
+    </div>
+
+    <div style="border-top:1px solid #222;padding-top:20px;margin-top:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px">BUILT BY <strong style="color:#878787">CONTENDER STUDIO</strong> · © 2026</div><a href="https://www.contender.studio" target="_blank" rel="noopener" style="font-family:var(--fb);font-size:12px;color:#878787;text-decoration:underline;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a></div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <a onclick="go('terms')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
+        <a onclick="go('privacy')" style="font-family:var(--f);font-size:13px;color:var(--g);letter-spacing:.5px;cursor:pointer;text-decoration:none">PRIVACY POLICY</a>
+        <a onclick="go('contact')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="pg" id="pg-contact">
+  <div class="topbar"><span class="tb-bk" onclick="go('about')">&lt; BACK</span></div>
+  <div style="max-width:760px;margin:0 auto;padding:36px 28px 60px">
+    <h1 style="font-family:var(--f);font-size:32px;font-weight:900;letter-spacing:1px;color:#fff;margin-bottom:6px">CONTACT</h1>
+    <div style="font-family:var(--f);font-size:13px;color:var(--t3);letter-spacing:.5px;margin-bottom:36px">We'd love to hear from you.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:36px">
+      <!-- General Inquiries -->
+      <div style="background:#252525;border:1px solid #363636;border-radius:8px;padding:24px">
+        <div style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:1.8px;color:var(--t3);margin-bottom:10px">GENERAL INQUIRIES</div>
+        <div style="font-family:var(--f);font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Contender Studio</div>
+        <a href="mailto:hello@contenderstudio.com" style="font-size:14px;color:var(--g);text-decoration:none;font-family:var(--fb)">hello@contenderstudio.com</a>
+        <p style="font-size:13px;color:var(--t3);line-height:1.6;margin-top:10px;font-family:var(--fb)">For questions about the platform, data, or partnership opportunities.</p>
+      </div>
+      <!-- Project Contact -->
+      <div style="background:#252525;border:1px solid #363636;border-radius:8px;padding:24px">
+        <div style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:1.8px;color:var(--t3);margin-bottom:10px">PROJECT LEAD</div>
+        <div style="font-family:var(--f);font-size:15px;font-weight:700;color:#fff;margin-bottom:6px">Olivia Weiss</div>
+        <a href="mailto:olivia@contenderstudio.com" style="font-size:14px;color:var(--g);text-decoration:none;font-family:var(--fb)">olivia@contenderstudio.com</a>
+        <p style="font-size:13px;color:var(--t3);line-height:1.6;margin-top:10px;font-family:var(--fb)">Design, UX, and academic enquiries related to this capstone project.</p>
+      </div>
+    </div>
+
+    <!-- Send a Message form-style card -->
+    <div style="background:#252525;border:1px solid #363636;border-radius:8px;padding:28px;margin-bottom:36px">
+      <div style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:1.8px;color:var(--t3);margin-bottom:20px">SEND A MESSAGE</div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div>
+            <label style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--t3);display:block;margin-bottom:6px">NAME</label>
+            <input id="ct-name" type="text" placeholder="Your name" style="width:100%;background:#1c1c1c;border:1px solid #3a3a3a;border-radius:5px;padding:10px 13px;font-family:var(--fb);font-size:14px;color:#fff;outline:none" onfocus="this.style.borderColor='#00e676'" onblur="this.style.borderColor='#3a3a3a'">
+          </div>
+          <div>
+            <label style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--t3);display:block;margin-bottom:6px">EMAIL</label>
+            <input id="ct-email" type="email" placeholder="your@email.com" style="width:100%;background:#1c1c1c;border:1px solid #3a3a3a;border-radius:5px;padding:10px 13px;font-family:var(--fb);font-size:14px;color:#fff;outline:none" onfocus="this.style.borderColor='#00e676'" onblur="this.style.borderColor='#3a3a3a'">
+          </div>
+        </div>
+        <div>
+          <label style="font-family:var(--f);font-size:12px;font-weight:700;letter-spacing:.8px;color:var(--t3);display:block;margin-bottom:6px">MESSAGE</label>
+          <textarea id="ct-msg" rows="5" placeholder="What's on your mind?" style="width:100%;background:#1c1c1c;border:1px solid #3a3a3a;border-radius:5px;padding:10px 13px;font-family:var(--fb);font-size:14px;color:#fff;outline:none;resize:vertical" onfocus="this.style.borderColor='#00e676'" onblur="this.style.borderColor='#3a3a3a'"></textarea>
+        </div>
+        <div>
+          <button onclick="submitContact()" style="font-family:var(--f);font-size:14px;font-weight:800;letter-spacing:.8px;padding:11px 28px;background:var(--g);color:#000;border:none;border-radius:5px;cursor:pointer">SEND MESSAGE</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top:1px solid #222;padding-top:20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px"><div style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px">BUILT BY <strong style="color:#878787">CONTENDER STUDIO</strong> · © 2026</div><a href="https://www.contender.studio" target="_blank" rel="noopener" style="font-family:var(--fb);font-size:12px;color:#878787;text-decoration:underline;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a></div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <a onclick="go('terms')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
+        <a onclick="go('privacy')" style="font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
+        <a onclick="go('contact')" style="font-family:var(--f);font-size:13px;color:var(--g);letter-spacing:.5px;cursor:pointer;text-decoration:none">CONTACT</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -33074,6 +33273,18 @@ function ring(score,color,sz=120,sw=10){
   </div>`;
 }
 function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',ms);}
+function submitContact(){
+  const name=document.getElementById('ct-name').value.trim();
+  const email=document.getElementById('ct-email').value.trim();
+  const msg=document.getElementById('ct-msg').value.trim();
+  if(!name||!email||!msg){toast('Please fill in all fields before sending.');return;}
+  const emailRe=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRe.test(email)){toast('Please enter a valid email address.');return;}
+  document.getElementById('ct-name').value='';
+  document.getElementById('ct-email').value='';
+  document.getElementById('ct-msg').value='';
+  toast("Message sent! We'll be in touch soon \u2713",3500);
+}
 
 
 
@@ -33083,6 +33294,8 @@ function go(id, addToStack=true){
   if(!el) return;
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   el.classList.add('on');
+  const mainScroll = document.querySelector('.main');
+  if(mainScroll) mainScroll.scrollTop = 0;
   ['home','lists','favs','about'].forEach((pg,i)=>{
     document.querySelectorAll('.sb-item')[i].classList.toggle('on', pg===id || (pg==='lists' && id==='listresults'));
   });
@@ -34338,6 +34551,13 @@ function toggleFavFC(name,el){
   toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
   saveFavs();
 }
+function toggleFavList(name){
+  if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; return; }
+  favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];
+  toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
+  saveFavs();
+  renderFavs();
+}
 
 function toggleFeatFav(){
   if(!featuredName) return;
@@ -34379,11 +34599,43 @@ function renderFavs(){
     </div>`;
     return;
   }
-  const players = favIds.map(n=>allPlayers[n]).filter(Boolean);
+  const q = (document.getElementById('fsi')?.value || '').toLowerCase().trim();
+  let players = favIds.map(n=>allPlayers[n]).filter(Boolean)
+    .filter(p => !q || p.name.toLowerCase().includes(q) || (p.team||'').toLowerCase().includes(q));
+
+  // Position filter
+  if(favsFilterPos !== 'all'){
+    players = players.filter(p => {
+      const pg = (p.posGroup||'').toLowerCase();
+      if(pg && pg !== '—') return pg === favsFilterPos.toLowerCase();
+      // fallback to EA positions
+      const ea = (getEAPositions(p.name)||'').toLowerCase();
+      const fav = favsFilterPos.toLowerCase();
+      if(fav === 'forward')    return /fw|cf|lw|rw|st/.test(ea);
+      if(fav === 'midfielder') return /cm|cam|cdm|lm|rm|mf/.test(ea);
+      if(fav === 'defender')   return /cb|lb|rb|lwb|rwb|df/.test(ea);
+      if(fav === 'goalkeeper') return /gk/.test(ea);
+      return false;
+    });
+  }
+
+  // Sort
+  if(favsFilterSort === 'score')  players.sort((a,b)=>b.score-a.score);
+  else if(favsFilterSort === 'xg') players.sort((a,b)=>b.xG-a.xG);
+  else if(favsFilterSort === 'goals') players.sort((a,b)=>b.goals-a.goals);
+  else if(favsFilterSort === 'shots') players.sort((a,b)=>b.shots-a.shots);
+  else if(favsFilterSort === 'pass') players.sort((a,b)=>{
+    const pa=a.passAtt>0?(a.passComp/a.passAtt):0, pb=b.passAtt>0?(b.passComp/b.passAtt):0;
+    return pb-pa;
+  });
   if(!players.length){
     grid.style.display='grid';
     grid.style.gridTemplateColumns='repeat(auto-fill,348px)';
-    grid.innerHTML=`<div style="grid-column:1/-1;padding:20px;color:var(--t3);font-size:13px">Player data not loaded yet — browse a competition first.</div>`;
+    grid.innerHTML=`<div style="grid-column:1/-1;padding:48px 24px;text-align:center">
+      <div style="font-family:var(--f);font-size:32px;font-weight:900;color:#2a2a2a;margin-bottom:12px">★</div>
+      <div style="font-family:var(--f);font-size:16px;font-weight:800;color:#fff;margin-bottom:8px">No matching players found</div>
+      <div style="font-size:13px;color:#878787">This player isn't in your favourites. Browse players and tap ★ to save them.</div>
+    </div>`;
     return;
   }
   if(favsView==='list'){
@@ -34432,14 +34684,25 @@ function renderCompare(){
     ['Turnovers',p=>p.fouls,            (a,b)=>a.fouls-b.fouls],
   ];
 
+  /* Compute league averages from all loaded players */
+  const allP = Object.values(allPlayers);
+  function avg(fn){ const vals=allP.map(fn).filter(v=>isFinite(v)); return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0; }
+  const avgs = [
+    avg(p=>p.xG),
+    avg(p=>p.mins>0 ? p.xG/(p.mins/90) : null),
+    avg(p=>p.shots),
+    avg(p=>p.keyPasses),
+    avg(p=>p.shotsOnT),
+    avg(p=>p.fouls),
+  ];
+
   document.getElementById('cp-body').innerHTML = players.map((p, playerIdx)=>{
     const playerColor = PLAYER_COLORS[playerIdx];
     const other = players.find(x=>x.name!==p.name);
 
-    const statsHtml = defs.map(([l,fn,cmp])=>{
+    const statsHtml = defs.map(([l,fn,cmp], i)=>{
       return `<div class="cps">
         <span class="cps-val">${fn(p)}</span>
-        <div class="cps-avg">AVG: 0000</div>
         <div class="cps-nm">${l}</div>
       </div>`;
     }).join('');
@@ -34458,10 +34721,30 @@ function renderCompare(){
         </div>
         <div class="cp-info">
           <div class="cp-name">${p.name}</div>
-          <div class="cp-age" style="font-size:18px;color:#878787;margin:8px 0 4px">
-            ${calcAge(p.birthDate)} | ${p.foot !== '—' ? p.foot[0].toUpperCase() : '—'}
+          <div style="font-size:13px;margin:6px 0 4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            ${(()=>{
+              const eaPos = getEAPositions(p.name);
+              if(eaPos){
+                return eaPos.split(',').map(pos=>pos.trim()).map((pos,i)=>
+                  `<span style="color:${i===0?'var(--g)':'#aaa'};font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:${i===0?'rgba(0,230,118,.1)':'rgba(255,255,255,.05)'};padding:2px 8px;border-radius:3px">${pos}</span>`
+                ).join('');
+              }
+              return p.posGroup&&p.posGroup!=='—'?`<span style="color:var(--g);font-family:var(--f);font-weight:300;font-size:13px;background:rgba(0,230,118,.1);padding:2px 8px;border-radius:3px">${p.posGroup.toUpperCase()}</span>`:'';
+            })()}
           </div>
-          <div class="cp-pos" style="font-size:13px;color:#878787">${p.pos} | ${p.team}</div>
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0">
+            ${(()=>{
+              const eaAge = getEAAge(p.name);
+              const age = eaAge || calcAge(p.birthDate);
+              const eaFoot = getEAFoot(p.name);
+              const foot = (eaFoot&&eaFoot!=='')?eaFoot:(p.foot!=='—'?p.foot:null);
+              const parts=[];
+              if(age&&age!=='—') parts.push(`<span style="font-family:var(--f);font-size:13px;font-weight:300;color:#fff">${age} yrs</span>`);
+              if(foot) parts.push(`<span style="font-family:var(--f);font-size:13px;font-weight:300;color:#fff">${foot} foot</span>`);
+              return parts.join('<span style="color:#fff;margin:0 4px;opacity:.5">·</span>');
+            })()}
+          </div>
+          ${(p.comp&&p.comp!=='—')||p.season?`<div style="font-size:13px;font-weight:300;color:#878787;margin-top:2px">${[p.comp,p.season].filter(v=>v&&v!=='—').join(' · ')}</div>`:''}
         </div>
         <div class="cp-ring">${ring(p.score,playerColor,120,10)}</div>
       </div>
@@ -34758,8 +35041,9 @@ function updateCompareBar(){
   const slots = document.getElementById('cmp-slots');
   const goBtn = document.getElementById('cmp-go-btn');
 
-  if(compareIds.length===0){ bar.classList.remove('show'); return; }
+  if(compareIds.length===0){ bar.classList.remove('show'); document.querySelector('.main').style.paddingBottom='0'; return; }
   bar.classList.add('show');
+  document.querySelector('.main').style.paddingBottom = (bar.offsetHeight || 72) + 'px';
 
   /* Build slots */
   let html = '';
@@ -34897,6 +35181,8 @@ function toggleComp(el){}
 function toggleSort(el){
   document.querySelectorAll('#fp-sort .fp-chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
+  const mainScroll = document.querySelector('.main');
+  if(mainScroll) mainScroll.scrollTop = 0;
   activeFilters.sortBy = el.dataset.sort;
   updateFilterCount();
 }
@@ -34991,6 +35277,7 @@ function renderTableHTML(players, opts={}){
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">xG</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">GOALS</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">PASS%</th>
+          <th style="padding:10px 12px"></th>
         </tr>
       </thead>
       <tbody>
@@ -35018,6 +35305,10 @@ function renderTableHTML(players, opts={}){
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-weight:700;color:#878787">${p.xG.toFixed(2)}</td>
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-weight:700;color:#878787">${p.goals}</td>
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-size:13px;color:#878787">${pct(p)}%</td>
+            <td style="padding:11px 12px;text-align:right;white-space:nowrap" onclick="event.stopPropagation()">
+              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" onmouseover="this.style.color='#fff';this.style.transform='scale(1.25)'" onmouseout="this.style.color='${favIds.includes(p.name)?'var(--g)':'#555'}';this.style.transform='scale(1)'" style="background:none;border:none;cursor:pointer;font-size:16px;color:${favIds.includes(p.name)?'var(--g)':'#555'};padding:0 6px;transition:color .15s,transform .15s;vertical-align:middle" title="Favourite">★</button>
+              <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" onmouseover="this.style.color='#fff';this.style.transform='scale(1.25)'" onmouseout="this.style.color='${compareIds.includes(p.name)?'var(--g)':'#555'}';this.style.transform='scale(1)'" style="background:none;border:none;cursor:pointer;padding:0 4px;color:${compareIds.includes(p.name)?'var(--g)':'#555'};transition:color .15s,transform .15s;font-size:16px;line-height:1;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'⊕'}</button>
+            </td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -35234,6 +35525,45 @@ function boot(){
   }
 }
 
+
+/* ════ FAVS FILTER ════ */
+let favsFilterPos  = 'all';
+let favsFilterSort = 'custom';
+
+function openFavsFilter(){ document.getElementById('favs-filter-overlay').classList.add('show'); }
+function closeFavsFilter(){ document.getElementById('favs-filter-overlay').classList.remove('show'); }
+
+function selectFavsPos(el){
+  document.querySelectorAll('#favs-fp-pos .fp-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  favsFilterPos = el.dataset.pos;
+}
+
+function selectFavsSort(el){
+  document.querySelectorAll('#favs-fp-sort .fp-chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  favsFilterSort = el.dataset.sort;
+}
+
+function applyFavsFilter(){
+  closeFavsFilter();
+  const active = favsFilterPos!=='all' || favsFilterSort!=='custom';
+  const btn = document.getElementById('favs-filter-btn');
+  if(btn){ btn.style.background=active?'var(--g)':''; btn.style.color=active?'#000':''; }
+  renderFavs();
+}
+
+function resetFavsFilter(){
+  favsFilterPos  = 'all';
+  favsFilterSort = 'custom';
+  document.querySelectorAll('#favs-fp-pos .fp-chip').forEach(c=>c.classList.toggle('on', c.dataset.pos==='all'));
+  document.querySelectorAll('#favs-fp-sort .fp-chip').forEach(c=>c.classList.toggle('on', c.dataset.sort==='custom'));
+  const btn = document.getElementById('favs-filter-btn');
+  if(btn){ btn.style.background=''; btn.style.color=''; }
+  closeFavsFilter();
+  renderFavs();
+}
+
 boot();
 </script>
 
@@ -35399,6 +35729,47 @@ boot();
     <div class="fp-footer">
       <button class="fp-reset" onclick="resetFilters()">RESET</button>
       <button class="fp-apply" onclick="applyFilters()">SHOW RESULTS</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAVS FILTER PANEL -->
+<div class="filter-overlay" id="favs-filter-overlay" onclick="if(event.target===this)closeFavsFilter()">
+  <div class="filter-panel" style="display:flex;flex-direction:column;height:100%">
+    <div class="fp-header">
+      <div class="fp-title">FILTER FAVOURITES</div>
+      <button class="fp-close" onclick="closeFavsFilter()">✕</button>
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:20px">
+
+      <div class="fp-section">
+        <div class="fp-section-label">POSITION</div>
+        <div class="fp-chips" id="favs-fp-pos">
+          <div class="fp-chip on" data-pos="all" onclick="selectFavsPos(this)">ALL</div>
+          <div class="fp-chip" data-pos="Forward" onclick="selectFavsPos(this)">FORWARD</div>
+          <div class="fp-chip" data-pos="Midfielder" onclick="selectFavsPos(this)">MIDFIELDER</div>
+          <div class="fp-chip" data-pos="Defender" onclick="selectFavsPos(this)">DEFENDER</div>
+          <div class="fp-chip" data-pos="Goalkeeper" onclick="selectFavsPos(this)">GOALKEEPER</div>
+        </div>
+      </div>
+
+      <div class="fp-section" style="margin-top:24px">
+        <div class="fp-section-label">SORT BY</div>
+        <div class="fp-chips" id="favs-fp-sort">
+          <div class="fp-chip on" data-sort="custom" onclick="selectFavsSort(this)">MY ORDER</div>
+          <div class="fp-chip" data-sort="score" onclick="selectFavsSort(this)">SCORE</div>
+          <div class="fp-chip" data-sort="xg" onclick="selectFavsSort(this)">xG</div>
+          <div class="fp-chip" data-sort="goals" onclick="selectFavsSort(this)">GOALS</div>
+          <div class="fp-chip" data-sort="shots" onclick="selectFavsSort(this)">SHOTS</div>
+          <div class="fp-chip" data-sort="pass" onclick="selectFavsSort(this)">PASS %</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="fp-footer">
+      <button class="fp-reset" onclick="resetFavsFilter()">RESET</button>
+      <button class="fp-apply" onclick="applyFavsFilter()">SHOW RESULTS</button>
     </div>
   </div>
 </div>

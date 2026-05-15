@@ -49,10 +49,17 @@
       if(!window.dataLoaded){ window.bootData?.(); }
       window.toast?.('Welcome back, ' + name + ' 👋');
     } else {
-      // Signed out
+      // Signed out — clear all app state
       window.currentUser = null;
       window.favIds = [];
+      window.compareIds = [];
+      window.dataLoaded = false;
+      if(window.allPlayers) Object.keys(window.allPlayers).forEach(k=>delete window.allPlayers[k]);
+      if(window.allMatches) Object.keys(window.allMatches).forEach(k=>delete window.allMatches[k]);
+      if(window.loadedComps) window.loadedComps.clear();
+      window.competitionsData = [];
       window.updateSidebarUser?.();
+      window.toast?.('Signed out');
       document.getElementById('auth-overlay').style.display = 'flex';
     }
   });
@@ -1433,19 +1440,9 @@ function continueAsGuest(){
 
 async function signOut(){
   try {
-    const { fbSignOut } = window._fbFns;
-    await fbSignOut(window._fbAuth);
-  } catch(_){}
-  currentUser=null;
-  favIds=[];
-  compareIds=[];
-  dataLoaded=false;
-  Object.keys(allPlayers).forEach(k=>delete allPlayers[k]);
-  Object.keys(allMatches).forEach(k=>delete allMatches[k]);
-  loadedComps.clear();
-  competitionsData=[];
-  updateSidebarUser();
-  toast('Signed out');
+    await window._fbAuth.signOut();
+  } catch(e){ console.warn('signOut error:', e); }
+  // onAuthStateChanged will handle clearing state and showing overlay
 }
 
 function handleUserAction(){

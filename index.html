@@ -268,7 +268,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-pos{display:none}
 .pd-sub{font-size:15px;font-weight:300;color:#fff;margin:7px 0 3px}
 .pd-team{font-size:13px;font-weight:300;color:#fff}
-.pd-star{background:none;border:none;color:#555;font-size:20px;cursor:pointer;margin-top:12px;padding:0;display:block;transition:color .15s;text-align:left;align-self:flex-start}
+.pd-star{background:none;border:none;color:#555;font-size:20px;cursor:pointer;margin-top:12px;padding:0;display:block;transition:color .15s,transform .15s;text-align:left;align-self:flex-start;transform-origin:left center;width:fit-content}
+.pd-star:hover{color:var(--g);transform:scale(1.25)}
 .pd-star.on{color:var(--g)}
 .pd-ring{padding:20px 22px;display:flex;align-items:center}
 .pd-stats{background:#1f1f1f;border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(6,1fr)}
@@ -306,6 +307,44 @@ table.ht tbody tr:hover{background:#232323}
 .fc:hover{border-color:#878787}
 .fc:active{cursor:grabbing}
 .fc.dragging{opacity:.45;transform:scale(.985)}
+
+/* League drag / drop indicator enhancements */
+.league-comp-card{position:relative}
+.league-dragging{opacity:.85;transform:scale(.998);z-index:8}
+
+/* base pseudo-element (hidden) */
+.league-comp-card::after{
+  content:"";
+  position:absolute;
+  top:6px;
+  bottom:6px;
+  width:10px;
+  pointer-events:none;
+  border-radius:6px;
+  box-shadow:0 0 18px rgba(255,255,255,.03);
+  transition:transform .18s cubic-bezier(.2,.9,.2,1), opacity .12s ease;
+  opacity:0;
+  transform:scaleX(0);
+  z-index:7;
+}
+
+/* visible states: scale horizontally from edge */
+.league-comp-card.league-drop-before::after{
+  left:-6px;
+  background:rgba(255,255,255,0.06);
+  transform-origin:left;
+  transform:scaleX(1);
+  opacity:1;
+}
+.league-comp-card.league-drop-after::after{
+  right:-6px;
+  background:rgba(255,255,255,0.06);
+  transform-origin:right;
+  transform:scaleX(1);
+  opacity:1;
+}
+
+
 .fc.drop-before{box-shadow:-3px 0 0 var(--g) inset}
 .fc.drop-after{box-shadow:3px 0 0 var(--g) inset}
 .fc-grab,.fr-grab{position:absolute;left:10px;top:10px;z-index:6;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(0,0,0,.25);color:#878787;font-size:15px;cursor:grab;user-select:none}
@@ -332,7 +371,7 @@ table.ht tbody tr:hover{background:#232323}
 .fav-row .fr-grab{position:static;margin:0 auto}
 .fr-name{display:flex;align-items:center;gap:10px}
 .fav-row .fr-name{display:flex;align-items:center;gap:10px}
-.fc-cmp-btn{width:100%;margin-top:8px;background:transparent;border:none;color:#878787;font-family:var(--f);font-size:15px;font-weight:700;padding:6px 0;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.4px}
+.fc-cmp-btn{background:none;border:none;color:#555;font-size:15px;cursor:pointer;padding:0;line-height:1;transition:color .15s;font-family:var(--f)}
 .fc-cmp-btn:hover{color:var(--g)}
 .fc-cmp-btn.selected{color:var(--g)}
 /* Whole card glows green when selected for compare */
@@ -362,9 +401,12 @@ table.ht tbody tr:hover{background:#232323}
 .cmp-clear{font-family:var(--f);font-size:13px;font-weight:700;color:#878787;background:none;border:none;cursor:pointer;padding:0 8px;white-space:nowrap}
 .cmp-clear:hover{color:#878787}
 /* player detail compare button */
-.pd-cmp-btn{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font-family:var(--f);font-size:14px;font-weight:300;letter-spacing:.4px;padding:4px 0;background:transparent;border:none;color:#fff;cursor:pointer;transition:all .15s}
-.pd-cmp-btn:hover{border-color:var(--g);color:var(--g)}
-.pd-cmp-btn.on{border-color:var(--g);color:var(--g);background:#1a2a1a}
+.pd-cmp-btn{display:inline-flex;align-items:center;gap:7px;margin-top:2px;margin-left:2px;font-family:var(--f);font-size:20px;font-weight:300;letter-spacing:.4px;padding:4px 0;background:transparent;border:none;color:#555;cursor:pointer;transition:color .15s,transform .15s;transform-origin:left center;width:fit-content;align-self:flex-start}
+.pd-cmp-btn:hover{color:var(--g);transform:scale(1.25)}
+.pd-cmp-btn.on{color:var(--g)}
+.icon-btn{background:none;border:none;cursor:pointer;padding:0;font-size:16px;line-height:1;transition:color .15s,transform .15s;vertical-align:middle;color:#555}
+.icon-btn:hover{color:var(--g);transform:scale(1.25)}
+.icon-btn.on{color:var(--g)}
 
 /* compare — wireframe exact match */
 .cp-sec{border-bottom:1px solid #1a1a1a}
@@ -758,10 +800,10 @@ table.ht tbody tr:hover{background:#232323}
     <div class="pdh-hdr">
       <div><div class="pdh-title">PLAYER HISTORY</div><div class="pdh-sub" id="pdh-sub">Match log</div></div>
       <div class="pdh-tabs">
-        <div class="pdh-tab on" onclick="switchTab('stats')">HISTORY</div>
-        <div class="pdh-tab" onclick="switchTab('pitch')">PITCH</div>
-        <div class="pdh-tab" onclick="switchTab('value')">STATS</div>
-        <div class="pdh-tab" onclick="switchTab('leagues')">LEAGUES</div>
+        <div class="pdh-tab on" data-tab="value" onclick="switchTab('value')">STATS</div>
+        <div class="pdh-tab" data-tab="pitch" onclick="switchTab('pitch')">PITCH</div>
+        <div class="pdh-tab" data-tab="stats" onclick="switchTab('stats')">HISTORY</div>
+        <div class="pdh-tab" data-tab="leagues" onclick="switchTab('leagues')">LEAGUES</div>
       </div>
     </div>
 
@@ -1392,6 +1434,7 @@ async function sbFetch(path){
 /* ════ STATE ════ */
 let allPlayers={},allMatches={},competitionsData=[];
 let loadedComps=new Set();
+let leagueCompareDrag = null;
 /* ════ AUTH SYSTEM (Firebase) ════ */
 let currentUser = null; // { uid, email, name, initials }
 
@@ -33320,14 +33363,16 @@ function eaBadge(name, style=''){
 }
 
 function ring(score,color,sz=120,sw=10){
-  const r=44,circ=2*Math.PI*r,dash=(score/100)*circ;
+  const r=44, circ=2*Math.PI*r, dash=(score/100)*circ;
+  // render progress circle with data attrs so we can animate from 0 -> dash after insertion
   return `<div class="rw" style="width:${sz}px;height:${sz}px">
     <svg viewBox="0 0 100 100" width="${sz}" height="${sz}">
       <circle cx="50" cy="50" r="${r}" fill="none" stroke="#333" stroke-width="${sw}"/>
-      <circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
-        stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+      <circle class="ring-progress" cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}"
+        data-dash-target="${dash.toFixed(1)}" data-circ="${circ.toFixed(1)}"
+        stroke-dasharray="0 ${circ.toFixed(1)}" stroke-linecap="round"/>
     </svg>
-    <div class="rl" style="color:${color};font-size:${Math.round(sz*.45)}px">${score}</div>
+    <div class="rl" style="color:${color};font-size:${Math.round(sz*.45)}px">0</div>
   </div>`;
 }
 function toast(msg,ms=2500){const el=document.getElementById('toast');el.textContent=msg;el.style.display='block';clearTimeout(el._t);el._t=setTimeout(()=>el.style.display='none',ms);}
@@ -33410,6 +33455,7 @@ function go(id, addToStack=true){
       if(navStack.length > 20) navStack.shift(); // cap stack size
     }
   }
+  if(typeof updateCompareBar === 'function') updateCompareBar();
   closeSidebar();
 }
 
@@ -33435,10 +33481,18 @@ function closeSidebar(){
 let currentPlayerForPitch = null;
 
 function switchTab(name){
+  // Prevent selecting the pitch tab for goalkeepers (defensive guard)
+  if(name === 'pitch' && currentPlayerForPitch){
+    const pt = [currentPlayerForPitch.posGroup, currentPlayerForPitch.posFull, currentPlayerForPitch.pos].filter(Boolean).join(' ').toLowerCase();
+    const curIsGK = /\bgk\b/.test(pt) || pt.includes('goalkeeper') || pt.includes('keeper');
+    if(curIsGK){
+      // fallback to value (STATS)
+      name = 'value';
+    }
+  }
   /* Update tab highlighting */
   const tabs = document.querySelectorAll('.pdh-tab');
-  const names = ['stats','pitch','value','leagues'];
-  tabs.forEach((t,i)=>t.classList.toggle('on', names[i]===name));
+  tabs.forEach(t=>t.classList.toggle('on', t.dataset.tab===name));
 
   /* Show/hide panels */
   ['stats','pitch','value','leagues'].forEach(n=>{
@@ -33706,20 +33760,31 @@ function renderValue(){
           return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:14px">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
               <div>
-                <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1px;color:#878787;margin-bottom:2px">${abbr}</div>
                 <div style="font-family:var(--f);font-size:13px;font-weight:700;color:#fff">${label}</div>
                 <div style="font-size:13px;color:#878787;margin-top:2px">${desc}</div>
               </div>
               <div style="font-family:var(--f);font-size:32px;font-weight:900;color:${color};line-height:1">${val}</div>
             </div>
             <div style="height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden">
-              <div style="height:100%;width:${pct}%;background:${color};border-radius:2px;transition:width .6s ease"></div>
+              <div class="value-bar-inner" data-pct="${pct}" style="height:100%;width:0;background:${color};border-radius:2px;transition:width .6s ease"></div>
             </div>
           </div>`;
         }).join('')}
       </div>
     </div>`;
+  // Trigger animations for value and league bars after render
+  setTimeout(() => {
+    const inners = document.querySelectorAll('#value-content .value-bar-inner, #leagues-content .score-bar-inner, #leagues-content .comp-bar-inner');
+    inners.forEach((el, i) => {
+      const pct = el.dataset.pct || '0';
+      const delay = i * 80; // stagger 80ms between bars
+      setTimeout(() => {
+        requestAnimationFrame(() => { el.style.width = pct + '%'; });
+      }, delay);
+    });
+  }, 30);
 }
+
 
 function valueCard(title, val, desc, color){
   return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:14px">
@@ -33735,9 +33800,71 @@ function scoreBar(label, pct, color){
       <span style="font-family:var(--f);font-size:13px;color:${color}">${Math.round(pct)}%</span>
     </div>
     <div style="height:5px;background:#2a2a2a;border-radius:3px;overflow:hidden">
-      <div style="height:100%;width:${pct}%;background:${color};border-radius:3px;transition:width .6s ease"></div>
+        <div class="score-bar-inner" data-pct="${pct}" style="height:100%;width:0;background:${color};border-radius:3px;transition:width .6s ease"></div>
     </div>
   </div>`;
+}
+
+function startLeagueDrag(ev, playerName, compKey){
+  leagueCompareDrag = { playerName, compKey };
+  ev.dataTransfer.effectAllowed = 'move';
+  ev.dataTransfer.setData('text/plain', compKey);
+}
+
+function allowLeagueDrop(ev, playerName, compKey){
+  if(!leagueCompareDrag || leagueCompareDrag.playerName !== playerName) return;
+  ev.preventDefault();
+  ev.dataTransfer.dropEffect = 'move';
+  const header = ev.currentTarget;
+  if(!header) return;
+  const rect = header.getBoundingClientRect();
+  const placeAfter = ev.clientX > rect.left + rect.width / 2;
+  header.classList.toggle('league-drop-before', !placeAfter);
+  header.classList.toggle('league-drop-after', placeAfter);
+}
+
+function clearLeagueDropState(){
+  document.querySelectorAll('.league-comp-card').forEach(card => {
+    card.classList.remove('league-dragging','league-drop-before','league-drop-after');
+  });
+}
+
+function dropLeagueCard(ev, playerName, compKey){
+  ev.preventDefault();
+  ev.stopPropagation();
+  if(!leagueCompareDrag || leagueCompareDrag.playerName !== playerName) return;
+
+  const p = currentPlayerForPitch;
+  if(!p) return;
+
+  const order = Array.isArray(p.leagueCompareOrder) ? [...p.leagueCompareOrder] : [];
+  const fromKey = leagueCompareDrag.compKey;
+  const fromIdx = order.indexOf(fromKey);
+  const toIdx = order.indexOf(compKey);
+  if(fromIdx < 0 || toIdx < 0 || fromKey === compKey){
+    leagueCompareDrag = null;
+    clearLeagueDropState();
+    return;
+  }
+
+  const rect = ev.currentTarget.getBoundingClientRect();
+  const placeAfter = ev.clientX > rect.left + rect.width / 2;
+  order.splice(fromIdx, 1);
+  let insertAt = placeAfter ? toIdx + 1 : toIdx;
+  if(fromIdx < toIdx) insertAt -= 1;
+  if(insertAt < 0) insertAt = 0;
+  if(insertAt > order.length) insertAt = order.length;
+  order.splice(insertAt, 0, fromKey);
+  p.leagueCompareOrder = order;
+
+  leagueCompareDrag = null;
+  clearLeagueDropState();
+  renderLeagues();
+}
+
+function endLeagueDrag(){
+  leagueCompareDrag = null;
+  clearLeagueDropState();
 }
 
 function renderLeagues(){
@@ -33769,10 +33896,20 @@ function renderLeagues(){
   }
 
   const comps = Object.values(compMap).sort((a,b) => b.mins - a.mins);
+  const compOrder = Array.isArray(p.leagueCompareOrder) && p.leagueCompareOrder.length
+    ? p.leagueCompareOrder
+    : comps.map(c => c.key);
+  const orderedComps = [...comps].sort((a,b) => {
+    const ai = compOrder.indexOf(a.key);
+    const bi = compOrder.indexOf(b.key);
+    if(ai !== -1 || bi !== -1) return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+    return b.mins - a.mins;
+  });
+  p.leagueCompareOrder = orderedComps.map(c => c.key);
 
-  if(comps.length < 2){
+  if(orderedComps.length < 2){
     el.innerHTML = `<div style="padding:40px;text-align:center;color:#878787;font-family:var(--f);font-size:13px">
-      ${comps.length === 0 ? 'No match data available.' : 'This player only appears in one competition — nothing to compare.'}
+      ${orderedComps.length === 0 ? 'No match data available.' : 'This player only appears in one competition — nothing to compare.'}
     </div>`;
     return;
   }
@@ -33783,8 +33920,8 @@ function renderLeagues(){
     for(let i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i);
     return Math.abs(hash) % 360;
   };
-  const colorForComp = (key, i) => {
-    const hue = (hueFromKey(key) + i * 17) % 360;
+  const colorForComp = key => {
+    const hue = hueFromKey(key) % 360;
     return `hsl(${hue} 78% 58%)`;
   };
 
@@ -33807,12 +33944,18 @@ function renderLeagues(){
     <div style="overflow-x:auto;padding-bottom:16px">
 
       <!-- Competition headers -->
-      <div style="display:grid;grid-template-columns:120px ${comps.map(()=>'1fr').join(' ')};gap:10px;margin-bottom:10px">
+      <div style="display:grid;grid-template-columns:120px ${orderedComps.map(()=>'1fr').join(' ')};gap:10px;margin-bottom:10px">
         <div></div>
-        ${comps.map((c,i) => {
-          const col = colorForComp(c.key, i);
+        ${orderedComps.map((c) => {
+          const col = colorForComp(c.key);
           return `
-          <div style="background:${col}18;border-top:3px solid ${col};border-radius:6px 6px 0 0;padding:14px 12px;text-align:center">
+          <div class="league-comp-card" draggable="true"
+            ondragstart="startLeagueDrag(event,'${esc(p.name)}','${esc(c.key)}')"
+            ondragover="allowLeagueDrop(event,'${esc(p.name)}','${esc(c.key)}')"
+            ondrop="dropLeagueCard(event,'${esc(p.name)}','${esc(c.key)}')"
+            ondragend="endLeagueDrag()"
+            style="background:${col}18;border-top:3px solid ${col};border-radius:6px 6px 0 0;padding:14px 12px;text-align:center;cursor:grab;user-select:none;transition:transform .15s,box-shadow .15s,border-color .15s">
+            <div style="font-family:var(--f);font-size:11px;font-weight:800;color:#878787;letter-spacing:1.2px;margin-bottom:6px">DRAG TO REORDER</div>
             <div style="font-family:var(--f);font-size:13px;font-weight:800;color:${col};letter-spacing:.5px;margin-bottom:2px">${c.comp}</div>
             <div style="font-size:13px;color:#878787">${c.season}</div>
             <div style="font-size:13px;color:#878787;margin-top:4px">${c.matches} match${c.matches!==1?'es':''}</div>
@@ -33822,20 +33965,20 @@ function renderLeagues(){
 
       <!-- Stat rows -->
       ${statDefs.map(({label, fn}) => {
-        const vals = comps.map(c => fn(c));
+        const vals = orderedComps.map(c => fn(c));
         const nums = vals.map(v => numVal(v));
         const maxVal = Math.max(...nums, 0.001);
         return `
-          <div style="display:grid;grid-template-columns:120px ${comps.map(()=>'1fr').join(' ')};gap:10px;margin-bottom:10px">
+          <div style="display:grid;grid-template-columns:120px ${orderedComps.map(()=>'1fr').join(' ')};gap:10px;margin-bottom:10px">
             <div style="display:flex;align-items:center;padding:10px 12px;background:#1a1a1a;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.5px;color:#878787">${label}</div>
-            ${comps.map((c,i) => {
+            ${orderedComps.map((c, i) => {
               const val = vals[i];
               const num = nums[i];
               const barW = maxVal > 0 ? Math.round((num/maxVal)*100) : 0;
               const isBest = num === Math.max(...nums) && num > 0;
-              const col = colorForComp(c.key, i);
+              const col = colorForComp(c.key);
               return `<div style="background:#161616;padding:10px 12px;text-align:center;position:relative;overflow:hidden">
-                <div style="position:absolute;bottom:0;left:0;height:3px;width:${barW}%;background:${col};opacity:0.5;transition:width .4s"></div>
+                <div class="comp-bar-inner" data-pct="${barW}" style="position:absolute;bottom:0;left:0;height:3px;width:0;background:${col};opacity:0.5;transition:width .4s"></div>
                 <span style="font-family:var(--f);font-size:15px;font-weight:${isBest?800:400};color:${isBest?col:'#ccc'}">${val}</span>
               </div>`;
             }).join('')}
@@ -34350,8 +34493,11 @@ function viewP(name){
   const p=allPlayers[name];if(!p){toast('Player not found');return;}
   
   const isFav=favIds.includes(name);
+  // robust GK detection across posGroup/posFull/pos values (e.g., 'GK', 'Goalkeeper', 'Goal Keeper')
+  const posText = [p.posGroup, p.posFull, p.pos].filter(Boolean).join(' ').toLowerCase();
+  const isGK = /\bgk\b/.test(posText) || posText.includes('goalkeeper') || posText.includes('keeper');
+  console.debug && console.debug('viewP', name, {posText, isGK});
   currentPlayerForPitch = p;
-  switchTab('stats');
   addToRecentlyViewed(name); // track view
   /* Load Wikipedia headshot into profile hero */
   getPlayerImg(p.name).then(url=>{
@@ -34380,10 +34526,10 @@ function viewP(name){
           const eaPos = getEAPositions(name);
           if(eaPos){
             return eaPos.split(',').map(pos => pos.trim()).map((pos,i) =>
-              `<span style="color:${i===0?'var(--g)':'#aaa'};font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:${i===0?'rgba(0,230,118,.1)':'rgba(255,255,255,.05)'};padding:2px 8px;border-radius:3px">${pos}</span>`
+              `<span style="color:#aaa;font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:3px">${pos}</span>`
             ).join('');
           }
-          return `<span style="color:var(--g);font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:rgba(0,230,118,.1);padding:2px 8px;border-radius:3px">${p.posGroup&&p.posGroup!=='—'?p.posGroup.toUpperCase():'—'}</span>
+          return `<span style="color:#aaa;font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:3px">${p.posGroup&&p.posGroup!=='—'?p.posGroup.toUpperCase():'—'}</span>
           <span style="color:#878787;font-size:13px">${p.posFull&&p.posFull!=='—'?p.posFull:''}</span>`;
         })()}
       </div>
@@ -34402,8 +34548,7 @@ function viewP(name){
       <div class="pd-team">${p.comp} · ${p.season}</div>
       <button class="pd-star ${isFav?'on':''}" onclick="toggleFav('${esc(name)}',this)">★</button>
       <button class="pd-cmp-btn ${compareIds.includes(name)?'on':''}" id="pd-cmp-btn" onclick="toggleCompare('${esc(name)}',this)">
-        <span style="font-size:20px;font-weight:300;opacity:.9">${compareIds.includes(name)?'✓':'⊕'}</span>
-        ${compareIds.includes(name)?'ADDED TO COMPARE':'ADD TO COMPARE'}
+        ${compareIds.includes(name)?'✓':'⊕'}
       </button>
     </div>
     <div class="pd-ring" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 22px">
@@ -34420,6 +34565,29 @@ function viewP(name){
     ['Pass Acc.',     pct(p)+'%'],
     ['Minutes',       Math.round(p.mins)],
   ].map(([n,v])=>`<div class="pds"><span class="pds-val">${v}</span><div class="pds-name">${n}</div></div>`).join('');
+  const tabsContainer = document.querySelector('.pdh-tabs');
+  let pitchTabBtn = tabsContainer && tabsContainer.querySelector('.pdh-tab[data-tab="pitch"]');
+  if(isGK){
+    // remove pitch tab entirely for goalkeepers (run before switching tabs)
+    if(pitchTabBtn) pitchTabBtn.remove();
+  } else {
+    // ensure pitch tab exists for non-goalkeepers
+    if(!pitchTabBtn && tabsContainer){
+      const ref = tabsContainer.querySelector('.pdh-tab[data-tab="value"]');
+      const btn = document.createElement('div');
+      btn.className = 'pdh-tab';
+      btn.dataset.tab = 'pitch';
+      btn.setAttribute('onclick', "switchTab('pitch')");
+      btn.textContent = 'PITCH';
+      if(ref && ref.nextSibling) tabsContainer.insertBefore(btn, ref.nextSibling);
+      else tabsContainer.appendChild(btn);
+      pitchTabBtn = btn;
+    }
+    if(pitchTabBtn) pitchTabBtn.style.display = '';
+  }
+
+  // Now switch to the default tab (STATS) after tabs have been adjusted for GK
+  switchTab('value');
   const rows=p.matchLog.slice().reverse().slice(0,20);
   document.getElementById('pd-hist-body').innerHTML=rows.length
     ?rows.map(m=>{
@@ -34438,6 +34606,42 @@ function viewP(name){
       </tr>`;}).join('')
     :'<tr><td colspan="13" style="text-align:center;color:#878787;padding:20px">No match data</td></tr>';
   go('player');
+  // Animate circular rings (arc + numeric count)
+  try{
+    const rwContainer = document.querySelector('#pd-hero');
+    if(rwContainer){
+      const rings = rwContainer.querySelectorAll('.ring-progress');
+      rings.forEach(circle => {
+        const target = parseFloat(circle.dataset.dashTarget) || 0;
+        const circ = parseFloat(circle.dataset.circ) || 1;
+        // trigger transition
+        circle.style.transition = 'stroke-dasharray 800ms cubic-bezier(.22,.9,.28,1)';
+        // force layout then set to target
+        circle.getBoundingClientRect();
+        circle.setAttribute('stroke-dasharray', `${target} ${circ}`);
+      });
+      // numeric counter
+      const labels = rwContainer.querySelectorAll('.rl');
+      labels.forEach(label => {
+        const parent = label.closest('.rw');
+        if(!parent) return;
+        const prog = parent.querySelector('.ring-progress');
+        const targetDash = prog ? parseFloat(prog.dataset.dashTarget) : 0;
+        const circ = prog ? parseFloat(prog.dataset.circ) : 1;
+        const pct = circ>0 ? Math.round((targetDash / circ) * 100) : 0;
+        const start = 0; const end = pct; const duration = 800;
+        let startTime = null;
+        function step(ts){
+          if(!startTime) startTime = ts;
+          const t = Math.min(1, (ts - startTime)/duration);
+          const val = Math.round(start + (end - start) * t);
+          label.textContent = val;
+          if(t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }
+  }catch(e){console.warn('ring animation error',e)}
 }
 
 /* ════ FAVS ════ */
@@ -34572,16 +34776,17 @@ function fcHtml(p){
     }
   },100);
 
-  return `<div class="fc${isCmp?' cmp-selected':''}" data-fav-name="${esc(p.name)}" draggable="true" ondragstart="startFavDrag(event,this,'${esc(p.name)}')" ondragover="allowFavDrop(event,this)" ondrop="dropFavCard(event,this,'${esc(p.name)}')" ondragend="endFavDrag()" onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
-    <div class="fc-top" style="cursor:pointer;position:relative;height:210px;background:#272727;display:flex;align-items:center;justify-content:center;overflow:hidden;width:100%">
+  return `<div class="fc feat${isCmp?' cmp-selected':''}" data-fav-name="${esc(p.name)}" draggable="true" ondragstart="startFavDrag(event,this,'${esc(p.name)}')" ondragover="allowFavDrop(event,this)" ondrop="dropFavCard(event,this,'${esc(p.name)}')" ondragend="endFavDrag()" onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
+    <div class="feat-img" style="cursor:pointer;position:relative;height:210px;background:#272727;display:flex;align-items:center;justify-content:center;overflow:hidden;width:100%">
       <div id="fc-crest-${safeId}" style="width:170px;height:170px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);background-color:#4a4a4a;flex-shrink:0;position:relative;overflow:hidden;background-image:url('${imgSrc}');background-size:120%;background-position:${PLAYER_IMG_POSITION[p.name]||'center top'};opacity:${imgOpacity}"></div>
-      <span style="color:${isFav?'var(--g)':'#555'};position:absolute;top:8px;left:10px;z-index:5;font-size:15px;cursor:pointer;background:none;border:none;font-family:var(--f)" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
-      <span style="color:${p.rc};position:absolute;top:4px;right:4px;z-index:5;font-family:var(--f);font-size:32px;font-weight:800">${p.score}</span>
+      <span class="feat-star" style="position:absolute;top:8px;left:10px;z-index:5;font-size:18px;cursor:pointer" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
+      <button class="icon-btn fc-cmp-btn${isCmp?' selected on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:10px;z-index:5;font-size:15px">${isCmp?'✓':'⊕'}</button>
+      <span class="feat-score" style="color:${p.rc};position:absolute;top:6px;right:8px;z-index:5;font-family:var(--f);font-size:32px;font-weight:800">${p.score}</span>
+      <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
     </div>
-    <div class="fc-body">
-      <div class="fc-name">${p.name}</div>
-      <div class="fc-club">${p.team}</div>
-      <div class="fc-stats">
+    <div class="feat-body">
+      <div class="feat-name">${p.name}</div>
+      <div class="feat-stats">
         ${(()=>{
           const eaInfo = getEAInfo(p.name);
           const eaPos = (eaInfo&&eaInfo.pos) ? eaInfo.pos : (getEAPositions(p.name)||'');
@@ -34590,15 +34795,12 @@ function fcHtml(p){
           const isGK  = /goalkeeper|keeper|\bgk\b/i.test(pos);
           const passAcc = p.passAtt>0?Math.round((p.passComp/p.passAtt)*100):0;
           if(isDef||isGK){
-            return `<span>Pass: ${passAcc}%</span><span>Aerials: <span class="hi">${p.aerialWon||0}</span></span><span>Key Pass: ${p.keyPasses}</span>`;
+            return `<div style="display:flex;gap:12px"><span>Pass: ${passAcc}%</span><span>Aerials: <span class="hi">${p.aerialWon||0}</span></span><span>Key Pass: ${p.keyPasses}</span></div>`;
           }
-          return `<span>xG: ${p.xG.toFixed(2)}</span><span>Shots: <span class="${p.rc==='#e05a2b'?'hio':'hi'}">${p.shots}</span></span><span>Goals: ${p.goals}</span>`;
+          return `<div style="display:flex;gap:12px"><span>xG: ${p.xG.toFixed(2)}</span><span>Shots: <span class="${p.rc==='#e05a2b'?'hio':'hi'}">${p.shots}</span></span><span>Goals: ${p.goals}</span></div>`;
         })()}
       </div>
-      <button class="fc-btn" onclick="event.stopPropagation();viewP('${esc(p.name)}')">VIEW MORE</button>
-      <button class="fc-cmp-btn${isCmp?' selected':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)">
-        <span style="font-size:18px">${isCmp?'✓':'⊕'}</span> ${isCmp?'SELECTED':'ADD TO COMPARE'}
-      </button>
+      <button class="btn-vm" onclick="event.stopPropagation();viewP('${esc(p.name)}')">VIEW MORE</button>
     </div>
   </div>`;
 }
@@ -34615,7 +34817,11 @@ function toggleFavFC(name,el){
 function toggleFavList(name){
   if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; return; }
   favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];
-  toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
+  const on = favIds.includes(name);
+  toast(on?'Added to favourites ★':'Removed from favourites');
+  document.querySelectorAll('.icon-btn[data-fav="'+name.replace(/"/g,'&quot;')+'"]').forEach(b=>{
+    b.classList.toggle('on', on);
+  });
   saveFavs();
   renderFavs();
 }
@@ -34727,7 +34933,7 @@ function renderCompare(){
   if(players.length<2){
     document.getElementById('cp-body').innerHTML=`<div style="padding:48px 24px;text-align:center">
       <div style="font-family:var(--f);font-size:18px;font-weight:800;color:#fff;margin-bottom:8px">Select players to compare</div>
-      <div style="font-size:13px;color:#878787;margin-bottom:20px">Tap <strong style="color:#fff">⊕ ADD TO COMPARE</strong> on any player card.</div>
+      <div style="font-size:13px;color:#878787;margin-bottom:20px">Tap <strong style="color:#fff">⊕</strong> on any player card.</div>
       <button onclick="go('home')" style="font-family:var(--f);font-size:13px;font-weight:800;padding:10px 22px;background:transparent;border:1.5px solid #555;color:#878787;border-radius:5px;cursor:pointer">BROWSE PLAYERS</button>
     </div>`;
     return;
@@ -34787,10 +34993,10 @@ function renderCompare(){
               const eaPos = getEAPositions(p.name);
               if(eaPos){
                 return eaPos.split(',').map(pos=>pos.trim()).map((pos,i)=>
-                  `<span style="color:${i===0?'var(--g)':'#aaa'};font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:${i===0?'rgba(0,230,118,.1)':'rgba(255,255,255,.05)'};padding:2px 8px;border-radius:3px">${pos}</span>`
+                  `<span style="color:#aaa;font-family:var(--f);font-weight:300;font-size:13px;letter-spacing:.5px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:3px">${pos}</span>`
                 ).join('');
               }
-              return p.posGroup&&p.posGroup!=='—'?`<span style="color:var(--g);font-family:var(--f);font-weight:300;font-size:13px;background:rgba(0,230,118,.1);padding:2px 8px;border-radius:3px">${p.posGroup.toUpperCase()}</span>`:'';
+              return p.posGroup&&p.posGroup!=='—'?`<span style="color:#aaa;font-family:var(--f);font-weight:300;font-size:13px;background:rgba(255,255,255,.05);padding:2px 8px;border-radius:3px">${p.posGroup.toUpperCase()}</span>`:'';
             })()}
           </div>
           <div style="display:flex;gap:8px;align-items:center;margin:4px 0">
@@ -34812,6 +35018,42 @@ function renderCompare(){
       <div class="cp-sbar" style="background:${sbarBg}">${statsHtml}</div>
     </div>`;
   }).join('');
+
+  // Animate compare-page rings to the actual player score values
+  setTimeout(() => {
+    const root = document.getElementById('cp-body');
+    if(!root) return;
+
+    const rings = root.querySelectorAll('.ring-progress');
+    rings.forEach(circle => {
+      const target = parseFloat(circle.dataset.dashTarget) || 0;
+      const circ = parseFloat(circle.dataset.circ) || 1;
+      circle.style.transition = 'stroke-dasharray 800ms cubic-bezier(.22,.9,.28,1)';
+      circle.getBoundingClientRect();
+      circle.setAttribute('stroke-dasharray', `${target} ${circ}`);
+    });
+
+    const labels = root.querySelectorAll('.rl');
+    labels.forEach(label => {
+      const parent = label.closest('.rw');
+      if(!parent) return;
+      const prog = parent.querySelector('.ring-progress');
+      const targetDash = prog ? parseFloat(prog.dataset.dashTarget) : 0;
+      const circ = prog ? parseFloat(prog.dataset.circ) : 1;
+      const pct = circ > 0 ? Math.round((targetDash / circ) * 100) : 0;
+      const start = 0;
+      const end = pct;
+      const duration = 800;
+      let startTime = null;
+      function step(ts){
+        if(!startTime) startTime = ts;
+        const t = Math.min(1, (ts - startTime) / duration);
+        label.textContent = Math.round(start + (end - start) * t);
+        if(t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }, 30);
 
 }
 
@@ -35078,22 +35320,26 @@ function toggleCompare(name, btn){
   }
   updateCompareBar();
   updateCompareBtn();
-  /* Update card button + highlight whole card */
+  const sel = compareIds.includes(name);
+  /* Update fc card button */
   const safeId = name.replace(/[^a-z0-9]/gi,'_');
   const cardBtn = document.getElementById('cmpbtn-'+safeId);
   const card = cardBtn?.closest('.fc');
   if(cardBtn){
-    const sel = compareIds.includes(name);
-    cardBtn.className = 'fc-cmp-btn'+(sel?' selected':'');
-    cardBtn.innerHTML = `<span style="font-size:18px">${sel?'✓':'⊕'}</span> ${sel?'SELECTED':'ADD TO COMPARE'}`;
+    cardBtn.className = 'icon-btn fc-cmp-btn'+(sel?' selected on':'');
+    cardBtn.innerHTML = sel?'✓':'⊕';
     if(card) card.classList.toggle('cmp-selected', sel);
   }
+  /* Update table row button(s) — may be multiple views */
+  document.querySelectorAll('.icon-btn[data-cmp="'+name.replace(/"/g,'&quot;')+'"]').forEach(b=>{
+    b.className = 'icon-btn'+(sel?' on':'');
+    b.innerHTML = sel?'✓':'⊕';
+  });
   /* Update detail page button if visible */
   const pdBtn = document.getElementById('pd-cmp-btn');
   if(pdBtn){
-    const sel = compareIds.includes(name);
     pdBtn.className = 'pd-cmp-btn'+(sel?' on':'');
-    pdBtn.innerHTML = `<span style="font-size:14px">${sel?'✓':'⊕'}</span> ${sel?'ADDED TO COMPARE':'ADD TO COMPARE'}`;
+    pdBtn.innerHTML = sel?'✓':'⊕';
   }
 }
 
@@ -35101,8 +35347,9 @@ function updateCompareBar(){
   const bar = document.getElementById('cmp-bar');
   const slots = document.getElementById('cmp-slots');
   const goBtn = document.getElementById('cmp-go-btn');
+  const onComparePage = document.getElementById('pg-compare')?.classList.contains('on');
 
-  if(compareIds.length===0){ bar.classList.remove('show'); document.querySelector('.main').style.paddingBottom='0'; return; }
+  if(compareIds.length===0 || onComparePage){ bar.classList.remove('show'); document.querySelector('.main').style.paddingBottom='0'; return; }
   bar.classList.add('show');
   document.querySelector('.main').style.paddingBottom = (bar.offsetHeight || 72) + 'px';
 
@@ -35154,12 +35401,12 @@ function clearCompare(){
   });
   document.querySelectorAll('.fc-cmp-btn').forEach(btn=>{
     btn.className='fc-cmp-btn';
-    btn.innerHTML='<span style="font-size:18px">⊕</span> ADD TO COMPARE';
+    btn.innerHTML='⊕';
   });
   const pdBtn=document.getElementById('pd-cmp-btn');
   if(pdBtn){
     pdBtn.className='pd-cmp-btn';
-    pdBtn.innerHTML='<span style="font-size:14px">⊕</span> ADD TO COMPARE';
+    pdBtn.innerHTML='⊕';
   }
   toast('Comparison cleared');
 }
@@ -35330,6 +35577,7 @@ function renderTableHTML(players, opts={}){
       <thead>
         <tr style="border-bottom:2px solid #2a2a2a;text-align:left">
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;width:36px">#</th>
+          <th style="padding:10px 8px;width:44px"></th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787">PLAYER</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787">TEAM</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787">POS</th>
@@ -35338,7 +35586,6 @@ function renderTableHTML(players, opts={}){
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">xG</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">GOALS</th>
           <th style="padding:10px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;text-align:right">PASS%</th>
-          <th style="padding:10px 12px"></th>
         </tr>
       </thead>
       <tbody>
@@ -35351,6 +35598,10 @@ function renderTableHTML(players, opts={}){
             onmouseout="this.style.background='${rowBg}'"
             onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
             <td style="padding:11px 8px;font-family:var(--f);font-weight:800;font-size:13px;color:${rankColor};width:36px">${i+1}</td>
+            <td style="padding:11px 8px;white-space:nowrap;pointer-events:none" onclick="event.stopPropagation()">
+              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:8px;pointer-events:auto;font-size:18px;vertical-align:middle" title="Favourite">★</button>
+              <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" class="icon-btn${compareIds.includes(p.name)?' on':''}" data-cmp="${esc(p.name)}" style="pointer-events:auto;font-size:18px;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'⊕'}</button>
+            </td>
             <td style="padding:11px 8px">
               <div class="fr-name">
                 <div style="width:32px;height:32px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#222;background-image:url('${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}');background-size:120%;background-position:center top"></div>
@@ -35366,10 +35617,6 @@ function renderTableHTML(players, opts={}){
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-weight:700;color:#878787">${p.xG.toFixed(2)}</td>
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-weight:700;color:#878787">${p.goals}</td>
             <td style="padding:11px 8px;text-align:right;font-family:var(--f);font-size:13px;color:#878787">${pct(p)}%</td>
-            <td style="padding:11px 12px;text-align:right;white-space:nowrap" onclick="event.stopPropagation()">
-              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" onmouseover="this.style.color='#fff';this.style.transform='scale(1.25)'" onmouseout="this.style.color='${favIds.includes(p.name)?'var(--g)':'#555'}';this.style.transform='scale(1)'" style="background:none;border:none;cursor:pointer;font-size:16px;color:${favIds.includes(p.name)?'var(--g)':'#555'};padding:0 6px;transition:color .15s,transform .15s;vertical-align:middle" title="Favourite">★</button>
-              <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" onmouseover="this.style.color='#fff';this.style.transform='scale(1.25)'" onmouseout="this.style.color='${compareIds.includes(p.name)?'var(--g)':'#555'}';this.style.transform='scale(1)'" style="background:none;border:none;cursor:pointer;padding:0 4px;color:${compareIds.includes(p.name)?'var(--g)':'#555'};transition:color .15s,transform .15s;font-size:16px;line-height:1;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'⊕'}</button>
-            </td>
           </tr>`;
         }).join('')}
       </tbody>

@@ -34,14 +34,21 @@
   };
 
   window.firebaseSignUp = async (email, pass, name) => {
+    console.log('[Firebase] Starting signup with email:', email);
+    console.log('[Firebase] Auth object:', auth);
+    console.log('[Firebase] Creating user...');
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    console.log('[Firebase] User created:', cred.user.uid);
+    console.log('[Firebase] Updating profile...');
     await updateProfile(cred.user, { displayName: name });
+    console.log('[Firebase] Profile updated, creating user doc...');
     await setDoc(doc(db, 'users', cred.user.uid), { name, email, favs: [], createdAt: Date.now() });
+    console.log('[Firebase] User doc created successfully');
     return cred;
   };
 
   window.firebaseSignOut = async () => {
-    await signOut(auth);
+    await fbSignOut(auth);
   };
 
   window.firebaseLoadFavs = async (uid) => {
@@ -203,7 +210,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
   z-index:1;
 }
 .feat-init{display:none!important}
-.feat-star{position:absolute;top:10px;left:12px;color:#878787;font-size:18px;z-index:4;line-height:1;cursor:pointer;transition:color .15s,transform .15s}
+.feat-star{position:absolute;top:10px;left:12px;color:#fff;font-size:18px;z-index:4;line-height:1;cursor:pointer;transition:color .15s,transform .15s}
 .feat-star:hover{color:#fff;transform:scale(1.2)}
 .feat-plus{position:absolute;top:33px;left:12px;color:#878787;font-size:22px;z-index:4;line-height:1}
 .feat-score{position:absolute;top:10px;right:12px;font-family:var(--f);font-size:40px;font-weight:800;color:var(--g);z-index:4}
@@ -304,6 +311,7 @@ table.ht tbody tr:hover{background:#232323}
 .favs-vbtn.on{background:#2a2a2a;color:#fff}
 .favs-vbtn:hover:not(.on){color:#878787}
 .fc{background:#272727;border:1px solid #363636;border-radius:7px;overflow:hidden;cursor:grab;transition:border-color .2s;display:flex;flex-direction:column;width:100%;min-width:0;position:relative}
+.fc.feat{background:#5A5A5A;border:3px solid #3a3a3a}
 .fc:hover{border-color:#878787}
 .fc:active{cursor:grabbing}
 .fc.dragging{opacity:.45;transform:scale(.985)}
@@ -371,7 +379,7 @@ table.ht tbody tr:hover{background:#232323}
 .fav-row .fr-grab{position:static;margin:0 auto}
 .fr-name{display:flex;align-items:center;gap:10px}
 .fav-row .fr-name{display:flex;align-items:center;gap:10px}
-.fc-cmp-btn{background:none;border:none;color:#555;font-size:15px;cursor:pointer;padding:0;line-height:1;transition:color .15s;font-family:var(--f)}
+.fc-cmp-btn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0;line-height:1;transition:color .15s;font-family:var(--f)}
 .fc-cmp-btn:hover{color:var(--g)}
 .fc-cmp-btn.selected{color:var(--g)}
 /* Whole card glows green when selected for compare */
@@ -1467,18 +1475,23 @@ async function doSignIn(){
 }
 
 async function doSignUp(){
+  console.log('[doSignUp] Starting signup process...');
   const name=document.getElementById('su-name').value.trim();
   const email=document.getElementById('su-email').value.trim().toLowerCase();
   const pass=document.getElementById('su-pass').value;
+  console.log('[doSignUp] Form inputs:', {name, email, passLength: pass.length});
   if(!name||!email||!pass){ setAuthError('Please fill in all fields.'); return; }
   if(pass.length<6){ setAuthError('Password must be at least 6 characters.'); return; }
   if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ setAuthError('Please enter a valid email.'); return; }
   try {
     setAuthError('Creating account…');
+    console.log('[doSignUp] Calling window.firebaseSignUp...');
     await window.firebaseSignUp(email, pass, name);
+    console.log('[doSignUp] Sign up successful!');
     toast('Account created! Welcome to MONEYBOL ✓');
     // onAuthStateChanged handles the rest
   } catch(e) {
+    console.error('[doSignUp] Error during signup:', e);
     const msg = e.code==='auth/email-already-in-use'
       ? 'An account with this email already exists.'
       : e.code==='auth/invalid-email'
@@ -1486,6 +1499,7 @@ async function doSignUp(){
       : e.code==='auth/weak-password'
       ? 'Password must be at least 6 characters.'
       : 'Sign up failed. Please try again.';
+    console.log('[doSignUp] Error message:', msg, 'Full error:', e.message);
     setAuthError(msg);
   }
 }
@@ -33483,7 +33497,10 @@ let currentPlayerForPitch = null;
 function switchTab(name){
   // Prevent selecting the pitch tab for goalkeepers (defensive guard)
   if(name === 'pitch' && currentPlayerForPitch){
-    const pt = [currentPlayerForPitch.posGroup, currentPlayerForPitch.posFull, currentPlayerForPitch.pos].filter(Boolean).join(' ').toLowerCase();
+    const p = currentPlayerForPitch;
+    const eaI = getEAInfo(p.name);
+    const eaP = (eaI && eaI.pos) ? eaI.pos : '';
+    const pt = [p.posGroup, p.posFull, p.pos, eaP].filter(Boolean).join(' ').toLowerCase();
     const curIsGK = /\bgk\b/.test(pt) || pt.includes('goalkeeper') || pt.includes('keeper');
     if(curIsGK){
       // fallback to value (STATS)
@@ -34493,10 +34510,11 @@ function viewP(name){
   const p=allPlayers[name];if(!p){toast('Player not found');return;}
   
   const isFav=favIds.includes(name);
-  // robust GK detection across posGroup/posFull/pos values (e.g., 'GK', 'Goalkeeper', 'Goal Keeper')
-  const posText = [p.posGroup, p.posFull, p.pos].filter(Boolean).join(' ').toLowerCase();
+  // robust GK detection: check StatsBomb posGroup/posFull/pos AND EA pos field
+  const eaInfoForGK = getEAInfo(name);
+  const eaPosForGK = (eaInfoForGK && eaInfoForGK.pos) ? eaInfoForGK.pos : '';
+  const posText = [p.posGroup, p.posFull, p.pos, eaPosForGK].filter(Boolean).join(' ').toLowerCase();
   const isGK = /\bgk\b/.test(posText) || posText.includes('goalkeeper') || posText.includes('keeper');
-  console.debug && console.debug('viewP', name, {posText, isGK});
   currentPlayerForPitch = p;
   addToRecentlyViewed(name); // track view
   /* Load Wikipedia headshot into profile hero */
@@ -34777,11 +34795,11 @@ function fcHtml(p){
   },100);
 
   return `<div class="fc feat${isCmp?' cmp-selected':''}" data-fav-name="${esc(p.name)}" draggable="true" ondragstart="startFavDrag(event,this,'${esc(p.name)}')" ondragover="allowFavDrop(event,this)" ondrop="dropFavCard(event,this,'${esc(p.name)}')" ondragend="endFavDrag()" onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
-    <div class="feat-img" style="cursor:pointer;position:relative;height:210px;background:#272727;display:flex;align-items:center;justify-content:center;overflow:hidden;width:100%">
-      <div id="fc-crest-${safeId}" style="width:170px;height:170px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);background-color:#4a4a4a;flex-shrink:0;position:relative;overflow:hidden;background-image:url('${imgSrc}');background-size:120%;background-position:${PLAYER_IMG_POSITION[p.name]||'center top'};opacity:${imgOpacity}"></div>
-      <span class="feat-star" style="position:absolute;top:8px;left:10px;z-index:5;font-size:18px;cursor:pointer" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
-      <button class="icon-btn fc-cmp-btn${isCmp?' selected on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:10px;z-index:5;font-size:15px">${isCmp?'✓':'⊕'}</button>
-      <span class="feat-score" style="color:${p.rc};position:absolute;top:6px;right:8px;z-index:5;font-family:var(--f);font-size:32px;font-weight:800">${p.score}</span>
+    <div class="feat-img" style="cursor:pointer">
+      <div id="fc-crest-${safeId}" class="feat-crest" style="background-image:url('${imgSrc}');background-size:120%;background-position:${PLAYER_IMG_POSITION[p.name]||'center top'}"></div>
+      <span class="feat-star" style="color:var(--g);width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
+      <button class="icon-btn fc-cmp-btn${isCmp?' selected on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:34px;left:12px;z-index:5;font-size:18px;color:${isCmp?'var(--g)':'#aaa'};width:18px;text-align:center">${isCmp?'✓':'⊕'}</button>
+      <span class="feat-score" style="color:${p.rc}">${p.score}</span>
       <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
     </div>
     <div class="feat-body">
@@ -34809,7 +34827,7 @@ function fcHtml(p){
 function toggleFavFC(name,el){
   if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; return; }
   favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];
-  el.style.color=favIds.includes(name)?'var(--g)':'#555';
+  el.style.color=favIds.includes(name)?'var(--g)':'#fff';
   el.textContent=favIds.includes(name)?'★':'☆';
   toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
   saveFavs();
@@ -34984,7 +35002,7 @@ function renderCompare(){
         <div class="cp-hero-bg" style="background:${heroBg}"></div>
         <div class="cp-crest-circle" id="cp-img-${p.name.replace(/[^a-z0-9]/gi,'_')}"
           style="background-color:#878787;overflow:hidden;position:relative">
-          <img src="${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}" style="width:120%;height:120%;object-fit:${PLAYER_IMAGES[p.name]?'cover':'contain'};margin:-10%;object-position:center 20%;" onerror="this.src='${SILHOUETTE_URL}'">
+          <img src="${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:${PLAYER_IMG_POSITION[p.name]||'center top'};display:block;transform:scale(1.2);transform-origin:center 30%;" onerror="this.src='${SILHOUETTE_URL}'">
         </div>
         <div class="cp-info">
           <div class="cp-name">${p.name}</div>
@@ -35328,6 +35346,7 @@ function toggleCompare(name, btn){
   if(cardBtn){
     cardBtn.className = 'icon-btn fc-cmp-btn'+(sel?' selected on':'');
     cardBtn.innerHTML = sel?'✓':'⊕';
+    cardBtn.style.color = sel ? 'var(--g)' : '#aaa';
     if(card) card.classList.toggle('cmp-selected', sel);
   }
   /* Update table row button(s) — may be multiple views */

@@ -42,7 +42,7 @@
     console.log('[Firebase] Updating profile...');
     await updateProfile(cred.user, { displayName: name });
     console.log('[Firebase] Profile updated, creating user doc...');
-    await setDoc(doc(db, 'users', cred.user.uid), { name, email, favs: [], createdAt: Date.now() });
+    await setDoc(doc(db, 'users', cred.user.uid), { name, email, favs: [], recent: [], createdAt: Date.now() });
     console.log('[Firebase] User doc created successfully');
     return cred;
   };
@@ -56,27 +56,57 @@
     return snap.exists() ? (snap.data().favs || []) : [];
   };
 
+  window.firebaseLoadRecent = async (uid) => {
+    const snap = await getDoc(doc(db, 'users', uid));
+    return snap.exists() ? (snap.data().recent || []) : [];
+  };
+
   window.firebaseSaveFavs = async (uid, favs) => {
     await updateDoc(doc(db, 'users', uid), { favs });
+  };
+
+  window.firebaseSaveRecent = async (uid, recent) => {
+    await updateDoc(doc(db, 'users', uid), { recent });
   };
 
   // Auth state listener — fires on page load and on sign in/out
   let authInitialized = false;
   onAuthStateChanged(auth, async (user) => {
+    console.log('[Auth] onAuthStateChanged fired. user:', user);
     if(user){
       // Signed in
+      if(currentUser && navStack.length){
+        try{
+          localStorage.setItem('mb_nav_' + currentUser.uid, JSON.stringify(navStack));
+        } catch(_){ }
+      }
       const name = user.displayName || user.email.split('@')[0];
       const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-      window.currentUser = { uid: user.uid, email: user.email, name, initials };
+      const u = { uid: user.uid, email: user.email, name, initials };
+      window.currentUser = u;
+      currentUser = u;
 
       // Load favs from Firestore
       try {
-        window.favIds = await window.firebaseLoadFavs(user.uid);
+        const loadedFavs = await window.firebaseLoadFavs(user.uid);
+        window.favIds = loadedFavs;
+        favIds = Array.isArray(loadedFavs) ? loadedFavs : [];
+        const loadedRecent = await window.firebaseLoadRecent(user.uid);
+        window.recentIds = loadedRecent;
+        recentIds = Array.isArray(loadedRecent) ? loadedRecent : [];
       } catch(e) {
         window.favIds = [];
+        favIds = [];
+        window.recentIds = [];
+        recentIds = [];
       }
 
+      navStack = ['home'];
+      saveNavStack();
+
       authInitialized = true;
+      console.log('[Auth] Signed in as', window.currentUser);
+      go('home', false);
       document.getElementById('auth-overlay').style.display = 'none';
       window.updateSidebarUser?.();
       if(!window.dataLoaded){ window.bootData?.(); }
@@ -86,19 +116,28 @@
       // and only if we were previously signed in
       if(!authInitialized){
         authInitialized = true;
+        console.log('[Auth] No user on first init — showing auth overlay');
         // First load, no user — show overlay
         document.getElementById('auth-overlay').style.display = 'flex';
         return;
       }
       // Signed out — clear all app state
       window.currentUser = null;
+      currentUser = null;
       window.favIds = [];
+      favIds = [];
+      window.recentIds = [];
+      recentIds = [];
       window.compareIds = [];
+      compareIds = [];
       window.dataLoaded = false;
+      dataLoaded = false;
       if(window.allPlayers) Object.keys(window.allPlayers).forEach(k=>delete window.allPlayers[k]);
       if(window.allMatches) Object.keys(window.allMatches).forEach(k=>delete window.allMatches[k]);
       if(window.loadedComps) window.loadedComps.clear();
       window.competitionsData = [];
+      navStack = loadNavStack();
+      go(navStack[navStack.length-1] || 'home', false);
       window.updateSidebarUser?.();
       window.toast?.('Signed out');
       document.getElementById('auth-overlay').style.display = 'flex';
@@ -577,13 +616,16 @@ table.ht tbody tr:hover{background:#232323}
 .auth-guest{width:100%;background:transparent;border:1px solid #333;color:#878787;border-radius:6px;font-family:var(--f);font-size:13px;font-weight:700;padding:10px;cursor:pointer;transition:all .15s}
 .auth-guest:hover{border-color:#878787;color:#878787}
 /* Sidebar user area */
-.sb-user{padding:10px 14px 16px;margin-top:auto;border-top:1px solid #1e3a1e}
-.sb-user-row{display:flex;align-items:center;gap:9px;cursor:pointer;border-radius:6px;padding:8px;transition:background .15s}
+.sb-user{padding:8px 12px 12px;margin-top:auto;border-top:1px solid #1e3a1e}
+.sb-user-row{display:flex;align-items:center;gap:8px;cursor:pointer;border-radius:6px;padding:6px 7px;transition:background .15s}
 .sb-user-row:hover{background:rgba(255,255,255,.05)}
-.sb-user-av{width:32px;height:32px;border-radius:50%;background:var(--g);color:#000;font-family:var(--f);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sb-user-name{font-family:var(--f);font-size:13px;font-weight:700;color:#878787;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sb-user-out{font-family:var(--f);font-size:13px;color:#878787;cursor:pointer;padding:2px 0;transition:color .15s}
-.sb-user-out:hover{color:#e05a2b}
+.sb-user-av{width:30px;height:30px;border-radius:50%;background:var(--g);color:#000;font-family:var(--f);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user-name{font-family:var(--f);font-size:12px;font-weight:700;color:#878787;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-user-out{font-family:var(--f);font-size:12px;color:#878787;cursor:pointer;padding:1px 0;transition:color .15s}
+.sb-user-out:hover{color:#00e676}
+.sb-user-signout{display:none;width:100%;margin:4px 0 8px;padding:6px 7px;border:none;border-radius:6px;background:rgba(255,255,255,.03);color:#878787;font-family:var(--f);font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,color .15s;text-align:left}
+.sb-user-signout.is-signin:hover{color:#00e676;background:rgba(0,230,118,.08)}
+.sb-user-signout.is-signout:hover{color:#e05a2b;background:rgba(224,90,43,.08)}
 @media (max-width:900px){
   .sb{width:140px;min-width:140px}
   .main{margin-left:140px}
@@ -707,9 +749,9 @@ table.ht tbody tr:hover{background:#232323}
     <div class="sb-user-av" id="sb-user-av">?</div>
     <div>
       <div class="sb-user-name" id="sb-user-name">Guest</div>
-      <div class="sb-user-out" id="sb-user-action" onclick="event.stopPropagation();handleUserAction()">Sign in</div>
     </div>
   </div>
+  <button type="button" class="sb-user-signout is-signin" id="sb-user-signout" onclick="event.stopPropagation();handleUserAction()">Sign in</button>
   <div style="font-family:var(--f);font-size:9px;color:#878787;padding:0 8px 8px;letter-spacing:.3px">© 2026 JSNJAY DESIGN INC.</div>
 </div>
 </aside>
@@ -1464,7 +1506,33 @@ function authTab(tab){
   document.getElementById('auth-error').textContent='';
 }
 
-function setAuthError(msg){ document.getElementById('auth-error').textContent=msg; }
+function setAuthError(msg, err){
+  const el = document.getElementById('auth-error');
+  if(el){
+    el.textContent = msg + (err && (err.code || err.message) ? (' — ' + (err.code || '') + ' ' + (err.message || '')) : '');
+  }
+  if(err) console.error('[Auth Error]', err);
+}
+
+// Detect if Firebase SDK failed to initialize (common when opening via file://)
+document.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    if(!window._fbAuth){
+      const target = document.getElementById('auth-error');
+      const help = 'Firebase failed to load. Serve the app over http(s): run `python -m http.server` and open http://localhost:8000';
+      if(target) target.textContent = help;
+      else {
+        const overlay = document.getElementById('auth-overlay');
+        if(overlay){
+          const p = document.createElement('div');
+          p.style.color='#e05a2b'; p.style.marginTop='12px'; p.textContent = help;
+          overlay.firstElementChild.appendChild(p);
+        }
+      }
+      console.error('Firebase SDK did not initialize. window._fbAuth missing.');
+    }
+  },600);
+});
 
 async function doSignIn(){
   const email=document.getElementById('si-email').value.trim().toLowerCase();
@@ -1472,7 +1540,9 @@ async function doSignIn(){
   if(!email||!pass){ setAuthError('Please fill in all fields.'); return; }
   try {
     setAuthError('Signing in…');
-    await window.firebaseSignIn(email, pass);
+    const cred = await window.firebaseSignIn(email, pass);
+    console.log('[doSignIn] signInWithEmailAndPassword returned:', cred);
+    setAuthError('');
     // onAuthStateChanged handles the rest
   } catch(e) {
     const msg = e.code==='auth/invalid-credential'||e.code==='auth/wrong-password'||e.code==='auth/user-not-found'
@@ -1480,7 +1550,7 @@ async function doSignIn(){
       : e.code==='auth/too-many-requests'
       ? 'Too many attempts. Try again later.'
       : 'Sign in failed. Please try again.';
-    setAuthError(msg);
+    setAuthError(msg, e);
   }
 }
 
@@ -1510,7 +1580,7 @@ async function doSignUp(){
       ? 'Password must be at least 6 characters.'
       : 'Sign up failed. Please try again.';
     console.log('[doSignUp] Error message:', msg, 'Full error:', e.message);
-    setAuthError(msg);
+    setAuthError(msg, e);
   }
 }
 
@@ -1543,19 +1613,17 @@ function showProfileMenu(){
 function updateSidebarUser(){
   const av=document.getElementById('sb-user-av');
   const nm=document.getElementById('sb-user-name');
-  const ac=document.getElementById('sb-user-action');
+  const so=document.getElementById('sb-user-signout');
   if(currentUser){
     av.textContent=currentUser.initials;
     av.style.background='var(--g)';
     nm.textContent=currentUser.name;
-    ac.textContent='Sign out';
-    ac.style.color='#555';
+    if(so){ so.textContent='Sign out'; so.classList.remove('is-signin'); so.classList.add('is-signout'); so.style.display='block'; }
   } else {
     av.textContent='?';
     av.style.background='#333';
     nm.textContent='Guest';
-    ac.textContent='Sign in';
-    ac.style.color='var(--g)';
+    if(so){ so.textContent='Sign in'; so.classList.remove('is-signout'); so.classList.add('is-signin'); so.style.display='block'; }
   }
 }
 
@@ -1567,6 +1635,7 @@ function checkSession(){
 
 /* ════ FAVS (account-aware) ════ */
 let favIds = [];
+let recentIds = [];
 let compareIds=[];
 const imgCache={};
 
@@ -1676,18 +1745,48 @@ async function getPlayerImg(name){
 
 let navStack=['home'],featuredName=null,aiMode=true;
 
+function navStateKey(){
+  return currentUser ? 'mb_nav_' + currentUser.uid : 'mb_nav_guest';
+}
+
+function loadNavStack(){
+  try{
+    const raw = localStorage.getItem(navStateKey());
+    const parsed = raw ? JSON.parse(raw) : null;
+    return Array.isArray(parsed) && parsed.length ? parsed : ['home'];
+  } catch(_){
+    return ['home'];
+  }
+}
+
+function saveNavStack(){
+  try{
+    localStorage.setItem(navStateKey(), JSON.stringify(navStack.length ? navStack : ['home']));
+  } catch(_){
+    /* ignore storage failures */
+  }
+}
+
 /* ════ RECENTLY VIEWED ════ */
 const MAX_RECENT = 20;
 
 function getRecentlyViewed(){
-  const key = currentUser ? 'mb_recent_' + currentUser.email : 'mb_recent_guest';
+  if(currentUser) return Array.isArray(recentIds) ? recentIds : [];
+  const key = 'mb_recent_guest';
   try{ return JSON.parse(localStorage.getItem(key)||'[]'); }
   catch(_){ return []; }
 }
 
 function saveRecentlyViewed(list){
-  const key = currentUser ? 'mb_recent_' + currentUser.email : 'mb_recent_guest';
-  localStorage.setItem(key, JSON.stringify(list));
+  if(currentUser && window.firebaseSaveRecent){
+    recentIds = Array.isArray(list) ? list : [];
+    window.recentIds = recentIds;
+    window.firebaseSaveRecent(currentUser.uid, recentIds).catch(e=>{
+      console.warn('saveRecentlyViewed error:', e);
+    });
+    return;
+  }
+  localStorage.setItem('mb_recent_guest', JSON.stringify(list));
 }
 
 function addToRecentlyViewed(name){
@@ -33492,6 +33591,7 @@ function go(id, addToStack=true){
       navStack.push(id);
       if(navStack.length > 20) navStack.shift(); // cap stack size
     }
+    saveNavStack();
   }
   if(typeof updateCompareBar === 'function') updateCompareBar();
   closeSidebar();
@@ -33501,6 +33601,7 @@ function back(){
   // Pop current page off stack
   if(navStack.length > 1){
     navStack.pop();
+    saveNavStack();
     const dest = navStack[navStack.length-1];
     go(dest, false); // navigate without adding to stack again
   } else {
@@ -34775,8 +34876,12 @@ const saveFavs = async () => {
   if(currentUser && window.firebaseSaveFavs){
     try {
       await window.firebaseSaveFavs(currentUser.uid, favIds);
+      console.log('[saveFavs] saved for', currentUser.uid, 'favs:', favIds);
     } catch(e) {
       console.warn('saveFavs error:', e);
+      toast('Failed to save favourites — check network or try again');
+      // Surface auth-related save errors in the auth UI area for clarity
+      setAuthError('Failed to save favourites. Please try again.', e);
     }
   }
 };

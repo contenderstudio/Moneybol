@@ -725,7 +725,7 @@ table.ht tbody tr:hover{background:#232323}
     <div class="sh-row">
       <div class="sh-input-wrap">
         <span class="sh-ico" id="sh-ico">🔍</span>
-        <input type="text" id="hs" placeholder="Search a player, or ask the AI analyst anything…" onkeydown="if(event.key==='Enter')handleSubmit()" oninput="detectMode()">
+        <input type="text" id="hs" placeholder="Search a player, or ask the AI analyst anything…" onfocus="this.dataset.ph=this.placeholder;this.placeholder='';" onblur="if(!this.value.trim())this.placeholder=this.dataset.ph||'Search a player, or ask the AI analyst anything…';" onkeydown="if(event.key==='Enter')handleSubmit()" oninput="detectMode()">
         <span id="ai-mode-indicator" style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;padding:3px 7px;border-radius:3px;background:var(--g);color:#000;flex-shrink:0;display:none">AI</span>
       </div>
       <button class="btn-search-blk" id="submit-btn" onclick="handleSubmit()">SEARCH</button>

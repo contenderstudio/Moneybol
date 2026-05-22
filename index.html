@@ -176,10 +176,15 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .btn-filter-out{font-family:var(--f);font-size:15px;font-weight:700;letter-spacing:.3px;padding:10px 18px;background:#fff;color:#000;border:1.5px solid #000;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:7px}
 .btn-filter-out:hover{background:#f0f0f0}
 /* AI chips row */
-.ai-chips-row{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center}
-.ai-chips-label{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:var(--g);white-space:nowrap}
-.ai-chip-btn{font-family:var(--f);font-size:13px;font-weight:600;padding:5px 13px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:rgba(0,230,118,.8);border-radius:20px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ai-chips-row{display:flex;align-items:center;gap:12px;margin:30px auto 40px;flex-wrap:nowrap;justify-content:flex-start;max-width:100%;padding:0 12px;overflow-x:visible}
+.ai-chips-label{font-family:var(--f);font-size:18px;font-weight:800;letter-spacing:.8px;color:var(--g);white-space:nowrap}
+.ai-chip-btn{font-family:var(--f);font-size:16px;font-weight:700;padding:10px 18px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:rgba(0,230,118,.9);border-radius:24px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .ai-chip-btn:hover{background:rgba(0,230,118,.18);border-color:var(--g);color:var(--g)}
+@media (max-width:900px){
+  .ai-chips-row{flex-wrap:wrap;gap:8px;margin:22px 12px 28px}
+  .ai-chip-btn{font-size:14px;padding:8px 12px;border-radius:20px}
+  .ai-chips-label{font-size:16px}
+}
 .ai-resp{background:#1e1e1e;border:1px solid #2a3a2a;border-radius:6px;overflow:hidden;display:none;margin:12px 20px 0}
 .ai-resp.show{display:block}
 .ai-resp-hdr{display:flex;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #2a2a2a;background:#1a2a1a}
@@ -731,16 +736,18 @@ table.ht tbody tr:hover{background:#232323}
       <button class="btn-search-blk" id="submit-btn" onclick="handleSubmit()">SEARCH</button>
     </div>
 
-    <!-- AI suggestion chips -->
-    <div class="ai-chips-row" id="ai-chips-row">
-      <span class="ai-chips-label">⚡ Ask AI:</span>
-      <div class="ai-chip-btn" onclick="askAI('Who has the highest xG in the dataset?')">Highest xG?</div>
-      <div class="ai-chip-btn" onclick="askAI('Which player has the best goals per 90 minutes?')">Best goals/90?</div>
-      <div class="ai-chip-btn" onclick="askAI('Compare the top 3 strikers by shot volume')">Compare strikers</div>
-      <div class="ai-chip-btn" onclick="askAI('Who are the best passers by pass accuracy?')">Best passers</div>
-      <div class="ai-chip-btn" onclick="askAI('Which players are underrated — high xG but fewer goals?')">Underrated</div>
-    </div>
   </div>
+
+  <!-- AI suggestion chips (moved below the grey search box) -->
+  <div class="ai-chips-row" id="ai-chips-row">
+    <span class="ai-chips-label">⚡ Ask AI:</span>
+    <div class="ai-chip-btn" onclick="askAI('Who has the highest xG in the dataset?')">Highest xG?</div>
+    <div class="ai-chip-btn" onclick="askAI('Which player has the best goals per 90 minutes?')">Best goals/90?</div>
+    <div class="ai-chip-btn" onclick="askAI('Compare the top 3 strikers by shot volume')">Compare strikers</div>
+    <div class="ai-chip-btn" onclick="askAI('Who are the best passers by pass accuracy?')">Best passers</div>
+    <div class="ai-chip-btn" onclick="askAI('Which players are underrated — high xG but fewer goals?')">Underrated</div>
+  </div>
+
 
   <!-- AI response panel (hidden until AI query) -->
   <div class="ai-resp" id="ai-resp">
@@ -34398,6 +34405,7 @@ function processEvents(events,matchId,meta,comp,season){
   }
 }
 async function loadCompetition(cid,sid,compName,seasonName){
+  if(!isSeason2019Onward(seasonName)) return;
   const key=`${cid}_${sid}`;if(loadedComps.has(key))return;loadedComps.add(key);
   const matches=await sbFetch(`matches/${cid}/${sid}.json`);
   await Promise.allSettled(matches.slice(0,10).map(async m=>{
@@ -35184,13 +35192,18 @@ function renderCompare(){
 /* ════ COMPETITIONS ════ */
 function renderCompetitions(){
   if(!competitionsData.length)return;
-  document.getElementById('comp-grid').innerHTML=competitionsData.sort((a,b)=>a.competition_name.localeCompare(b.competition_name)).map(c=>{
+  const visibleCompetitions = competitionsData.filter(c=>isSeason2019Onward(c.season_name));
+  document.getElementById('comp-grid').innerHTML=visibleCompetitions.sort((a,b)=>a.competition_name.localeCompare(b.competition_name)).map(c=>{
     const key=`${c.competition_id}_${c.season_id}`;const done=loadedComps.has(key);
     return `<div class="comp-card ${done?'loaded':''}" id="cc-${key}" onclick="loadAndBrowse(${c.competition_id},${c.season_id},'${esc(c.competition_name)}','${esc(c.season_name)}')">
       <div class="cc-name">${c.competition_name}</div><div class="cc-meta">${c.season_name} · ${c.country_name}</div>${done?'<span class="cc-badge">✓ LOADED</span>':''}
     </div>`;}).join('');
 }
 async function loadAndBrowse(cid,sid,compName,seasonName){
+  if(!isSeason2019Onward(seasonName)){
+    toast('Only 2019 onwards is loaded', 2500);
+    return;
+  }
   const key=`${cid}_${sid}`;const card=document.getElementById('cc-'+key);
   if(card)card.innerHTML+=`<span style="color:var(--g);font-size:13px;font-family:var(--f);display:block;margin-top:6px">Loading…</span>`;
   toast(`Loading ${compName} ${seasonName}…`,8000);
@@ -35818,11 +35831,20 @@ function backToListButtons(){
 
 const PRIORITY_COMPS = [
   { id: 11, sid: 90,  name: 'La Liga',       season: '2020/21' }, // shown first
-  { id: 2,  sid: 27,  name: 'Premier League', season: '2003/04' },
   { id: 9,  sid: 90,  name: 'Bundesliga',     season: '2020/21' },
   { id: 43, sid: 106, name: 'FIFA World Cup', season: '2022'    },
   { id: 55, sid: 43,  name: 'UEFA Euro',      season: '2020'    },
 ];
+
+function seasonStartYear(seasonName){
+  const match = String(seasonName || '').match(/^(\d{4})/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function isSeason2019Onward(seasonName){
+  const startYear = seasonStartYear(seasonName);
+  return startYear !== null && startYear >= 2019;
+}
 
 const MATCHES_TIER1 = 8;  // first comp: just enough to fill the home screen fast
 const MATCHES_TIER2 = 8;  // remaining priority comps
@@ -35849,6 +35871,7 @@ function recalcScores(){
 }
 
 async function loadCompetitionCapped(cid, sid, compName, seasonName, matchCap){
+  if(!isSeason2019Onward(seasonName)) return;
   const key=`${cid}_${sid}`;
   if(loadedComps.has(key)) return;
   loadedComps.add(key);
@@ -35892,7 +35915,7 @@ async function bootData(){
   }
 
   try{
-    competitionsData = await sbFetch('competitions.json');
+    competitionsData = (await sbFetch('competitions.json')).filter(c=>isSeason2019Onward(c.season_name));
   } catch(e){
     document.getElementById('home-status').innerHTML=`
       <div style="color:var(--or);font-family:var(--f);font-size:14px;padding:20px;text-align:center;max-width:500px;margin:0 auto">
@@ -35932,6 +35955,7 @@ async function bootData(){
     const WOMENS_KEYWORDS = /women|female|wsl|nwsl|fawsl|w-league/i;
     const rest = competitionsData.filter(c =>
       !priorityKeys.has(`${c.competition_id}_${c.season_id}`) &&
+      isSeason2019Onward(c.season_name) &&
       !WOMENS_KEYWORDS.test(c.competition_name)
     );
 
@@ -36040,12 +36064,6 @@ boot();
           <div class="fp-comp-group-body">
             <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2021" data-comp="La Liga" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-laliga-2021">2020/21 <span>Messi, Benzema</span></label></div>
             <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2020" data-comp="La Liga" data-season="2019/20" onchange="updateCompFilter()"><label for="fc-laliga-2020">2019/20</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2019" data-comp="La Liga" data-season="2018/19" onchange="updateCompFilter()"><label for="fc-laliga-2019">2018/19</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2018" data-comp="La Liga" data-season="2017/18" onchange="updateCompFilter()"><label for="fc-laliga-2018">2017/18</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2017" data-comp="La Liga" data-season="2016/17" onchange="updateCompFilter()"><label for="fc-laliga-2017">2016/17</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2016" data-comp="La Liga" data-season="2015/16" onchange="updateCompFilter()"><label for="fc-laliga-2016">2015/16</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2015" data-comp="La Liga" data-season="2014/15" onchange="updateCompFilter()"><label for="fc-laliga-2015">2014/15</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-laliga-2014" data-comp="La Liga" data-season="2013/14" onchange="updateCompFilter()"><label for="fc-laliga-2014">2013/14</label></div>
           </div>
         </div>
 
@@ -36057,8 +36075,6 @@ boot();
           </div>
           <div class="fp-comp-group-body">
             <div class="fp-comp-item"><input type="checkbox" id="fc-epl-2021" data-comp="Premier League" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-epl-2021">2020/21 <span>Son, Kane</span></label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-epl-2016" data-comp="Premier League" data-season="2015/16" onchange="updateCompFilter()"><label for="fc-epl-2016">2015/16 <span>Leicester title</span></label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-epl-2004" data-comp="Premier League" data-season="2003/04" onchange="updateCompFilter()"><label for="fc-epl-2004">2003/04 <span>Invincibles</span></label></div>
           </div>
         </div>
 
@@ -36096,9 +36112,7 @@ boot();
           <div class="fp-comp-group-body">
             <div class="fp-comp-item"><input type="checkbox" id="fc-ucl" data-comp="UEFA Champions League" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-ucl">Champions League 2020/21</label></div>
             <div class="fp-comp-item"><input type="checkbox" id="fc-wc22" data-comp="FIFA World Cup" data-season="2022" onchange="updateCompFilter()"><label for="fc-wc22">World Cup 2022 <span>Mbappe, Messi</span></label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-wc18" data-comp="FIFA World Cup" data-season="2018" onchange="updateCompFilter()"><label for="fc-wc18">World Cup 2018</label></div>
             <div class="fp-comp-item"><input type="checkbox" id="fc-euro20" data-comp="UEFA Euro" data-season="2020" onchange="updateCompFilter()"><label for="fc-euro20">UEFA Euro 2020</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-euro16" data-comp="UEFA Euro" data-season="2016" onchange="updateCompFilter()"><label for="fc-euro16">UEFA Euro 2016</label></div>
           </div>
         </div>
 

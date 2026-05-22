@@ -872,7 +872,7 @@ table.ht tbody tr:hover{background:#232323}
     <!-- STATISTICS tab -->
     <div id="tab-stats">
       <div style="overflow-x:auto">
-        <table class="ht"><thead><tr>
+        <table class="ht"><thead id="pd-hist-head"><tr>
           <th>Opponent</th><th>Competition</th><th>Date</th><th>Min</th>
           <th>Goals</th><th>xG</th><th>Shots</th><th>On Target</th>
           <th>Touches Opp Box</th><th>Crosses</th><th>Cross%</th>
@@ -34497,7 +34497,10 @@ function processEvents(events,matchId,meta,comp,season){
       crossComp:pm.crossComp||0,crossAtt:pm.crossAtt||0,
       touchesOppBox:pm.touches_opp_box||0,
       aerialWon:pm.aerialWon||0,aerialLost:pm.aerialLost||0,
-      dribbles:pm.dribbles,fouls:pm.fouls});
+      dribbles:pm.dribbles,fouls:pm.fouls,
+      tackles:pm.tackles||0,dribbledPast:pm.dribbledPast||0,
+      interceptions:pm.interceptions||0,pressures:pm.pressures||0,
+      saves:pm.saves||0,goalsConceded:pm.goalsConceded||0,sweeperActions:pm.sweeperActions||0});
     if(pm.shotEvents) p.shotLog.push(...pm.shotEvents);
   }
 }
@@ -34816,22 +34819,71 @@ function viewP(name){
   // Now switch to the default tab (STATS) after tabs have been adjusted for GK
   switchTab('value');
   const rows=p.matchLog.slice().reverse().slice(0,20);
-  document.getElementById('pd-hist-body').innerHTML=rows.length
-    ?rows.map(m=>{
-      const cPct=m.crossAtt>0?Math.round((m.crossComp/m.crossAtt)*100):0;
-      return `<tr>
-        <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
-        <td class="${m.goals>0?'tg':''}">${m.goals}</td>
-        <td class="${m.xG>=.3?'tg':''}">${m.xG}</td>
-        <td>${m.shots}</td><td>${m.shotsOnT}</td>
-        <td class="${m.touchesOppBox>3?'tg':''}">${m.touchesOppBox||0}</td>
-        <td>${m.crossComp||0}/${m.crossAtt||0}</td>
-        <td>${cPct}%</td>
-        <td>${m.keyPasses}</td>
-        <td>${m.passAcc}%</td>
-        <td class="${m.aerialWon>2?'tg':''}">${m.aerialWon||0}</td>
-      </tr>`;}).join('')
-    :'<tr><td colspan="13" style="text-align:center;color:#878787;padding:20px">No match data</td></tr>';
+  // Update history table header and rows based on position
+  if(isGK){
+    document.getElementById('pd-hist-head').innerHTML=`<tr>
+      <th>Opponent</th><th>Competition</th><th>Date</th><th>Min</th>
+      <th>Saves</th><th>Goals Conceded</th><th>Save%</th>
+      <th>Sweeper Actions</th><th>Pass%</th><th>Aerial Won</th>
+    </tr>`;
+    document.getElementById('pd-hist-body').innerHTML=rows.length
+      ?rows.map(m=>{
+        const sv=m.saves||0; const gc=m.goalsConceded||0;
+        const svPct=sv+gc>0?Math.round((sv/(sv+gc))*100):0;
+        return `<tr>
+          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
+          <td class="${sv>3?'tg':''}">${sv}</td>
+          <td class="${gc===0?'tg':''}">${gc}</td>
+          <td class="${svPct>=70?'tg':''}">${svPct}%</td>
+          <td>${m.sweeperActions||0}</td>
+          <td>${m.passAcc}%</td>
+          <td class="${m.aerialWon>1?'tg':''}">${m.aerialWon||0}</td>
+        </tr>`;}).join('')
+      :'<tr><td colspan="10" style="text-align:center;color:#878787;padding:20px">No match data</td></tr>';
+  } else if(isDef){
+    document.getElementById('pd-hist-head').innerHTML=`<tr>
+      <th>Opponent</th><th>Competition</th><th>Date</th><th>Min</th>
+      <th>Tackles</th><th>Interceptions</th><th>Pressures</th>
+      <th>Aerial Won</th><th>Crosses</th><th>Cross%</th><th>Pass%</th>
+    </tr>`;
+    document.getElementById('pd-hist-body').innerHTML=rows.length
+      ?rows.map(m=>{
+        const cPct=m.crossAtt>0?Math.round((m.crossComp/m.crossAtt)*100):0;
+        return `<tr>
+          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
+          <td class="${m.tackles>1?'tg':''}">${m.tackles||0}</td>
+          <td class="${m.interceptions>1?'tg':''}">${m.interceptions||0}</td>
+          <td>${m.pressures||0}</td>
+          <td class="${m.aerialWon>2?'tg':''}">${m.aerialWon||0}</td>
+          <td>${m.crossComp||0}/${m.crossAtt||0}</td>
+          <td>${cPct}%</td>
+          <td>${m.passAcc}%</td>
+        </tr>`;}).join('')
+      :'<tr><td colspan="11" style="text-align:center;color:#878787;padding:20px">No match data</td></tr>';
+  } else {
+    document.getElementById('pd-hist-head').innerHTML=`<tr>
+      <th>Opponent</th><th>Competition</th><th>Date</th><th>Min</th>
+      <th>Goals</th><th>xG</th><th>Shots</th><th>On Target</th>
+      <th>Touches Opp Box</th><th>Crosses</th><th>Cross%</th>
+      <th>Key Passes</th><th>Pass%</th><th>Aerial Won</th>
+    </tr>`;
+    document.getElementById('pd-hist-body').innerHTML=rows.length
+      ?rows.map(m=>{
+        const cPct=m.crossAtt>0?Math.round((m.crossComp/m.crossAtt)*100):0;
+        return `<tr>
+          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
+          <td class="${m.goals>0?'tg':''}">${m.goals}</td>
+          <td class="${m.xG>=.3?'tg':''}">${m.xG}</td>
+          <td>${m.shots}</td><td>${m.shotsOnT}</td>
+          <td class="${m.touchesOppBox>3?'tg':''}">${m.touchesOppBox||0}</td>
+          <td>${m.crossComp||0}/${m.crossAtt||0}</td>
+          <td>${cPct}%</td>
+          <td>${m.keyPasses}</td>
+          <td>${m.passAcc}%</td>
+          <td class="${m.aerialWon>2?'tg':''}">${m.aerialWon||0}</td>
+        </tr>`;}).join('')
+      :'<tr><td colspan="14" style="text-align:center;color:#878787;padding:20px">No match data</td></tr>';
+  }
   go('player');
   // Animate circular rings (arc + numeric count)
   try{

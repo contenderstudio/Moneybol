@@ -63,21 +63,26 @@
   // Auth state listener — fires on page load and on sign in/out
   let authInitialized = false;
   onAuthStateChanged(auth, async (user) => {
+    try {
     if(user){
       // Signed in
       const name = user.displayName || user.email.split('@')[0];
       const initials = name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-      window.currentUser = { uid: user.uid, email: user.email, name, initials };
+      currentUser = { uid: user.uid, email: user.email, name, initials };
+      window.currentUser = currentUser;
 
       // Load favs from Firestore
       try {
-        window.favIds = await window.firebaseLoadFavs(user.uid);
+        favIds = await window.firebaseLoadFavs(user.uid);
+        window.favIds = favIds;
       } catch(e) {
+        favIds = [];
         window.favIds = [];
       }
 
       authInitialized = true;
-      document.getElementById('auth-overlay').style.display = 'none';
+      const overlayEl = document.getElementById('auth-overlay');
+      if(overlayEl) overlayEl.style.display = 'none';
       window.updateSidebarUser?.();
       if(!window.dataLoaded){ window.bootData?.(); }
       window.toast?.('Welcome back, ' + name + ' 👋');
@@ -87,11 +92,14 @@
       if(!authInitialized){
         authInitialized = true;
         // First load, no user — show overlay
-        document.getElementById('auth-overlay').style.display = 'flex';
+        const overlayEl = document.getElementById('auth-overlay');
+        if(overlayEl) overlayEl.style.display = 'flex';
         return;
       }
       // Signed out — clear all app state
+      currentUser = null;
       window.currentUser = null;
+      favIds = [];
       window.favIds = [];
       window.compareIds = [];
       window.dataLoaded = false;
@@ -101,7 +109,11 @@
       window.competitionsData = [];
       window.updateSidebarUser?.();
       window.toast?.('Signed out');
-      document.getElementById('auth-overlay').style.display = 'flex';
+      const overlayEl = document.getElementById('auth-overlay');
+      if(overlayEl) overlayEl.style.display = 'flex';
+    }
+    } catch(err){
+      console.error('[Auth] onAuthStateChanged handler error:', err);
     }
   });
 </script>
@@ -593,13 +605,21 @@ table.ht tbody tr:hover{background:#232323}
 .auth-guest{width:100%;background:transparent;border:1px solid #333;color:#878787;border-radius:6px;font-family:var(--f);font-size:13px;font-weight:700;padding:10px;cursor:pointer;transition:all .15s}
 .auth-guest:hover{border-color:#878787;color:#878787}
 /* Sidebar user area */
-.sb-user{padding:8px 16px 16px;margin-top:auto;border-top:1px solid #1e3a1e}
-.sb-user-row{display:flex;align-items:center;gap:8px;cursor:pointer;border-radius:6px;padding:8px;transition:background .15s}
-.sb-user-row:hover{background:rgba(255,255,255,.05)}
-.sb-user-av{width:32px;height:32px;border-radius:50%;background:var(--g);color:#000;font-family:var(--f);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sb-user{padding:14px 16px 8px;margin-top:auto;border-top:1px solid #1e3a1e}
+.sb-user-row{display:flex;align-items:center;gap:6px;cursor:pointer;border-radius:6px;padding:8px;padding-bottom:2px;transition:background .15s}
+.sb-user-row:hover{background:transparent}
+.sb-user-left{display:flex;flex-direction:column;align-items:center;gap:4px;width:40px;flex-shrink:0;position:relative}
+.sb-user-right{flex:1;display:flex;align-items:center}
+.sb-user-av{width:34px;height:34px;border-radius:50%;background:var(--g);color:#000;font-family:var(--f);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .sb-user-name{font-family:var(--f);font-size:13px;font-weight:700;color:#878787;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sb-user-out{font-family:var(--f);font-size:13px;color:#878787;cursor:pointer;padding:2px 0;transition:color .15s}
 .sb-user-out:hover{color:#e05a2b}
+.sb-user-action{width:100%;background:transparent;border:1.5px solid transparent;color:#878787;border-radius:6px;font-family:var(--f);font-size:13px;font-weight:700;padding:10px 16px;cursor:pointer;transition:all .12s;display:inline-block;text-align:center;box-sizing:border-box}
+.sb-user-action:focus{outline:2px solid rgba(0,0,0,.25)}
+.sb-user-action.sign-in{border-color:transparent;color:var(--g)}
+.sb-user-action.sign-in:hover{background:rgba(0,230,118,0.08);border-color:var(--g);color:#00e676}
+.sb-user-action.sign-out{border-color:transparent;color:#878787;background:transparent;border-radius:4px}
+.sb-user-action.sign-out:hover{background:rgba(224,90,43,0.12);border-color:#e05a2b;color:#fff}
 @media (max-width:900px){
   .sb{width:140px;min-width:140px}
   .main{margin-left:140px}
@@ -725,13 +745,17 @@ table.ht tbody tr:hover{background:#232323}
   </nav>
   <div class="sb-user" id="sb-user">
   <div class="sb-user-row" onclick="showProfileMenu()">
-    <div class="sb-user-av" id="sb-user-av">?</div>
-    <div>
+    <div class="sb-user-left">
+      <div class="sb-user-av" id="sb-user-av">?</div>
+    </div>
+    <div class="sb-user-right">
       <div class="sb-user-name" id="sb-user-name">Guest</div>
-      <div class="sb-user-out" id="sb-user-action" onclick="event.stopPropagation();handleUserAction()">Sign in</div>
     </div>
   </div>
-  <div style="font-family:var(--f);font-size:9px;color:#878787;padding:0 8px 8px;letter-spacing:.3px">© 2026 JSNJAY DESIGN INC.</div>
+  <div style="padding:2px 16px 6px;">
+    <button class="sb-user-action sign-in" id="sb-user-action" onclick="event.stopPropagation();handleUserAction()">Sign in</button>
+  </div>
+  <div style="font-family:var(--f);font-size:9px;color:#878787;padding:0 16px 8px;letter-spacing:.3px">© 2026 JSNJAY DESIGN INC.</div>
 </div>
 </aside>
 
@@ -1623,13 +1647,15 @@ function updateSidebarUser(){
     av.style.background='var(--g)';
     nm.textContent=currentUser.name;
     ac.textContent='Sign out';
-    ac.style.color='#555';
+    ac.className='sb-user-action sign-out';
+    ac.setAttribute('aria-pressed','true');
   } else {
     av.textContent='?';
     av.style.background='#333';
     nm.textContent='Guest';
     ac.textContent='Sign in';
-    ac.style.color='var(--g)';
+    ac.className='sb-user-action sign-in';
+    ac.setAttribute('aria-pressed','false');
   }
 }
 

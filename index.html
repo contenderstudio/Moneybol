@@ -121,6 +121,8 @@
       window.competitionsData = [];
       window.updateSidebarUser?.();
       window.toast?.('Signed out');
+      authTab('signin');
+      resetAuthForm();
       const overlayEl = document.getElementById('auth-overlay');
       if(overlayEl) overlayEl.style.display = 'flex';
     }
@@ -128,6 +130,13 @@
       console.error('[Auth] onAuthStateChanged handler error:', err);
     }
   });
+  function resetAuthForm(){
+    const emailEl = document.getElementById('si-email');
+    const passEl = document.getElementById('si-pass');
+    if(emailEl) emailEl.value = '';
+    if(passEl) passEl.value = '';
+    setAuthError('');
+  }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;500;600;700;800;900&family=Roboto:wght@400;500;600;700&family=Ultra&display=swap" rel="stylesheet">
 <style>
@@ -1643,11 +1652,17 @@ async function signOut(){
 
 function handleUserAction(){
   if(currentUser) signOut();
-  else { document.getElementById('auth-overlay').style.display='flex'; }
+  else {
+    authTab('signin');
+    document.getElementById('auth-overlay').style.display='flex';
+  }
 }
 
 function showProfileMenu(){
-  if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; }
+  if(!currentUser){
+    authTab('signin');
+    document.getElementById('auth-overlay').style.display='flex';
+  }
 }
 
 function updateSidebarUser(){
@@ -36255,6 +36270,7 @@ function boot(){
   // Firebase's onAuthStateChanged (in the module script above) handles
   // session restore and overlay hiding automatically.
   // Just show the overlay while Firebase checks auth state.
+  authTab('signin');
   document.getElementById('auth-overlay').style.display='flex';
 }
 

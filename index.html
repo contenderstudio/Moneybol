@@ -35094,8 +35094,10 @@ function fcHtml(p){
   const imgOpacity = cachedUrl ? '1' : '1';
   const isCmp = compareIds.includes(p.name);
 
+  // Determine display name for card (show 'Lionel Messi' when favourited Cuccittini)
+  const displayName = (isFav && /Cuccittini/.test(p.name)) ? 'Lionel Messi' : (p.name || '');
   // Split name into first and last for card display
-  const _parts = (p.name||'').trim().split(/\s+/);
+  const _parts = (displayName||'').trim().split(/\s+/);
   const _first = _parts[0] || '';
   const _last = _parts.length>1 ? _parts.slice(-1)[0] : '';
   const _firstEsc = hEsc(_first);
@@ -36050,6 +36052,7 @@ function renderTableHTML(players, opts={}){
       </thead>
       <tbody>
         ${players.map((p,i)=>{
+          const displayName = (dragReorder && favIds.includes(p.name) && /Cuccittini/.test(p.name)) ? 'Lionel Messi' : p.name;
           const rowBg = i%2===0 ? '#161616' : '#111';
           const rankColor = i===0?'#555':i===1?'#555':i===2?'#555':'#555';
           const pos = p.pos&&p.pos!=='—'?p.pos:getEAPositions(p.name)?.split(',')[0].trim()||'—';
@@ -36065,7 +36068,7 @@ function renderTableHTML(players, opts={}){
             <td style="padding:12px 8px">
               <div class="fr-name">
                 <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#222;background-image:url('${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}');background-size:120%;background-position:center top"></div>
-                <span style="font-family:var(--f);font-weight:300;color:#fff;font-size:15px">${p.name}</span>
+                <span style="font-family:var(--f);font-weight:300;color:#fff;font-size:15px">${displayName}</span>
               </div>
             </td>
             <td style="padding:12px 8px;color:#878787;font-size:15px">${p.team}</td>

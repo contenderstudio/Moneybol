@@ -198,6 +198,12 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 /* ── HOME SEARCH HERO ── */
 
 .search-hero{background:#2d2d2d;margin:16px 16px 0;border-radius:8px;padding:32px 24px;text-align:center}
+.search-brand{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;margin:24px 0 16px}
+.search-brand-logo img{height:56px;width:auto;display:block;object-fit:contain}
+.search-brand-sub{font-family:var(--f);font-size:14px;font-weight:300;letter-spacing:.7px;color:#878787;line-height:1.2}
+.auth-choices{display:flex;flex-direction:column;align-items:stretch}
+.auth-btn{height:56px;padding:12px;font-size:15px;box-sizing:border-box}
+.auth-or{font-family:'Roboto Condensed',sans-serif;text-align:center;font-size:13px;color:#878787;margin:0;padding:8px 0;letter-spacing:.5px}
 .search-hero h1{font-family:var(--f);font-size:34px;font-weight:900;letter-spacing:1px;color:#fff;margin-bottom:24px}
 .sh-row{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap}
 .sh-input-wrap{display:flex;align-items:center;gap:8px;background:#fff;border-radius:5px;padding:8px 16px;width:340px}
@@ -710,7 +716,7 @@ table.ht tbody tr:hover{background:#232323}
         <input type="password" id="si-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doSignIn()"
           style="width:100%;background:#141414;border:1px solid #333;border-radius:5px;padding:10px 13px;font-family:'Roboto',sans-serif;font-size:14px;color:#fff;outline:none;box-sizing:border-box">
       </div>
-      <button onclick="doSignIn()" style="width:100%;background:#00e676;color:#000;border:none;border-radius:6px;font-family:'Roboto Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.5px;padding:12px;cursor:pointer;margin-top:4px">SIGN IN</button>
+      
     </div>
     <div id="auth-signup" style="display:none">
       <div style="margin-bottom:14px">
@@ -731,8 +737,11 @@ table.ht tbody tr:hover{background:#232323}
       <button onclick="doSignUp()" style="width:100%;background:#00e676;color:#000;border:none;border-radius:6px;font-family:'Roboto Condensed',sans-serif;font-size:15px;font-weight:800;letter-spacing:.5px;padding:12px;cursor:pointer;margin-top:4px">CREATE ACCOUNT</button>
     </div>
     <div id="auth-error" style="color:#e05a2b;font-size:13px;text-align:center;margin-top:10px;min-height:18px;font-family:'Roboto',sans-serif"></div>
-    <div style="text-align:center;font-size:13px;color:#878787;margin:16px 0;font-family:'Roboto Condensed',sans-serif;letter-spacing:.5px">— OR —</div>
-    <button onclick="continueAsGuest()" style="width:100%;background:transparent;border:1.5px solid #878787;color:#878787;border-radius:6px;font-family:'Roboto Condensed',sans-serif;font-size:14px;font-weight:700;padding:11px;cursor:pointer;letter-spacing:.3px">CONTINUE AS GUEST</button>
+    <div class="auth-choices">
+      <button class="auth-btn" onclick="doSignIn()" style="width:100%;background:#00e676;color:#000;border:none;border-radius:6px;font-family:'Roboto Condensed',sans-serif;font-weight:800;letter-spacing:.5px;cursor:pointer;margin:0 0 8px 0">SIGN IN</button>
+      <div class="auth-or">— OR —</div>
+      <button class="auth-btn" onclick="continueAsGuest()" style="width:100%;background:transparent;border:1.5px solid #878787;color:#878787;border-radius:6px;font-family:'Roboto Condensed',sans-serif;font-weight:700;letter-spacing:.3px;margin-top:0">CONTINUE AS GUEST</button>
+    </div>
   </div>
 </div>
 
@@ -786,6 +795,10 @@ table.ht tbody tr:hover{background:#232323}
 <div class="pg on" id="pg-home">
 
   <!-- Search hero -->
+  <div class="search-brand">
+    <div class="search-brand-logo"><img src="assets/moneybol.png" alt="Moneybol" style="height:56px;width:auto;display:block" onerror="this.style.display='none'"></div>
+    <div class="search-brand-sub">FOOTBALL ANALYTICS INTELLIGENCE</div>
+  </div>
   <div class="search-hero">
     <h1>SEARCH FOR PLAYERS</h1>
     <div class="sh-row">
@@ -1802,6 +1815,9 @@ async function getPlayerImg(name){
 
 
 let navStack=['home'],featuredName=null,aiMode=true;
+// When a user manually selects a player, set this timestamp to prevent
+// automatic refreshes from overriding their selection for a short window.
+let userSelectedUntil = 0;
 
 /* ════ RECENTLY VIEWED ════ */
 const MAX_RECENT = 20;
@@ -34566,6 +34582,8 @@ function refreshHome(){
   const combined = [...recentPlayers, ...topNotRecent].slice(0, 20);
 
   if(!combined.length) return;
+  // If the user has recently selected a player, avoid overriding their choice
+  if(Date.now() < userSelectedUntil) return;
   featuredName = combined[0].name;
   const fp = combined[0];
 
@@ -34659,6 +34677,8 @@ function selectFeatured(name){
   const p = allPlayers[name];
   if(!p) return;
   featuredName = name;
+  // Respect user selection — prevent auto-refresh from overriding shortly after a manual pick
+  userSelectedUntil = Date.now() + 30000; // 30s
 
   // Update featured card content
   // no initials - silhouette handles placeholder
@@ -34712,6 +34732,8 @@ function selectFeatured(name){
 /* ════ PLAYER ════ */
 
 function viewP(name){
+  // Mark that the user explicitly chose a player — briefly lock out auto-selection
+  userSelectedUntil = Date.now() + 30000; // 30s
   // Direct lookup first
   let p = allPlayers[name];
 

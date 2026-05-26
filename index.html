@@ -279,6 +279,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .feat-body{padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
 /* Large name like wireframe */
 .feat-name{font-family:var(--f);font-size:28px;font-weight:300;text-align:center;margin-bottom:16px;margin-top:0;color:#fff}
+.feat-name .fn{display:block}
+.feat-name .ln{display:block;margin-top:6px}
 .feat-club{font-size:14px;color:#878787;text-align:center;margin-bottom:16px}
 .feat-stats{display:flex;gap:16px;font-size:13px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
 .hi{color:var(--g);font-weight:600}.hio{color:var(--or);font-weight:600}
@@ -35082,6 +35084,8 @@ function dropOnFavGrid(ev){
 
 function toggleFav(name,btn){favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];btn.classList.toggle('on',favIds.includes(name));toast(favIds.includes(name)?'Added to favourites ★':'Removed');saveFavs();}
 function fcHtml(p){
+  // small helper to escape text for HTML insertion
+  function hEsc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   const isFav=favIds.includes(p.name);
   const safeId=p.name.replace(/[^a-z0-9]/gi,'_');
   const cachedUrl = PLAYER_IMAGES[p.name] || null;
@@ -35089,6 +35093,13 @@ function fcHtml(p){
   const imgFit = cachedUrl ? 'cover' : 'contain';
   const imgOpacity = cachedUrl ? '1' : '1';
   const isCmp = compareIds.includes(p.name);
+
+  // Split name into first and last for card display
+  const _parts = (p.name||'').trim().split(/\s+/);
+  const _first = _parts[0] || '';
+  const _last = _parts.length>1 ? _parts.slice(-1)[0] : '';
+  const _firstEsc = hEsc(_first);
+  const _lastEsc = hEsc(_last);
 
   setTimeout(()=>{
     if(!cachedUrl){
@@ -35109,7 +35120,7 @@ function fcHtml(p){
       <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
     </div>
     <div class="feat-body">
-      <div class="feat-name">${p.name}</div>
+      <div class="feat-name"><div class="fn">${_firstEsc}</div><div class="ln">${_lastEsc}</div></div>
       <div class="feat-stats">
         ${(()=>{
           const eaInfo = getEAInfo(p.name);

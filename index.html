@@ -368,6 +368,19 @@ table.ht tbody tr:hover{background:#232323}
 .btn-cmp{background:#fff;color:#000;border:none;font-family:var(--f);font-size:13px;font-weight:700;padding:8px 16px;border-radius:4px;cursor:pointer}
 .btn-cmp:hover{background:#e0e0e0}
 .favs-grid{display:grid;grid-template-columns:repeat(auto-fill,348px);gap:12px}
+
+/* On the FAVS page, show cards stacked vertically and centered */
+.pg#pg-favs .favs-grid{
+  grid-template-columns:minmax(320px,520px) !important;
+  justify-content:center;
+  justify-items:center;
+  gap:14px;
+  margin:0 auto;
+  width:100%;
+}
+@media (max-width:520px){
+  .pg#pg-favs .favs-grid{grid-template-columns:1fr !important;padding:0 12px}
+}
 .favs-view-toggle{display:flex;gap:4px;background:#1e1e1e;border-radius:5px;padding:4px}
 .favs-vbtn{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;padding:4px 8px;border-radius:3px;border:none;cursor:pointer;background:transparent;color:#878787;transition:all .15s;display:flex;align-items:center;gap:4px}
 .favs-vbtn.on{background:#2a2a2a;color:#fff}
@@ -730,8 +743,15 @@ table.ht tbody tr:hover{background:#232323}
   .pds-val{font-size:32px}
   .pds-name{font-size:13px}
   .pd-ring{padding:20px 22px}
-  .pd-ring .rw{width:clamp(92px,30vw,120px)!important;height:clamp(92px,30vw,120px)!important}
-  .pd-ring .rl{font-size:clamp(38px,11vw,50px)!important}
+  .pd-ring{transform:none;justify-self:center}
+  /* stack numbers above labels and present stats in two columns on small screens */
+  .pd-stats{grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
+  .pds{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;border-radius:6px;background:transparent;text-align:center}
+  .pds-val{font-size:34px;line-height:1;margin-bottom:6px;color:var(--g)}
+  .pds-name{font-size:14px;font-weight:800;color:#fff;margin-top:6px}
+  .pds .pds-avg{display:block;font-size:12px;color:#878787;margin-bottom:6px}
+  .pd-ring .rw{width:clamp(120px,36vw,160px)!important;height:clamp(120px,36vw,160px)!important}
+  .pd-ring .rl{font-size:clamp(48px,18vw,64px)!important}
   .favs-wrap{padding:16px 12px}
   .favs-hdr{align-items:flex-start;gap:10px;margin-bottom:12px}
   .favs-title{font-size:18px}
@@ -33981,20 +34001,20 @@ function renderValue(){
   el.innerHTML = `
     <div style="margin-bottom:16px">
       <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">EA FC ATTRIBUTES</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr;gap:10px">
         ${attrDefs.map(({key, label, abbr, color, desc}) => {
           const val = attrs[key] || 0;
           const pct = val; // already 0-99
           return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:14px">
             <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-              <div>
-                <div style="font-family:var(--f);font-size:16px;font-weight:400;color:#fff">${label}</div>
-                <div style="font-size:13px;color:#878787;margin-top:4px">${desc}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-family:var(--f);font-size:16px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
+                <div style="font-size:13px;color:#878787;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${desc}</div>
               </div>
-              <div style="font-family:var(--f);font-size:32px;font-weight:300;color:${color};line-height:1">${val}</div>
+              <div style="margin-left:12px;flex-shrink:0;font-family:var(--f);font-size:32px;font-weight:300;color:${color};line-height:1">${val}</div>
             </div>
-            <div style="height:4px;background:#2a2a2a;border-radius:2px;overflow:hidden">
-              <div class="value-bar-inner" data-pct="${pct}" style="height:100%;width:0;background:${color};border-radius:2px;transition:width .6s ease"></div>
+            <div style="height:6px;background:#2a2a2a;border-radius:3px;overflow:hidden">
+              <div class="value-bar-inner" data-pct="${pct}" style="height:100%;width:0;background:${color};border-radius:3px;transition:width .6s ease"></div>
             </div>
           </div>`;
         }).join('')}

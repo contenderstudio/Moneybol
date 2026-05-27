@@ -263,6 +263,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
   overflow:hidden;
   z-index:1;
 }
+
+.feat-crest{background-size:cover;background-position:center center;background-repeat:no-repeat}
 .feat-init{display:none!important}
 .feat-star{position:absolute;top:10px;left:12px;color:#fff;font-size:18px;z-index:4;line-height:1;cursor:pointer;transition:color .15s,transform .15s}
 .feat-star:hover{color:#fff;transform:scale(1.2)}
@@ -370,6 +372,15 @@ table.ht tbody tr:hover{background:#232323}
 .favs-vbtn{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;padding:4px 8px;border-radius:3px;border:none;cursor:pointer;background:transparent;color:#878787;transition:all .15s;display:flex;align-items:center;gap:4px}
 .favs-vbtn.on{background:#2a2a2a;color:#fff}
 .favs-vbtn:hover:not(.on){color:#878787}
+/* Make fav cards use the same hover highlight as the featured card on the homepage */
+.favs-grid .fc:hover{
+  border-color:var(--g) !important;
+  box-shadow:0 0 0 3px rgba(0,230,118,0.25) !important;
+  background:#5A5A5A !important;
+  border-width:3px !important;
+  transition: border-color .15s, box-shadow .15s, background .15s, border-width .15s;
+  cursor: pointer !important;
+}
 .fc{background:#272727;border:1px solid #363636;border-radius:7px;overflow:hidden;cursor:grab;transition:border-color .2s;display:flex;flex-direction:column;width:100%;min-width:0;position:relative}
 .fc.feat{background:#5A5A5A;border:3px solid #3a3a3a}
 .fc:hover{border-color:#878787}
@@ -668,9 +679,14 @@ table.ht tbody tr:hover{background:#232323}
 @media (max-width:600px){
   .nav-toggle{display:flex}
   .sb{display:flex;width:min(292px,84vw);min-width:min(292px,84vw);transform:translateX(-100%);transition:transform .22s ease;box-shadow:8px 0 24px rgba(0,0,0,.35);z-index:350}
-  .sb-logo{padding:18px 16px 12px;font-size:22px;letter-spacing:1.6px}
-  .sb-nav{padding-top:6px}
-  .sb-item{padding:14px 16px;font-size:15px;letter-spacing:.5px}
+  .sb-logo{padding:14px 16px 10px;display:flex;flex-direction:column;align-items:center}
+  .sb-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--g);font-size:24px;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:10}
+  .sb-branding{text-align:center;width:100%}
+  .sb-powered{font-size:12px;color:#a0b8a0;letter-spacing:.4px;margin-top:4px}
+  .sb-nav{padding:20px 12px 8px;display:flex;flex-direction:column;gap:4px}
+  .sb-item{padding:14px 16px;font-size:15px;letter-spacing:.5px;border-radius:6px;margin:0}
+  .sb-item.on{background:var(--g);color:#000;width:100%}
+  .sb-item:not(.on){background:transparent;color:#a0b8a0}
   .sb-foot{padding:14px 16px 18px}
   .mobile-nav-open .sb{transform:translateX(0)}
   .main{margin-left:0}
@@ -902,7 +918,7 @@ table.ht tbody tr:hover{background:#232323}
         <!-- Featured card -->
         <div class="feat" id="feat-card">
           <div class="feat-img" id="feat-img-area" style="cursor:default">
-            <div class="feat-crest" id="feat-crest-main"><img id="feat-sil-img" src="https://raw.githubusercontent.com/OliviaWeiss/moneybol-players/refs/heads/main/silhouette.png" style="width:120%;height:120%;object-fit:contain;margin:-10%;opacity:1;transform:scale(1.1);transform-origin:center center" onerror="this.style.display='none'"></div>
+            <div class="feat-crest" id="feat-crest-main"><img id="feat-sil-img" src="https://raw.githubusercontent.com/OliviaWeiss/moneybol-players/refs/heads/main/silhouette.png" style="width:100%;height:100%;object-fit:cover;opacity:1;transform:scale(1.03);transform-origin:center center" onerror="this.style.display='none'"></div>
             <div class="feat-init" id="feat-init" style="display:none">—</div>
             <span class="feat-star" id="feat-star-btn" onclick="event.stopPropagation();toggleFeatFav()">☆</span>
             <span class="feat-score" id="feat-score">—</span>
@@ -937,7 +953,7 @@ table.ht tbody tr:hover{background:#232323}
     <div class="pdh-hdr">
       <div><div class="pdh-title">PLAYER HISTORY</div><div class="pdh-sub" id="pdh-sub">Match log</div></div>
       <div class="pdh-tabs">
-        <div class="pdh-tab on" data-tab="value" onclick="switchTab('value')">STATS</div>
+        <div class="pdh-tab on" data-tab="value" onclick="switchTab('value')">RATING</div>
         <div class="pdh-tab" data-tab="pitch" onclick="switchTab('pitch')">PITCH</div>
         <div class="pdh-tab" data-tab="stats" onclick="switchTab('stats')">HISTORY</div>
         <div class="pdh-tab" data-tab="leagues" onclick="switchTab('leagues')">LEAGUES</div>
@@ -33724,6 +33740,11 @@ function switchTab(name){
   const subEl=document.getElementById('pdh-sub');
   if(subEl) subEl.textContent=subs[name]||'';
 
+  /* Update title to match tab */
+  const titles={stats:'PLAYER HISTORY',pitch:'PITCH',value:'PLAYER RATING',leagues:'LEAGUES'};
+  const titleEl=document.querySelector('.pdh-title');
+  if(titleEl) titleEl.textContent = titles[name] || 'PLAYER';
+
   if(name==='pitch') renderPitch();
   if(name==='value') renderValue();
   if(name==='leagues') renderLeagues();
@@ -34845,7 +34866,7 @@ function viewP(name){
       <div class="pd-team">${p.comp} · ${p.season}</div>
       <div class="pd-actions">
         <button class="pd-star ${isFav?'on':''}" onclick="toggleFav('${esc(name)}',this)">★</button>
-        <button onclick="toggleCompare('${esc(name)}',this)" class="icon-btn${compareIds.includes(name)?' on':''}" id="pd-cmp-btn" style="pointer-events:auto;font-size:24px;vertical-align:middle;display:flex;align-items:center;justify-content:center;width:22px;height:22px;align-self:flex-start" title="Compare">${compareIds.includes(name)?'✓':'+'}</button>
+        <button onclick="toggleCompare('${esc(name)}',this)" class="icon-btn${compareIds.includes(name)?' on':''}" id="pd-cmp-btn" style="pointer-events:auto;font-size:24px;vertical-align:middle;margin-left:4px" title="Compare">${compareIds.includes(name)?'✓':'+'}</button>
       </div>
     </div>
     <div class="pd-ring" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 22px">
@@ -35141,16 +35162,16 @@ function fcHtml(p){
       getPlayerImg(p.name).then(url=>{
         if(!url) return;
         const c=document.getElementById('fc-crest-'+safeId);
-        if(c) c.style.backgroundImage=`url("${url}")`,c.style.backgroundSize='cover',c.style.backgroundPosition=(PLAYER_IMG_POSITION[p.name]||'center top');
+        if(c){ c.style.backgroundImage=`url("${url}")`; c.style.backgroundSize='cover'; c.style.backgroundPosition=(PLAYER_IMG_POSITION[p.name]||'center center'); c.style.backgroundRepeat='no-repeat'; }
       });
     }
   },100);
 
   return `<div class="fc feat${isCmp?' cmp-selected':''}" data-fav-name="${esc(p.name)}" draggable="true" ondragstart="startFavDrag(event,this,'${esc(p.name)}')" ondragover="allowFavDrop(event,this)" ondrop="dropFavCard(event,this,'${esc(p.name)}')" ondragend="endFavDrag()" onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
     <div class="feat-img" style="cursor:pointer">
-      <div id="fc-crest-${safeId}" class="feat-crest" style="background-image:url('${imgSrc}');background-size:120%;background-position:${PLAYER_IMG_POSITION[p.name]||'center top'}"></div>
+      <div id="fc-crest-${safeId}" class="feat-crest" style="background-image:url('${imgSrc}');background-size:cover;background-position:center center;background-repeat:no-repeat"></div>
       <span class="feat-star" style="color:var(--g);width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
-      <button class="icon-btn fc-cmp-btn${isCmp?' selected on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:34px;left:12px;z-index:5;font-size:24px;color:${isCmp?'var(--g)':'#aaa'};width:18px;height:18px;display:flex;align-items:center;justify-content:center">${isCmp?'✓':'+'}</button>
+      <button class="icon-btn${isCmp?' on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:14px;z-index:5;color:${isCmp?'var(--g)':'#aaa'};font-size:24px" title="Compare">${isCmp?'✓':'+'}</button>
       <span class="feat-score" style="color:${p.rc}">${p.score}</span>
       <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
     </div>

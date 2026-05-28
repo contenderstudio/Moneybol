@@ -701,9 +701,9 @@ table.ht tbody tr:hover{background:#232323}
   }
   .sb-logo{
     padding:0 !important;
-    margin:24px 16px 8px;
-    background:rgba(17,30,23,.56);
-    border:1px solid rgba(255,255,255,.05);
+    margin:56px 16px 8px;
+    background:transparent;
+    border:none;
     border-radius:0;
     min-height:80px;
     font-size:16px;
@@ -711,21 +711,21 @@ table.ht tbody tr:hover{background:#232323}
     align-items:center !important;
     justify-content:center;
   }
-  .sb-logo > img{max-width:none !important;width:auto !important;height:40px !important;object-fit:contain}
+  .sb-logo > img{max-width:none !important;width:auto !important;height:48px !important;object-fit:contain}
   .sb-powered-lockup{gap:7px !important;margin-top:4px !important}
   .sb-powered-lockup .sb-powered-text{font-size:11px !important;letter-spacing:1.05px !important}
   .sb-powered-lockup .sb-contender-logo{height:21px !important}
   .sb-close{position:absolute;top:16px;right:16px;background:none;border:none;color:#f2f5f2;font-size:40px;font-weight:300;line-height:1;cursor:pointer;padding:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;z-index:10}
   .sb-branding{text-align:center;width:100%}
   .sb-powered{font-size:12px;color:#cfd8cf;letter-spacing:.4px;margin-top:4px}
-  .sb-nav{padding:8px 16px 8px;display:flex;flex-direction:column;gap:8px;align-items:center}
+  .sb-nav{flex:none;padding:8px 16px 0;display:flex;flex-direction:column;gap:8px;align-items:center}
   .sb-item{padding:16px 16px;font-size:15px;line-height:1;letter-spacing:.7px;border-radius:0;margin:0;color:#9ea8a4;font-weight:700;justify-content:center;text-align:center;width:100%}
   .sb-item svg{width:16px;height:16px;opacity:.95}
   .sb-item.on{background:#22ef7b;color:#07140b;width:100%}
   .sb-item:not(.on){background:transparent;color:#9ea8a4}
   .sb-item:not(.on):hover{background:rgba(0,0,0,.12);color:#d4dbd7}
   .sb-foot{padding:16px 16px 16px}
-  .sb-user{padding:8px 8px 8px;margin-top:auto;border-top:2px solid rgba(255,255,255,.58)}
+  .sb-user{padding:6px 8px 4px;margin-top:12px;border-top:2px solid rgba(255,255,255,.58)}
   .sb-user-row{padding:8px 0 8px;align-items:center;position:relative}
   .sb-user-av{width:40px;height:40px;font-size:16px}
   .sb-user-name{font-size:16px;font-weight:600;color:#d8d8d8;padding-left:2px}
@@ -868,6 +868,43 @@ table.ht tbody tr:hover{background:#232323}
 <style>
 @media (max-width:600px){
   .pdh-tab{font-size:12px;padding:4px 8px}
+}
+</style>
+<style>
+@media (max-width:600px){
+  /* Compact compare chips for mobile */
+  .cmp-slot{padding:6px 10px;gap:8px;min-width:0}
+  .cmp-slot-init{width:28px;height:28px;font-size:12px}
+  .cmp-slot-name{font-size:14px}
+  .cmp-slot-meta{font-size:12px}
+  .cmp-slot-remove{font-size:16px;padding:0 6px}
+  .cmp-bar{padding:8px 12px}
+}
+</style>
+<style>
+@media (max-width:600px){
+  /* Ensure the sidebar close X is positioned in the corner and
+     does not overlap the dark green logo header. Move the header
+     down a bit to create clear space for the X. */
+  .sb{
+    padding-top: 18px !important;
+  }
+  .sb-close{
+    position: fixed !important;
+    top: 12px !important;
+    right: 14px !important;
+    z-index: 9999 !important;
+  }
+  .sb-logo{
+    padding-top: 44px !important;
+    margin-top: 20px !important;
+  }
+  .sb-nav{
+    padding-top: 20px !important;
+  }
+  .sb-user{
+    padding-top: 14px !important;
+  }
 }
 </style>
 </style>

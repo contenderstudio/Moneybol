@@ -821,7 +821,7 @@ table.ht tbody tr:hover{background:#232323}
     border-right:none !important;
   }
   #pg-lists #list-buttons > div:first-child{
-    padding:18px 12px 16px !important;
+    padding:60px 12px 16px !important;
   }
   #pg-lists #list-buttons > div:last-child{
     min-height:320px;
@@ -839,16 +839,112 @@ table.ht tbody tr:hover{background:#232323}
   }
   /* Lists results header: remove divider, center title, position back button near hamburger */
   /* Target the actual List Results topbar */
-  #pg-listresults .topbar { border-bottom: none !important; justify-content: center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important }
-  #pg-listresults .topbar .tb-bk { position:absolute !important; left:56px !important; top:8px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
+  #pg-listresults .topbar { border-bottom: none !important; justify-content: center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important; padding-top:32px !important; padding-bottom:8px !important }
+  #pg-listresults .topbar .tb-bk { position:absolute !important; left:56px !important; top:4px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
   /* Compare page header: remove top border and align BACK with hamburger */
   #pg-compare .topbar { border-bottom: none !important; justify-content:center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important }
   #pg-compare .topbar .tb-bk { position:absolute !important; left:56px !important; top:8px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
-  #pg-listresults #lr-lbl { margin:0 !important; text-align:center !important; font-weight:800 !important; letter-spacing:1px !important; font-size:15px !important; color:#fff !important }
+  #pg-listresults #lr-lbl { margin:32px 0 0 !important; text-align:center !important; font-weight:800 !important; letter-spacing:1px !important; font-size:15px !important; color:#fff !important }
   /* Stronger rules: target inline-styled header and force centering */
-  #list-results > div[style*="border-bottom"] { border-bottom: none !important; display:flex !important; justify-content:center !important; align-items:center !important; position:relative !important; padding-left:64px !important }
-  #list-results > div[style*="border-bottom"] button[onclick^="go('lists')"] { position:absolute !important; left:12px !important; top:50% !important; transform:translateY(-50%) !important; padding:6px 10px !important }
-  #list-results .sr-lbl { padding-left:0 !important; width:100% !important; text-align:center !important; box-sizing:border-box }
+  #list-results > div[style*="border-bottom"] { border-bottom: none !important; display:flex !important; justify-content:center !important; align-items:center !important; position:relative !important; padding-left:64px !important; padding-top:32px !important; padding-bottom:8px !important }
+  #list-results > div[style*="border-bottom"] button[onclick^="go('lists')"] { position:absolute !important; left:12px !important; top:4px !important; transform:none !important; padding:6px 10px !important }
+  #list-results .sr-lbl { padding-left:0 !important; width:100% !important; text-align:center !important; box-sizing:border-box; margin-top:32px !important }
+  .rt-wrap{overflow:visible !important;padding:0 0 16px 0 !important}
+  .rt-table{display:block !important;min-width:0 !important;width:100% !important;font-size:14px !important}
+  .rt-table thead{display:none !important}
+  .rt-table tbody{display:block !important}
+  .rt-table tr{
+    display:grid !important;
+    grid-template-columns:18px 46px minmax(0,1fr);
+    align-items:center !important;
+    column-gap:0;
+    row-gap:0;
+    padding:10px 12px 12px !important;
+    margin:0 12px 8px !important;
+    border:1px solid #2a2a2a;
+    border-radius:10px;
+    background:#161616 !important;
+  }
+  .rt-table tr:hover{background:#161616 !important}
+  .rt-table td{
+    display:block !important;
+    width:auto !important;
+    padding:0 !important;
+    border:none !important;
+    text-align:left !important;
+    white-space:normal !important;
+  }
+  .rt-table td[data-label="#"]{grid-column:1;align-self:center;color:#555 !important;font-size:13px !important;padding-top:0 !important}
+  .rt-table td[data-label="ACTIONS"]{grid-column:2;align-self:center;white-space:nowrap !important;padding-top:0 !important;line-height:1}
+  .rt-table td[data-label="PLAYER"]{grid-column:3;align-self:center;min-width:0}
+  .rt-table td[data-label="TEAM"],
+  .rt-table td[data-label="POS"],
+  .rt-table td[data-label="COMPETITION"],
+  .rt-table td[data-label="SEASON"],
+  .rt-table td[data-label="xG"],
+  .rt-table td[data-label="GOALS"],
+  .rt-table td[data-label="PASS%"]{
+    grid-column:1 / -1;
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    gap:14px;
+    color:#cfcfcf !important;
+    font-size:13px !important;
+    border-top:1px solid #2a2a2a;
+    padding-top:10px !important;
+  }
+  .rt-table td[data-label="TEAM"]{color:#cfcfcf !important}
+  .rt-table td[data-label="POS"]{color:#cfcfcf !important}
+  .rt-table td[data-label="TEAM"]::before,
+  .rt-table td[data-label="POS"]::before,
+  .rt-table td[data-label="COMPETITION"]::before,
+  .rt-table td[data-label="SEASON"]::before,
+  .rt-table td[data-label="xG"]::before,
+  .rt-table td[data-label="GOALS"]::before,
+  .rt-table td[data-label="PASS%"]::before{
+    content:attr(data-label);
+    display:block;
+    font-family:var(--f);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.7px;
+    color:#878787;
+    margin:0;
+  }
+  .rt-table td[data-label="PLAYER"]::before{content:'';display:none}
+  .rt-table .fr-name span{font-size:14px !important}
+  .rt-table .fr-name div{width:32px !important;height:32px !important}
+  .rt-table td[data-label="PLAYER"] .fr-name{display:flex;align-items:center;gap:8px !important;min-width:0}
+  .rt-table td[data-label="PLAYER"] .fr-name span{line-height:1.1 !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #pitch-summary{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .pitch-stat{
+    border:1px solid #2a2a2a;
+    border-radius:10px;
+    background:#161616;
+    padding:14px 10px 12px;
+    text-align:center;
+  }
+  .pitch-stat-val{
+    font-family:var(--f);
+    font-size:30px;
+    font-weight:300;
+    line-height:1;
+    letter-spacing:-.5px;
+    color:#e8e8e8;
+  }
+  .pitch-stat-label{
+    margin-top:8px;
+    font-family:var(--f);
+    font-size:13px;
+    font-weight:700;
+    line-height:1.15;
+    color:#fff;
+  }
   .cmp-bar{
     left:0;
     flex-direction:column;
@@ -860,7 +956,41 @@ table.ht tbody tr:hover{background:#232323}
   .cmp-slot,.cmp-slot-empty{min-width:0;width:100%;box-sizing:border-box}
   .cmp-go-btn{width:100%;padding:10px 14px;font-size:14px}
   .cp-ring{right:16px}
-  table.ht{display:block;overflow:auto;width:100%}
+  .pd-hist{padding:16px 12px 24px}
+  table.ht{display:block;overflow:visible;width:100%}
+  table.ht thead{display:none !important}
+  table.ht tbody{display:block;width:100%}
+  table.ht tbody tr{
+    display:block;
+    padding:10px 12px;
+    margin:0 0 10px;
+    border:1px solid #3a3a3a;
+    border-radius:10px;
+    background:#141414;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+  }
+  table.ht tbody td{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    gap:12px;
+    padding:7px 0 !important;
+    border:none !important;
+    border-top:1px solid #3a3a3a !important;
+    color:#cfcfcf !important;
+    white-space:normal !important;
+  }
+  table.ht tbody td:first-child{border-top:none !important;padding-top:0 !important}
+  table.ht tbody td::before{
+    content:attr(data-label);
+    font-family:var(--f);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.7px;
+    color:#878787;
+    flex:0 0 auto;
+  }
+  table.ht tbody td.tg{color:#fff !important;font-weight:700}
   /* Compare page — stack hero vertically on small screens */
   .cp-hero{flex-direction:column;align-items:center;padding:14px 12px;min-height:auto;height:auto}
   .cp-crest-circle{width:120px;height:120px;margin:6px 0;border-radius:50%}
@@ -34056,17 +34186,17 @@ function renderPitch(){
     const convRate = p.shotLog.length>0?((goals/p.shotLog.length)*100).toFixed(1):0;
     const xgDiff   = (goals - totalXG).toFixed(2);
     const xgDiffColor = goals>=totalXG?'#fff':'#fff';
-    const statRow=(label,val,color='#fff')=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #2a2a2a">
-        <span style="font-family:var(--f);font-size:13px;letter-spacing:.4px;color:#878787">${label}</span>
-        <span style="font-family:var(--f);font-size:15px;font-weight:300;color:${color}">${val}</span>
+    const statRow=(label,val)=>`
+      <div class="pitch-stat">
+        <div class="pitch-stat-val">${val}</div>
+        <div class="pitch-stat-label">${label}</div>
       </div>`;
     const summary = document.getElementById('pitch-summary');
     if(summary) summary.innerHTML =
       statRow('Total Shots', p.shotLog.length) +
-      statRow('Goals', goals, '#00e676') +
-      statRow('Total xG', totalXG.toFixed(2), '#fff') +
-      statRow('Goals vs xG', (goals>=totalXG?'+':'')+xgDiff, xgDiffColor) +
+      statRow('Goals', goals) +
+      statRow('Total xG', totalXG.toFixed(2)) +
+      statRow('Goals vs xG', (goals>=totalXG?'+':'')+xgDiff) +
       statRow('Conversion', convRate+'%');
     return;
   }
@@ -34130,21 +34260,21 @@ function renderPitch(){
   const bodyBreakdown = Object.entries(byBody).sort((a,b)=>b[1]-a[1])
     .map(([k,v])=>`<span style="color:#fff">${k}</span>: ${v}`).join(' · ');
 
-  const statRow=(label,val,color='#fff')=>`
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #2a2a2a">
-      <span style="font-family:var(--f);font-size:13px;letter-spacing:.4px;color:#878787">${label}</span>
-      <span style="font-family:var(--f);font-size:15px;font-weight:300;color:${color}">${val}</span>
+  const statRow=(label,val)=>`
+    <div class="pitch-stat">
+      <div class="pitch-stat-val">${val}</div>
+      <div class="pitch-stat-label">${label}</div>
     </div>`;
 
   if(summary) summary.innerHTML =
     statRow('Total Shots', p.shotLog.length) +
-    statRow('Goals', goals, '#00e676') +
-    statRow('On Target', onT+goals, '#4fc3f7') +
-    statRow('Blocked', blocked, '#888') +
-    statRow('Off Target', offT, '#e05a2b') +
-    (post?statRow('Hit Post', post, '#fff'):'') +
-    statRow('Total xG', totalXG.toFixed(2), '#fff') +
-    statRow('Goals vs xG', (goals>=totalXG?'+':'')+xgDiff, xgDiffColor) +
+    statRow('Goals', goals) +
+    statRow('On Target', onT+goals) +
+    statRow('Blocked', blocked) +
+    statRow('Off Target', offT) +
+    (post?statRow('Hit Post', post):'') +
+    statRow('Total xG', totalXG.toFixed(2)) +
+    statRow('Goals vs xG', (goals>=totalXG?'+':'')+xgDiff) +
     statRow('Conversion', convRate+'%') +
     (bodyBreakdown?`<div style="margin-top:10px;font-size:13px;color:#878787;line-height:1.8">
       <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;margin-bottom:4px">BODY PART</div>
@@ -35124,6 +35254,7 @@ function viewP(name){
 
   // Update table headers based on position
   const histHead = document.getElementById('pd-hist-head');
+  const cell = (label, value, cls='') => `<td data-label="${label}"${cls ? ` class="${cls}"` : ''}>${value}</td>`;
   if(histHead){
     if(isGK){
       histHead.innerHTML = '<th>Opponent</th><th>Competition</th><th>Date</th><th>Min</th><th>Saves</th><th>Goals Conceded</th><th>Save %</th><th>Sweeper Actions</th><th>Pass%</th>';
@@ -35142,31 +35273,41 @@ function viewP(name){
       const mSavePct = (mSaves+mGC)>0 ? Math.round((mSaves/(mSaves+mGC))*100) : 0;
       if(isGK){
         return `<tr>
-          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
-          <td class="${mSaves>3?'tg':''}">${mSaves}</td>
-          <td class="${mGC>1?'tg':''}">${mGC}</td>
-          <td>${mSavePct}%</td>
-          <td>${m.sweeperActions||0}</td>
-          <td>${m.passAcc}%</td>
+          ${cell('Opponent', `vs ${m.vs||'?'}`)}
+          ${cell('Competition', m.comp)}
+          ${cell('Date', m.date)}
+          ${cell('Min', `${m.mins}'`)}
+          ${cell('Saves', mSaves, mSaves>3 ? 'tg' : '')}
+          ${cell('Goals Conceded', mGC, mGC>1 ? 'tg' : '')}
+          ${cell('Save %', `${mSavePct}%`)}
+          ${cell('Sweeper Actions', m.sweeperActions||0)}
+          ${cell('Pass%', `${m.passAcc}%`)}
         </tr>`;
       } else if(isDef){
         return `<tr>
-          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
-          <td class="${(m.tackles||0)>2?'tg':''}">${m.tackles||0}</td>
-          <td class="${(m.interceptions||0)>1?'tg':''}">${m.interceptions||0}</td>
-          <td>${m.pressures||0}</td>
-          <td>${m.pressureRegains||0}</td>
-          <td>${m.passAcc}%</td>
+          ${cell('Opponent', `vs ${m.vs||'?'}`)}
+          ${cell('Competition', m.comp)}
+          ${cell('Date', m.date)}
+          ${cell('Min', `${m.mins}'`)}
+          ${cell('Tackles Won', m.tackles||0, (m.tackles||0)>2 ? 'tg' : '')}
+          ${cell('Interceptions', m.interceptions||0, (m.interceptions||0)>1 ? 'tg' : '')}
+          ${cell('Pressures', m.pressures||0)}
+          ${cell('Press Regains', m.pressureRegains||0)}
+          ${cell('Pass%', `${m.passAcc}%`)}
         </tr>`;
       } else {
         return `<tr>
-          <td>vs ${m.vs||'?'}</td><td>${m.comp}</td><td>${m.date}</td><td>${m.mins}'</td>
-          <td class="${m.goals>0?'tg':''}">${m.goals}</td>
-          <td class="${m.xG>=.3?'tg':''}">${m.xG}</td>
-          <td>${m.shots}</td><td>${m.shotsOnT}</td>
-          <td class="${m.touchesOppBox>3?'tg':''}">${m.touchesOppBox||0}</td>
-          <td>${m.keyPasses}</td>
-          <td>${m.passAcc}%</td>
+          ${cell('Opponent', `vs ${m.vs||'?'}`)}
+          ${cell('Competition', m.comp)}
+          ${cell('Date', m.date)}
+          ${cell('Min', `${m.mins}'`)}
+          ${cell('Goals', m.goals, m.goals>0 ? 'tg' : '')}
+          ${cell('xG', m.xG, m.xG>=.3 ? 'tg' : '')}
+          ${cell('Shots', m.shots)}
+          ${cell('On Target', m.shotsOnT)}
+          ${cell('Touches Opp Box', m.touchesOppBox||0, (m.touchesOppBox||0)>3 ? 'tg' : '')}
+          ${cell('Key Passes', m.keyPasses)}
+          ${cell('Pass%', `${m.passAcc}%`)}
         </tr>`;
       }
     }).join('')
@@ -36281,8 +36422,8 @@ function updateFilterCount(){
 
 function renderTableHTML(players, opts={}){
   const dragReorder = !!opts.dragReorder;
-  return `<div style="overflow-x:auto;width:100%;padding:0 0 40px 0">
-    <table style="width:100%;border-collapse:collapse;font-size:15px;min-width:700px">
+  return `<div class="rt-wrap" style="overflow-x:auto;width:100%;padding:0 0 40px 0">
+    <table class="rt-table" style="width:100%;border-collapse:collapse;font-size:15px;min-width:700px">
       <thead>
         <tr style="border-bottom:2px solid #2a2a2a;text-align:left">
           <th style="padding:12px 8px;font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.8px;color:#878787;width:36px">#</th>
@@ -36307,26 +36448,26 @@ function renderTableHTML(players, opts={}){
             onmouseover="this.style.background='#1e2a1e'"
             onmouseout="this.style.background='${rowBg}'"
             onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
-            <td style="padding:12px 8px;font-family:var(--f);font-weight:800;font-size:15px;color:${rankColor};width:36px">${i+1}</td>
-            <td style="padding:12px 8px;white-space:nowrap;pointer-events:none" onclick="event.stopPropagation()">
+            <td data-label="#" style="padding:12px 8px;font-family:var(--f);font-weight:800;font-size:15px;color:${rankColor};width:36px">${i+1}</td>
+            <td data-label="ACTIONS" style="padding:12px 8px;white-space:nowrap;pointer-events:none" onclick="event.stopPropagation()">
               <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:8px;pointer-events:auto;font-size:18px;vertical-align:middle" title="Favourite">★</button>
               <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" class="icon-btn${compareIds.includes(p.name)?' on':''}" data-cmp="${esc(p.name)}" style="pointer-events:auto;font-size:24px;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'+'}</button>
             </td>
-            <td style="padding:12px 8px">
+            <td data-label="PLAYER" style="padding:12px 8px">
               <div class="fr-name">
                 <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;overflow:hidden;background:#222;background-image:url('${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}');background-size:120%;background-position:center top"></div>
                 <span style="font-family:var(--f);font-weight:300;color:#fff;font-size:15px">${displayName}</span>
               </div>
             </td>
-            <td style="padding:12px 8px;color:#878787;font-size:15px">${p.team}</td>
-            <td style="padding:12px 8px">
+            <td data-label="TEAM" style="padding:12px 8px;color:#878787;font-size:15px">${p.team}</td>
+            <td data-label="POS" style="padding:12px 8px">
               <span style="font-family:var(--f);font-size:14px;font-weight:700;color:#878787;background:rgba(255,255,255,.06);padding:2px 8px;border-radius:3px">${pos}</span>
             </td>
-            <td style="padding:12px 8px;color:#878787;font-size:15px">${p.comp}</td>
-            <td style="padding:12px 8px;color:#878787;font-size:15px">${p.season}</td>
-            <td style="padding:12px 8px;text-align:right;font-family:var(--f);font-weight:700;font-size:15px;color:#878787">${p.mins > 0 ? p.xG.toFixed(2) : '—'}</td>
-            <td style="padding:12px 8px;text-align:right;font-family:var(--f);font-weight:700;font-size:15px;color:#878787">${p.mins > 0 ? p.goals : '—'}</td>
-            <td style="padding:12px 8px;text-align:right;font-family:var(--f);font-size:15px;color:#878787">${p.mins > 0 ? pct(p)+'%' : '—'}</td>
+            <td data-label="COMPETITION" style="padding:12px 8px;color:#878787;font-size:15px">${p.comp}</td>
+            <td data-label="SEASON" style="padding:12px 8px;color:#878787;font-size:15px">${p.season}</td>
+            <td data-label="xG" style="padding:12px 8px;text-align:right;font-family:var(--f);font-weight:700;font-size:15px;color:#878787">${p.mins > 0 ? p.xG.toFixed(2) : '—'}</td>
+            <td data-label="GOALS" style="padding:12px 8px;text-align:right;font-family:var(--f);font-weight:700;font-size:15px;color:#878787">${p.mins > 0 ? p.goals : '—'}</td>
+            <td data-label="PASS%" style="padding:12px 8px;text-align:right;font-family:var(--f);font-size:15px;color:#878787">${p.mins > 0 ? pct(p)+'%' : '—'}</td>
           </tr>`;
         }).join('')}
       </tbody>

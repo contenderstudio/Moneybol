@@ -737,16 +737,20 @@ table.ht tbody tr:hover{background:#232323}
   .topbar{padding:8px 8px 8px 56px;flex-wrap:wrap}
   /* Align topbar back button across all primary pages on mobile */
   .pg .topbar{border-bottom:none !important;position:relative}
-  .pg .topbar .tb-bk{position:absolute !important;left:56px !important;top:8px !important;height:40px !important;display:inline-flex !important;align-items:center !important;z-index:380 !important}
+  .pg .topbar .tb-bk{position:absolute !important;left:64px !important;top:12px !important;height:40px !important;display:inline-flex !important;align-items:center !important;z-index:380 !important}
   /* About page: remove topbar divider and align back button with hamburger */
   #pg-about .topbar{border-bottom:none !important;position:relative}
-  #pg-about .topbar .tb-bk{position:absolute !important;left:56px !important;top:8px !important;height:40px !important;display:inline-flex !important;align-items:center !important;z-index:380 !important}
-  .pd-topbar{padding:0 12px 0 60px;min-height:56px;border-bottom:none}
-  .pd-topbar .bk{display:inline-flex;align-items:center;height:40px;line-height:1}
+  #pg-about .topbar .tb-bk{position:absolute !important;left:64px !important;top:12px !important;height:40px !important;display:inline-flex !important;align-items:center !important;z-index:380 !important}
+  .pd-topbar{position:relative;padding:0 12px 0 48px;min-height:56px;border-bottom:none}
+  .pd-topbar .bk{position:absolute !important;left:64px !important;top:12px !important;display:inline-flex;align-items:center;height:40px;line-height:1}
   .tb-bk{order:1}
   .tb-sb{order:4;max-width:none;flex:1 1 100%;width:100%}
   .tb-btn{order:2}
   .tb-av{order:3}
+  #pg-search .topbar{flex-direction:column;align-items:stretch;position:relative !important;padding:32px 12px 10px 48px !important;gap:10px}
+  #pg-search .tb-bk{position:absolute !important;left:64px !important;top:12px !important;order:1;align-self:flex-start;height:40px !important;display:inline-flex !important;align-items:center;transform:none !important;z-index:380 !important}
+  #pg-search .tb-sb{order:2;width:100%;flex:0 0 auto;max-width:none;margin-top:24px}
+  #pg-search .tb-btn{order:3;width:100%;margin-top:12px}
   .search-brand{margin:52px 12px 8px;gap:6px}
   .search-brand-logo img{height:44px}
   .search-brand-sub{font-size:12px;letter-spacing:.6px}
@@ -840,10 +844,10 @@ table.ht tbody tr:hover{background:#232323}
   /* Lists results header: remove divider, center title, position back button near hamburger */
   /* Target the actual List Results topbar */
   #pg-listresults .topbar { border-bottom: none !important; justify-content: center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important; padding-top:32px !important; padding-bottom:8px !important }
-  #pg-listresults .topbar .tb-bk { position:absolute !important; left:56px !important; top:4px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
+  #pg-listresults .topbar .tb-bk { position:absolute !important; left:64px !important; top:12px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
   /* Compare page header: remove top border and align BACK with hamburger */
   #pg-compare .topbar { border-bottom: none !important; justify-content:center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important }
-  #pg-compare .topbar .tb-bk { position:absolute !important; left:56px !important; top:8px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
+  #pg-compare .topbar .tb-bk { position:absolute !important; left:64px !important; top:12px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
   #pg-listresults #lr-lbl { margin:32px 0 0 !important; text-align:center !important; font-weight:800 !important; letter-spacing:1px !important; font-size:15px !important; color:#fff !important }
   /* Stronger rules: target inline-styled header and force centering */
   #list-results > div[style*="border-bottom"] { border-bottom: none !important; display:flex !important; justify-content:center !important; align-items:center !important; position:relative !important; padding-left:64px !important; padding-top:32px !important; padding-bottom:8px !important }

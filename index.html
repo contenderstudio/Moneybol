@@ -826,15 +826,37 @@ table.ht tbody tr:hover{background:#232323}
   .pds-val{font-size:32px}
   .pds-name{font-size:13px}
   .pd-ring{padding:20px 22px}
-  .pd-ring{transform:none;justify-self:center}
+  .pd-ring{transform:translateY(-18px);justify-self:center}
   /* stack numbers above labels and present stats in two columns on small screens */
   .pd-stats{grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
   .pds{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;border-radius:6px;background:transparent;text-align:center}
   .pds-val{font-size:34px;line-height:1;margin-bottom:6px;color:var(--g)}
   .pds-name{font-size:14px;font-weight:800;color:#fff;margin-top:6px}
   .pds .pds-avg{display:block;font-size:12px;color:#878787;margin-bottom:6px}
-  .pd-ring .rw{width:clamp(120px,36vw,160px)!important;height:clamp(120px,36vw,160px)!important}
-  .pd-ring .rl{font-size:clamp(48px,18vw,64px)!important}
+  .pd-ring .rw{width:clamp(128px,40vw,176px)!important;height:clamp(128px,40vw,176px)!important}
+  .pd-ring .rl{font-size:clamp(52px,20vw,70px)!important}
+  .pdh-hdr{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .pdh-sub{display:none}
+  .pdh-tabs{
+    overflow:visible;
+    flex:1;
+    min-width:0;
+    gap:4px;
+    justify-content:space-between;
+  }
+  .pdh-tab{
+    font-size:11px;
+    padding:4px 6px;
+    letter-spacing:.4px;
+    flex:1 1 0;
+    text-align:center;
+    white-space:nowrap;
+  }
   #tab-pitch > div:first-child > div:first-child{display:none !important}
   #tab-pitch > div:first-child{justify-content:center !important;gap:0 !important}
   .favs-wrap{padding:24px 12px 16px}
@@ -34360,6 +34382,8 @@ function renderValue(){
     return;
   }
 
+  const isMobileValueTab = window.matchMedia('(max-width:600px)').matches;
+
   const attrDefs = [
     { key:'pac', label:'Pace',        abbr:'PAC', color:'#00e676', desc:'Speed & acceleration' },
     { key:'sho', label:'Shooting',    abbr:'SHO', color:'#4fc3f7', desc:'Finishing & shot power' },
@@ -34371,7 +34395,7 @@ function renderValue(){
 
   el.innerHTML = `
     <div style="margin-bottom:16px">
-      <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">EA FC ATTRIBUTES</div>
+      ${isMobileValueTab ? '' : '<div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">EA FC ATTRIBUTES</div>'}
       <div style="display:grid;grid-template-columns:1fr;gap:10px">
         ${attrDefs.map(({key, label, abbr, color, desc}) => {
           const val = attrs[key] || 0;

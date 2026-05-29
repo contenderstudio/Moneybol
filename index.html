@@ -674,6 +674,46 @@ table.ht tbody tr:hover{background:#232323}
 .sb-user-action.sign-out{color:#ff5a5a;background:transparent}
 .sb-user-action.sign-out:hover{color:#ff7a7a;transform:translateY(-1px);text-shadow:0 0 10px rgba(255,90,90,.28)}
 .sb-user-exit{display:none}
+
+#pitch-summary{
+  display:block;
+  width:100%;
+  max-width:none;
+}
+.pitch-stat{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:11px 0;
+  border:0;
+  border-bottom:1px solid #2a2a2a;
+  background:transparent;
+  text-align:left;
+  width:100%;
+}
+#pitch-summary .pitch-stat:last-child{border-bottom:none}
+.pitch-stat-label{
+  margin-top:0;
+  font-family:var(--f);
+  font-size:14px;
+  font-weight:700;
+  line-height:1.15;
+  color:#878787;
+  letter-spacing:.2px;
+  text-transform:none;
+}
+.pitch-stat-val{
+  font-family:var(--f);
+  font-size:18px;
+  font-weight:300;
+  line-height:1;
+  letter-spacing:-.5px;
+  color:#e8e8e8;
+  text-align:right;
+  flex-shrink:0;
+  min-width:84px;
+}
 @media (max-width:900px){
   .sb{width:140px;min-width:140px}
   .main{margin-left:140px}
@@ -936,44 +976,17 @@ table.ht tbody tr:hover{background:#232323}
     max-width:none !important;
     flex:1 1 100% !important;
   }
-  #pitch-summary{
-    display:block;
-  }
   .pitch-stat{
-    display:flex;
-    flex-direction:row;
-    justify-content:space-between;
-    align-items:center;
-    gap:18px;
+    gap:16px;
     padding:12px 0;
-    border:0;
     border-bottom:1px solid #2a2a2a;
-    border-radius:0;
-    background:transparent;
-    text-align:left;
-    width:100%;
   }
-  #pitch-summary .pitch-stat:last-child{border-bottom:none}
   .pitch-stat-val{
-    font-family:var(--f);
     font-size:19px;
-    font-weight:300;
-    line-height:1;
-    letter-spacing:-.5px;
-    color:#e8e8e8;
-    text-align:right;
-    flex-shrink:0;
     min-width:84px;
   }
   .pitch-stat-label{
-    margin-top:0;
-    font-family:var(--f);
-    font-size:15px;
-    font-weight:700;
-    line-height:1.15;
-    color:#878787;
-    letter-spacing:.2px;
-    text-transform:none;
+    font-size:14px;
     flex:1 1 auto;
   }
   .cmp-bar{
@@ -34217,7 +34230,6 @@ function renderPitch(){
     const convRate = p.shotLog.length>0?((goals/p.shotLog.length)*100).toFixed(1):0;
     const xgDiff   = (goals - totalXG).toFixed(2);
     const xgDiffColor = goals>=totalXG?'#fff':'#fff';
-    const isMobilePitchSummary = window.matchMedia('(max-width:600px)').matches;
     const statColors = {
       'Total Shots': '#fff',
       'Goals': 'var(--g)',
@@ -34229,15 +34241,11 @@ function renderPitch(){
       'Goals vs xG': 'var(--g)',
       'Conversion': 'var(--g)',
     };
-    const statRow=(label,val)=> isMobilePitchSummary
-      ? `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #2a2a2a">
-          <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.2px;color:#878787">${label}</div>
-          <div style="font-family:var(--f);font-size:18px;font-weight:300;line-height:1;text-align:right;color:${statColors[label] || '#fff'}">${val}</div>
-        </div>`
-      : `<div class="pitch-stat">
-          <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
-          <div class="pitch-stat-label">${label}</div>
-        </div>`;
+    const statRow=(label,val)=>`
+      <div class="pitch-stat">
+        <div class="pitch-stat-label">${label}</div>
+        <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
+      </div>`;
     const summary = document.getElementById('pitch-summary');
     if(summary) summary.innerHTML =
       statRow('Total Shots', p.shotLog.length) +
@@ -34300,7 +34308,6 @@ function renderPitch(){
   const convRate = p.shotLog.length>0?((goals/p.shotLog.length)*100).toFixed(1):0;
   const xgDiff   = (goals - totalXG).toFixed(2);
   const xgDiffColor = goals>=totalXG?'#fff':'#fff';
-  const isMobilePitchSummary = window.matchMedia('(max-width:600px)').matches;
   const statColors = {
     'Total Shots': '#fff',
     'Goals': 'var(--g)',
@@ -34319,15 +34326,11 @@ function renderPitch(){
   const bodyBreakdown = Object.entries(byBody).sort((a,b)=>b[1]-a[1])
     .map(([k,v])=>`<span style="color:#fff">${k}</span>: ${v}`).join(' · ');
 
-  const statRow=(label,val)=> isMobilePitchSummary
-    ? `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #2a2a2a">
-        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.2px;color:#878787">${label}</div>
-        <div style="font-family:var(--f);font-size:18px;font-weight:300;line-height:1;text-align:right;color:${statColors[label] || '#fff'}">${val}</div>
-      </div>`
-    : `<div class="pitch-stat">
-        <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
-        <div class="pitch-stat-label">${label}</div>
-      </div>`;
+  const statRow=(label,val)=>`
+    <div class="pitch-stat">
+      <div class="pitch-stat-label">${label}</div>
+      <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
+    </div>`;
 
   if(summary) summary.innerHTML =
     statRow('Total Shots', p.shotLog.length) +

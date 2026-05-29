@@ -795,6 +795,8 @@ table.ht tbody tr:hover{background:#232323}
   .pds .pds-avg{display:block;font-size:12px;color:#878787;margin-bottom:6px}
   .pd-ring .rw{width:clamp(120px,36vw,160px)!important;height:clamp(120px,36vw,160px)!important}
   .pd-ring .rl{font-size:clamp(48px,18vw,64px)!important}
+  #tab-pitch > div:first-child > div:first-child{display:none !important}
+  #tab-pitch > div:first-child{justify-content:center !important;gap:0 !important}
   .favs-wrap{padding:24px 12px 16px}
   #pg-favs .favs-hdr{flex-direction:column;align-items:center;gap:12px;margin:8px 0 12px}
   #pg-favs .favs-hdr > div:first-child{text-align:center;width:100%}
@@ -921,33 +923,58 @@ table.ht tbody tr:hover{background:#232323}
   .rt-table .fr-name div{width:32px !important;height:32px !important}
   .rt-table td[data-label="PLAYER"] .fr-name{display:flex;align-items:center;gap:8px !important;min-width:0}
   .rt-table td[data-label="PLAYER"] .fr-name span{line-height:1.1 !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #pitch-summary,
+  #pitch-match-note,
+  #legend-dots,
+  #legend-heat{
+    width:100%;
+    max-width:none;
+  }
+  div[style*="display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start"] > div:last-child{
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    flex:1 1 100% !important;
+  }
   #pitch-summary{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
+    display:block;
   }
   .pitch-stat{
-    border:1px solid #2a2a2a;
-    border-radius:10px;
-    background:#161616;
-    padding:14px 10px 12px;
-    text-align:center;
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    padding:12px 0;
+    border:0;
+    border-bottom:1px solid #2a2a2a;
+    border-radius:0;
+    background:transparent;
+    text-align:left;
+    width:100%;
   }
+  #pitch-summary .pitch-stat:last-child{border-bottom:none}
   .pitch-stat-val{
     font-family:var(--f);
-    font-size:30px;
+    font-size:19px;
     font-weight:300;
     line-height:1;
     letter-spacing:-.5px;
     color:#e8e8e8;
+    text-align:right;
+    flex-shrink:0;
+    min-width:84px;
   }
   .pitch-stat-label{
-    margin-top:8px;
+    margin-top:0;
     font-family:var(--f);
-    font-size:13px;
+    font-size:15px;
     font-weight:700;
     line-height:1.15;
-    color:#fff;
+    color:#878787;
+    letter-spacing:.2px;
+    text-transform:none;
+    flex:1 1 auto;
   }
   .cmp-bar{
     left:0;
@@ -34190,11 +34217,27 @@ function renderPitch(){
     const convRate = p.shotLog.length>0?((goals/p.shotLog.length)*100).toFixed(1):0;
     const xgDiff   = (goals - totalXG).toFixed(2);
     const xgDiffColor = goals>=totalXG?'#fff':'#fff';
-    const statRow=(label,val)=>`
-      <div class="pitch-stat">
-        <div class="pitch-stat-val">${val}</div>
-        <div class="pitch-stat-label">${label}</div>
-      </div>`;
+    const isMobilePitchSummary = window.matchMedia('(max-width:600px)').matches;
+    const statColors = {
+      'Total Shots': '#fff',
+      'Goals': 'var(--g)',
+      'On Target': '#4fc3f7',
+      'Blocked': '#888888',
+      'Off Target': '#e05a2b',
+      'Hit Post': '#ffb74d',
+      'Total xG': 'var(--g)',
+      'Goals vs xG': 'var(--g)',
+      'Conversion': 'var(--g)',
+    };
+    const statRow=(label,val)=> isMobilePitchSummary
+      ? `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #2a2a2a">
+          <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.2px;color:#878787">${label}</div>
+          <div style="font-family:var(--f);font-size:18px;font-weight:300;line-height:1;text-align:right;color:${statColors[label] || '#fff'}">${val}</div>
+        </div>`
+      : `<div class="pitch-stat">
+          <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
+          <div class="pitch-stat-label">${label}</div>
+        </div>`;
     const summary = document.getElementById('pitch-summary');
     if(summary) summary.innerHTML =
       statRow('Total Shots', p.shotLog.length) +
@@ -34257,6 +34300,18 @@ function renderPitch(){
   const convRate = p.shotLog.length>0?((goals/p.shotLog.length)*100).toFixed(1):0;
   const xgDiff   = (goals - totalXG).toFixed(2);
   const xgDiffColor = goals>=totalXG?'#fff':'#fff';
+  const isMobilePitchSummary = window.matchMedia('(max-width:600px)').matches;
+  const statColors = {
+    'Total Shots': '#fff',
+    'Goals': 'var(--g)',
+    'On Target': '#4fc3f7',
+    'Blocked': '#888888',
+    'Off Target': '#e05a2b',
+    'Hit Post': '#ffb74d',
+    'Total xG': 'var(--g)',
+    'Goals vs xG': 'var(--g)',
+    'Conversion': 'var(--g)',
+  };
 
   /* Body part breakdown */
   const byBody = {};
@@ -34264,11 +34319,15 @@ function renderPitch(){
   const bodyBreakdown = Object.entries(byBody).sort((a,b)=>b[1]-a[1])
     .map(([k,v])=>`<span style="color:#fff">${k}</span>: ${v}`).join(' · ');
 
-  const statRow=(label,val)=>`
-    <div class="pitch-stat">
-      <div class="pitch-stat-val">${val}</div>
-      <div class="pitch-stat-label">${label}</div>
-    </div>`;
+  const statRow=(label,val)=> isMobilePitchSummary
+    ? `<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #2a2a2a">
+        <div style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.2px;color:#878787">${label}</div>
+        <div style="font-family:var(--f);font-size:18px;font-weight:300;line-height:1;text-align:right;color:${statColors[label] || '#fff'}">${val}</div>
+      </div>`
+    : `<div class="pitch-stat">
+        <div class="pitch-stat-val" style="color:${statColors[label] || '#fff'}">${val}</div>
+        <div class="pitch-stat-label">${label}</div>
+      </div>`;
 
   if(summary) summary.innerHTML =
     statRow('Total Shots', p.shotLog.length) +

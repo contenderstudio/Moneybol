@@ -386,10 +386,10 @@ table.ht tbody tr:hover{background:#232323}
 @media (max-width:520px){
   .pg#pg-favs .favs-grid{grid-template-columns:1fr !important;padding:0 12px}
 }
-.favs-view-toggle{display:flex;gap:4px;background:#1e1e1e;border-radius:5px;padding:4px}
-.favs-vbtn{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;padding:4px 8px;border-radius:3px;border:none;cursor:pointer;background:transparent;color:#878787;transition:all .15s;display:flex;align-items:center;gap:4px}
-.favs-vbtn.on{background:#2a2a2a;color:#fff}
-.favs-vbtn:hover:not(.on){color:#878787}
+.favs-view-toggle,.lr-view-toggle{display:flex;gap:4px;background:#1e1e1e;border-radius:5px;padding:4px}
+.favs-vbtn,.lr-vbtn{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:.6px;padding:4px 8px;border-radius:3px;border:none;cursor:pointer;background:transparent;color:#878787;transition:all .15s;display:flex;align-items:center;gap:4px}
+.favs-vbtn.on,.lr-vbtn.on{background:#2a2a2a;color:#fff}
+.favs-vbtn:hover:not(.on),.lr-vbtn:hover:not(.on){color:#878787}
 /* Make fav cards use the same hover highlight as the featured card on the homepage */
 .favs-grid .fc:hover{
   border-color:var(--g) !important;
@@ -1009,6 +1009,57 @@ table.ht tbody tr:hover{background:#232323}
   .rt-table .fr-name div{width:32px !important;height:32px !important}
   .rt-table td[data-label="PLAYER"] .fr-name{display:flex;align-items:center;gap:8px !important;min-width:0}
   .rt-table td[data-label="PLAYER"] .fr-name span{line-height:1.1 !important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  /* Mobile list-results toggle: keep card view as default, but allow list view to scroll horizontally */
+  #pg-listresults #lr-viewbar{display:flex !important;justify-content:center !important}
+  #pg-listresults.lr-view-list .rt-wrap{overflow-x:auto !important;padding:0 0 16px 0 !important}
+  #pg-listresults.lr-view-list .rt-table{display:table !important;min-width:620px !important;width:100% !important;font-size:13px !important}
+  #pg-listresults.lr-view-list .rt-table thead{display:table-header-group !important}
+  #pg-listresults.lr-view-list .rt-table tbody{display:table-row-group !important}
+  #pg-listresults.lr-view-list .rt-table tr{
+    display:table-row !important;
+    padding:0 !important;
+    margin:0 !important;
+    border:none !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    grid-template-columns:none !important;
+    column-gap:0 !important;
+    row-gap:0 !important;
+  }
+  #pg-listresults.lr-view-list .rt-table td{
+    display:table-cell !important;
+    width:auto !important;
+    padding:8px 6px !important;
+    border:none !important;
+    white-space:nowrap !important;
+    text-align:left !important;
+  }
+  #pg-listresults.lr-view-list .rt-table td[data-label="#"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="ACTIONS"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="PLAYER"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="TEAM"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="POS"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="COMPETITION"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="SEASON"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="xG"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="GOALS"],
+  #pg-listresults.lr-view-list .rt-table td[data-label="PASS%"]{
+    grid-column:auto !important;
+    align-self:auto !important;
+    border-top:none !important;
+    padding-top:8px !important;
+  }
+  #pg-listresults.lr-view-list .rt-table td[data-label="TEAM"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="POS"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="COMPETITION"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="SEASON"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="xG"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="GOALS"]::before,
+  #pg-listresults.lr-view-list .rt-table td[data-label="PASS%"]::before{display:none !important;content:none !important}
+  #pg-listresults.lr-view-list .rt-table .fr-name div{width:28px !important;height:28px !important}
+  #pg-listresults.lr-view-list .rt-table .fr-name span{font-size:13px !important}
+  #pg-listresults.lr-view-list .rt-table td[data-label="ACTIONS"]{font-size:12px !important}
+  #pg-listresults.lr-view-list .rt-table td[data-label="#"]{font-size:12px !important}
   #pitch-summary,
   #pitch-match-note,
   #legend-dots,
@@ -1585,6 +1636,10 @@ table.ht tbody tr:hover{background:#232323}
   <div class="topbar">
     <span class="tb-bk" onclick="go('lists')">&lt; ALL LISTS</span>
     <span id="lr-lbl" style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.5px;color:#fff;margin-left:12px"></span>
+  </div>
+  <div id="lr-viewbar" class="lr-view-toggle" style="display:none;margin:10px 16px 0;width:max-content;align-self:center">
+    <button class="lr-vbtn on" id="lr-vbtn-cards" onclick="setListResultsView('cards')" title="Card view">CARDS</button>
+    <button class="lr-vbtn" id="lr-vbtn-list" onclick="setListResultsView('list')" title="List view">LIST</button>
   </div>
   <div id="lr-filterbar" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;border-bottom:1px solid #222;background:#141414">
     <input id="lr-filter-q" type="text" placeholder="Search player or team" oninput="applyListFilters()"
@@ -36082,6 +36137,24 @@ async function loadAndBrowse(cid,sid,compName,seasonName){
 /* ════ LISTS ════ */
 let listResultsBase = [];
 let listResultsTitle = 'PLAYERS';
+let listResultsView = localStorage.getItem('moneybolListResultsView') || 'cards';
+
+function syncListResultsViewButtons(){
+  const cardsBtn = document.getElementById('lr-vbtn-cards');
+  const listBtn = document.getElementById('lr-vbtn-list');
+  const isList = listResultsView === 'list';
+  if(cardsBtn) cardsBtn.classList.toggle('on', !isList);
+  if(listBtn) listBtn.classList.toggle('on', isList);
+  const page = document.getElementById('pg-listresults');
+  if(page) page.classList.toggle('lr-view-list', isList);
+}
+
+function setListResultsView(view){
+  listResultsView = view === 'list' ? 'list' : 'cards';
+  localStorage.setItem('moneybolListResultsView', listResultsView);
+  syncListResultsViewButtons();
+  applyListFilters();
+}
 
 function populateListCompFilter(players){
   const el = document.getElementById('lr-filter-comp');
@@ -36125,6 +36198,7 @@ function getListFilteredPlayers(){
 function applyListFilters(){
   const players = getListFilteredPlayers();
   document.getElementById('lr-lbl').textContent = listResultsTitle;
+  syncListResultsViewButtons();
   const grid = document.getElementById('lr-grid');
   grid.style.display = 'block';
   grid.innerHTML = players.length

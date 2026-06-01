@@ -321,9 +321,10 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .ri-m{font-size:13px;color:#fff;margin-top:2px}
 
 /* player detail */
-.pd-topbar{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border)}
+.pd-topbar{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);position:relative}
 .pd-topbar .bk{font-family:var(--f);font-size:13px;font-weight:600;color:#878787;cursor:pointer}
 .pd-topbar .bk:hover{color:var(--g)}
+.pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:13px;color:#878787;font-weight:300;max-width:calc(100% - 140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;z-index:2}
 .pd-hero{display:grid;grid-template-columns:205px 1fr auto;min-height:220px;background:#1d1d1d;border-bottom:1px solid var(--border)}
 .pd-img{position:relative;background:#555;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;width:200px;height:200px;justify-self:end;align-self:center;transform:translateX(22px)}
 .pd-crest{display:none}
@@ -1283,6 +1284,26 @@ table.ht tbody tr:hover{background:#232323}
   .about-header img{height:64px;max-width:70%;object-fit:contain}
 }
 </style>
+<style>
+@media (max-width:600px){
+  /* Reduce overall font sizes on narrow screens so text fits better */
+  body, body * { font-size:13px !important; }
+  /* Keep primary headings slightly larger but constrained */
+  .search-hero h1, .pd-name, .cp-name { font-size:20px !important; }
+  .feat-name { font-size:20px !important; }
+  /* Scale down large stat numbers to avoid wrapping */
+  .pds-val, .pds .pds-val, .pds-name, .feat-score, .fc-score, .cp-num { font-size:16px !important; }
+  /* Make player page disclaimer smaller and allow wrapping on narrow screens */
+  .pd-topbar .pd-disclaimer{
+    font-size:11px !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    max-width:calc(100% - 120px) !important;
+    display:block !important;
+    line-height:1.1 !important;
+  }
+}
+</style>
 </head>
 <body>
 <div id="auth-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)">
@@ -1481,7 +1502,7 @@ table.ht tbody tr:hover{background:#232323}
 </div>
 <!-- PLAYER -->
 <div class="pg" id="pg-player">
-  <div class="pd-topbar"><span class="bk" onclick="back()">&lt; BACK</span></div>
+  <div class="pd-topbar"><span class="bk" onclick="back()">&lt; BACK</span><span class="pd-disclaimer">Disclaimer: Data displayed is historical and may not reflect current market conditions.</span></div>
   <div class="pd-hero" id="pd-hero"></div>
   <div class="pd-stats" id="pd-stats"></div>
   <div class="pd-hist">

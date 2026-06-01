@@ -337,6 +337,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-star{background:none;border:none;color:#555;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:color .15s,transform .15s;text-align:center;align-self:flex-start;transform-origin:center center;width:22px;height:22px}
 .pd-star:hover{color:var(--g);transform:scale(1.25)}
 .pd-star.on{color:var(--g)}
+/* ensure card/featured stars use the same green when active */
+.feat-star.on,.fc-star.on{color:var(--g)}
 .pd-ring{padding:20px 22px;display:flex;align-items:center;transform:translateX(-218px)}
 .pd-ring .rw{width:clamp(108px,16vw,145px)!important;height:clamp(108px,16vw,145px)!important}
 .pd-ring .rw svg{width:100%;height:100%}
@@ -1181,16 +1183,48 @@ table.ht tbody tr:hover{background:#232323}
   .site-footer-note{flex-basis:100%;text-align:center;margin-top:0}
 }
 
-@media (min-width:700px){
-  .site-footer{flex-direction:row!important;align-items:center!important;text-align:left!important;padding:16px 28px!important}
-  .site-footer-brand{align-items:flex-start!important}
-  .site-footer-links{justify-content:center!important;flex:1;gap:20px}
-  .site-footer-right{margin-left:auto;display:flex;align-items:center;gap:16px}
-}
 
 /* Hide mobile 'X' close button on desktop/web view */
 @media (min-width:601px){
   .sb-close{display:none!important}
+}
+
+/* Add extra spacing above the pitch SVG on mobile so shot/zone maps
+   sit further from the tab row and field on small screens */
+@media (max-width:600px){
+  #tab-pitch{padding-top:18px}
+  #tab-pitch svg{margin-top:6px}
+}
+
+/* Ensure consistent vertical spacing between the toggle, pitch, and
+  the "Direction of Attack" label across viewports */
+/* align toggle with the pd-hist padding so it lines up with the pitch */
+#tab-pitch > div:first-child{margin-bottom:16px;padding-left:24px;padding-right:24px}
+/* target the main pitch SVG only so small inline svgs (arrow) aren't affected */
+#pitch-svg{margin-top:0;margin-bottom:16px;display:block}
+/* move the direction label (the div immediately after pitch SVG) down */
+#pitch-svg + div{margin-top:16px}
+
+/* Mobile footer: position logo top-left, stacked content to the right */
+@media (max-width:600px){
+  /* Use a single gap for consistent vertical rhythm */
+  .site-footer{flex-direction:column;align-items:center;text-align:center;gap:16px;padding:22px 16px 18px;position:relative;min-height:92px}
+  /* logo centered and no per-element margin so gap controls spacing */
+  .site-footer-logo{position:static;display:block;margin:0 auto;width:64px;height:auto}
+  .site-footer-brand{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:0;width:100%;text-align:center;margin:0}
+  .site-footer-brandline{font-size:13px;color:#e6e6e6;letter-spacing:0.6px;text-transform:none;margin:0}
+  .site-footer-brandline strong{font-weight:700}
+  .site-footer-site{font-size:12px;color:#dcdcdc;text-decoration:underline;margin:0}
+  /* slight spacing below the built-by line */
+  .site-footer-site{margin-top:8px}
+  /* Use flex gap to control consistent vertical rhythm */
+  .site-footer > *{margin:0;padding:0}
+  .site-footer-brandline,.site-footer-site,.site-footer-links,.site-footer-note{display:block;line-height:1.35}
+  .site-footer-links{width:100%;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:0}
+  .site-footer-link{font-size:13px;color:#e6e6e6;font-weight:700;letter-spacing:1px}
+  .site-footer-note{width:100%;text-align:center;margin:0;color:#cfcfcf;font-size:12px;order:1}
+  /* Ensure the logo block still appears before the brand */
+  .site-footer-right{order:-1;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;margin:0;padding:0}
 }
 </style>
 <style>
@@ -1983,8 +2017,8 @@ table.ht tbody tr:hover{background:#232323}
     <div class="site-footer">
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       </div>
+      <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       <div class="site-footer-links">
         <a onclick="go('terms')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">TERMS OF USE</a>
         <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
@@ -34125,8 +34159,8 @@ function injectSharedFooter(){
         <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
       </div>
+      <div class="site-footer-note">Data: StatsBomb Open Data</div>
       <div class="site-footer-right">
-        <div class="site-footer-note">Data: StatsBomb Open Data</div>
         <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
       </div>
     </div>`;
@@ -35428,7 +35462,7 @@ function viewP(name){
       </div>
       <div class="pd-team">${p.comp} · ${p.season}</div>
       <div class="pd-actions">
-        <button class="pd-star ${isFav?'on':''}" onclick="toggleFav('${esc(name)}',this)">★</button>
+        <button class="pd-star ${isFav?'on':''}" data-player-name="${esc(name)}" onclick="toggleFav('${esc(name)}',this)">${isFav?'★':'☆'}</button>
         <button onclick="toggleCompare('${esc(name)}',this)" class="icon-btn${compareIds.includes(name)?' on':''}" id="pd-cmp-btn" style="pointer-events:auto;font-size:24px;vertical-align:middle;margin-left:4px" title="Compare">${compareIds.includes(name)?'✓':'+'}</button>
       </div>
     </div>
@@ -35710,7 +35744,50 @@ function dropOnFavGrid(ev){
   reorderFavs(draggingFavName, targetName, placeAfter);
 }
 
-function toggleFav(name,btn){favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];btn.classList.toggle('on',favIds.includes(name));toast(favIds.includes(name)?'Added to favourites ★':'Removed');saveFavs();}
+function updateFavUI(name){
+  // Update any player-detail star buttons that have data-player-name
+  document.querySelectorAll('.pd-star[data-player-name="'+name+'"]').forEach(btn=>{
+    try{
+      btn.classList.toggle('on', favIds.includes(name));
+      btn.textContent = favIds.includes(name) ? '★' : '☆';
+      btn.style.color = favIds.includes(name) ? 'var(--g)' : '';
+    }catch(e){}
+  });
+
+  // featured star (header/featured card)
+  const fstar = document.getElementById('feat-star-btn');
+  if(fstar){
+    fstar.textContent = favIds.includes(name) ? '★' : '☆';
+    fstar.classList.toggle('on', favIds.includes(name));
+    fstar.style.color = favIds.includes(name) ? 'var(--g)' : '';
+  }
+
+  // card / grid stars — elements with data-player-name or cards with data-fav-name
+  // Be flexible: update any element that has a data-player-name or data-fav-name attribute
+  const candidates = Array.from(document.querySelectorAll('[data-player-name], [data-fav-name]'));
+  candidates.forEach(el => {
+    try{
+      const v = el.getAttribute('data-player-name') || el.getAttribute('data-fav-name') || '';
+      if(!v) return;
+      // compare in a forgiving way (exact or contains)
+      if(v === name || v.indexOf(name) > -1){
+        el.classList.toggle('on', favIds.includes(name));
+        if(el.tagName === 'BUTTON' || el.tagName === 'SPAN') el.textContent = favIds.includes(name) ? '★' : '☆';
+        el.style.color = favIds.includes(name) ? 'var(--g)' : '';
+      }
+    }catch(e){}
+  });
+}
+
+function toggleFav(name,btn){
+  favIds = favIds.includes(name) ? favIds.filter(x=>x!==name) : [...favIds,name];
+  // Ensure the clicked button reflects the new state immediately
+  if(btn){ btn.classList.toggle('on', favIds.includes(name)); }
+  // Sync other instances of the star UI across the page
+  try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
+  toast(favIds.includes(name)?'Added to favourites ★':'Removed');
+  saveFavs();
+}
 function fcHtml(p){
   // small helper to escape text for HTML insertion
   function hEsc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
@@ -35748,7 +35825,7 @@ function fcHtml(p){
   return `<div class="fc feat${isCmp?' cmp-selected':''}" data-fav-name="${esc(p.name)}" ${dragAttrs} onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
     <div class="feat-img" style="cursor:pointer">
       <div id="fc-crest-${safeId}" class="feat-crest" style="background-image:url('${imgSrc}');background-size:cover;background-position:center center;background-repeat:no-repeat"></div>
-      <span class="feat-star" style="color:var(--g);width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">★</span>
+    <span class="feat-star${isFav? ' on' : ''}" data-player-name="${esc(p.name)}" style="width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">${isFav? '★' : '☆'}</span>
       <button class="icon-btn${isCmp?' on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:14px;z-index:5;color:${isCmp?'var(--g)':'#aaa'};font-size:24px" title="Compare">${isCmp?'✓':'+'}</button>
       <span class="feat-score" style="color:${p.rc}">${p.score}</span>
       <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
@@ -35778,8 +35855,10 @@ function fcHtml(p){
 function toggleFavFC(name,el){
   if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; return; }
   favIds=favIds.includes(name)?favIds.filter(x=>x!==name):[...favIds,name];
-  el.style.color=favIds.includes(name)?'var(--g)':'#fff';
-  el.textContent=favIds.includes(name)?'★':'☆';
+  // Update the clicked element's class/text and sync other instances
+  el.classList.toggle('on', favIds.includes(name));
+  el.textContent = favIds.includes(name)?'★':'☆';
+  try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
   toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
   saveFavs();
 }
@@ -35791,6 +35870,7 @@ function toggleFavList(name){
   document.querySelectorAll('.icon-btn[data-fav="'+name.replace(/"/g,'&quot;')+'"]').forEach(b=>{
     b.classList.toggle('on', on);
   });
+  try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
   saveFavs();
   renderFavs();
 }
@@ -35800,7 +35880,8 @@ function toggleFeatFav(){
   if(!currentUser){ document.getElementById('auth-overlay').style.display='flex'; return; }
   const el = document.getElementById('feat-star-btn');
   favIds=favIds.includes(featuredName)?favIds.filter(x=>x!==featuredName):[...favIds,featuredName];
-  if(el){ el.textContent=favIds.includes(featuredName)?'★':'☆'; el.style.color=favIds.includes(featuredName)?'var(--g)':'#999'; }
+  if(el){ el.textContent=favIds.includes(featuredName)?'★':'☆'; el.classList.toggle('on', favIds.includes(featuredName)); }
+  try{ updateFavUI(featuredName); }catch(e){console.warn('updateFavUI',e)}
   toast(favIds.includes(featuredName)?'Added to favourites ★':'Removed from favourites');
   saveFavs();
 }

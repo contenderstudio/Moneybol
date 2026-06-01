@@ -605,16 +605,17 @@ table.ht tbody tr:hover{background:#232323}
 .fp-reset{font-family:var(--f);font-size:14px;font-weight:700;padding:12px 16px;background:transparent;border:1px solid #333;color:#878787;border-radius:5px;cursor:pointer}
 .fp-reset:hover{border-color:#878787;color:#878787}
 .fp-count{font-family:var(--f);font-size:13px;color:#878787;text-align:center;padding:4px 0}
-.site-footer{border-top:1px solid #222;padding:12px 20px 16px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.site-footer-brand{display:flex;flex-direction:column;gap:4px}
-.site-footer-brandline{display:flex;align-items:center;gap:8px;font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;flex-wrap:wrap;line-height:1.12}
-.site-footer-logo{width:64px;height:auto;display:block;flex-shrink:0;object-fit:contain;margin-bottom:0}
-.site-footer-brandline strong{color:#878787}
-.site-footer-site{font-family:var(--fb);font-size:11px;color:#878787;text-decoration:underline;transition:color .15s}
-.site-footer-links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.site-footer-link{font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.5px;cursor:pointer;text-decoration:none;transition:color .15s}
+.site-footer{background:#1b1b1b;padding:18px 30px 16px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:16px;border-top:1px solid rgba(255,255,255,0.02)}
+.site-footer-brand{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.site-footer-brandline{display:flex;align-items:center;gap:8px;font-family:var(--f);font-size:14px;color:#d0d0d0;letter-spacing:.6px;flex-wrap:wrap;line-height:1.12}
+.site-footer-logo{width:120px;height:auto;display:block;flex-shrink:0;object-fit:contain;margin-bottom:0}
+.site-footer-brandline strong{color:#d0d0d0}
+.site-footer-site{font-family:var(--fb);font-size:12px;color:#cfcfcf;text-decoration:underline;transition:color .15s}
+.site-footer-links{display:flex;align-items:center;gap:20px;flex:1;justify-content:center;text-transform:uppercase;font-weight:800}
+.site-footer-link{font-family:var(--f);font-size:13px;color:#cfcfcf;letter-spacing:1px;cursor:pointer;text-decoration:none;transition:color .15s}
 .site-footer-link.on{color:var(--g)}
-.site-footer-note{font-family:var(--f);font-size:13px;color:#878787;letter-spacing:.3px}
+.site-footer-note{font-family:var(--f);font-size:13px;color:#cfcfcf;letter-spacing:.3px;margin-right:12px}
+.site-footer-right{display:flex;align-items:center;gap:18px;margin-left:auto}
 /* Competition dropdown styles */
 .fp-comp-group{margin-bottom:8px;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden}
 .fp-comp-group-header{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#1e1e1e;cursor:pointer;transition:background .15s;user-select:none}
@@ -1178,6 +1179,18 @@ table.ht tbody tr:hover{background:#232323}
   .site-footer-note{font-size:11px}
   .site-footer-links{flex-direction:row;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
   .site-footer-note{flex-basis:100%;text-align:center;margin-top:0}
+}
+
+@media (min-width:700px){
+  .site-footer{flex-direction:row!important;align-items:center!important;text-align:left!important;padding:16px 28px!important}
+  .site-footer-brand{align-items:flex-start!important}
+  .site-footer-links{justify-content:center!important;flex:1;gap:20px}
+  .site-footer-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+}
+
+/* Hide mobile 'X' close button on desktop/web view */
+@media (min-width:601px){
+  .sb-close{display:none!important}
 }
 </style>
 <style>
@@ -1872,17 +1885,19 @@ table.ht tbody tr:hover{background:#232323}
     </div>
     <div class="site-footer">
       <div class="site-footer-brand">
-        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
+        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">www.contender.studio</a>
       </div>
       <div class="site-footer-links">
-        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
-        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
-        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">TERMS OF USE</a>
+        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">PRIVACY</a>
+        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">CONTACT</a>
       </div>
-      <div class="site-footer-note">Data: StatsBomb Open Data</div>
-    </div>
+      <div class="site-footer-right">
+        <div class="site-footer-note">Data:StatsBomb</div>
+        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
+      </div>
+    </div>`;
 
   </div>
 </div>
@@ -1967,7 +1982,6 @@ table.ht tbody tr:hover{background:#232323}
 
     <div class="site-footer">
       <div class="site-footer-brand">
-        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
         <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       </div>
@@ -1976,7 +1990,10 @@ table.ht tbody tr:hover{background:#232323}
         <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
       </div>
-      <div class="site-footer-note">Data: StatsBomb Open Data</div>
+      <div class="site-footer-right">
+        <div class="site-footer-note">Data: StatsBomb Open Data</div>
+        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
+      </div>
     </div>
   </div>
 </div>
@@ -2029,7 +2046,6 @@ table.ht tbody tr:hover{background:#232323}
 
     <div class="site-footer">
       <div class="site-footer-brand">
-        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
         <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       </div>
@@ -2038,7 +2054,10 @@ table.ht tbody tr:hover{background:#232323}
         <a onclick="go('privacy')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
       </div>
-      <div class="site-footer-note">Data: StatsBomb Open Data</div>
+      <div class="site-footer-right">
+        <div class="site-footer-note">Data: StatsBomb Open Data</div>
+        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
+      </div>
     </div>
   </div>
 </div>
@@ -2064,7 +2083,6 @@ table.ht tbody tr:hover{background:#232323}
 
     <div class="site-footer">
       <div class="site-footer-brand">
-        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
         <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       </div>
@@ -2073,7 +2091,10 @@ table.ht tbody tr:hover{background:#232323}
         <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">CONTACT</a>
       </div>
-      <div class="site-footer-note">Data: StatsBomb Open Data</div>
+      <div class="site-footer-right">
+        <div class="site-footer-note">Data: StatsBomb Open Data</div>
+        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
+      </div>
     </div>
   </div>
 </div>
@@ -34096,7 +34117,6 @@ function injectSharedFooter(){
   const footerHtml = `
     <div class="site-footer">
       <div class="site-footer-brand">
-        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
         <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
       </div>
@@ -34105,7 +34125,10 @@ function injectSharedFooter(){
         <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
       </div>
-      <div class="site-footer-note">Data: StatsBomb Open Data</div>
+      <div class="site-footer-right">
+        <div class="site-footer-note">Data: StatsBomb Open Data</div>
+        <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
+      </div>
     </div>`;
   ['home','player','favs','compare','competitions','search','listresults','lists'].forEach(id=>{
     const page = document.getElementById('pg-'+id);

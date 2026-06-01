@@ -333,6 +333,9 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-pos{display:none}
 .pd-sub{font-size:15px;font-weight:300;color:#fff;margin:8px 0 4px}
 .pd-team{font-size:13px;font-weight:300;color:#fff}
+.pd-team .pd-season{color:var(--g)}
+.pd-team .pd-league{color:var(--g)}
+.pd-league{color:var(--g)}
 .pd-actions{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin-top:12px}
 .pd-star{background:none;border:none;color:#555;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:color .15s,transform .15s;text-align:center;align-self:flex-start;transform-origin:center center;width:22px;height:22px}
 .pd-star:hover{color:var(--g);transform:scale(1.25)}
@@ -601,7 +604,7 @@ table.ht tbody tr:hover{background:#232323}
 .db-remove{background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;transition:color .15s;line-height:1}
 .db-remove:hover{color:#e05a2b}
 .db-grab{color:#3a3a3a;font-size:14px;flex-shrink:0;cursor:grab}
-.fp-footer{padding:16px 20px;border-top:1px solid #2a2a2a;display:flex;gap:8px;position:sticky;bottom:0;background:#1a1a1a}
+.fp-footer{padding:16px 20px;border-top:1px solid #2a2a2a;display:flex;gap:8px;position:sticky;bottom:0;background:#1b1b1b}
 .fp-apply{flex:1;font-family:var(--f);font-size:14px;font-weight:800;padding:12px;background:var(--g);color:#000;border:none;border-radius:5px;cursor:pointer}
 .fp-apply:hover{background:#00c060}
 .fp-reset{font-family:var(--f);font-size:14px;font-weight:700;padding:12px 16px;background:transparent;border:1px solid #333;color:#878787;border-radius:5px;cursor:pointer}
@@ -609,14 +612,14 @@ table.ht tbody tr:hover{background:#232323}
 .fp-count{font-family:var(--f);font-size:13px;color:#878787;text-align:center;padding:4px 0}
 .site-footer{background:#1b1b1b;padding:18px 30px 16px;margin-top:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:16px;border-top:1px solid rgba(255,255,255,0.02)}
 .site-footer-brand{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
-.site-footer-brandline{display:flex;align-items:center;gap:8px;font-family:var(--f);font-size:14px;color:#d0d0d0;letter-spacing:.6px;flex-wrap:wrap;line-height:1.12}
+.site-footer-brandline{display:flex;align-items:center;gap:8px;font-family:var(--f);font-size:14px;color:var(--t3);letter-spacing:.6px;flex-wrap:wrap;line-height:1.12}
 .site-footer-logo{width:120px;height:auto;display:block;flex-shrink:0;object-fit:contain;margin-bottom:0}
-.site-footer-brandline strong{color:#d0d0d0}
-.site-footer-site{font-family:var(--fb);font-size:12px;color:#cfcfcf;text-decoration:underline;transition:color .15s}
+.site-footer-brandline strong{color:var(--t3)}
+.site-footer-site{font-family:var(--fb);font-size:12px;color:var(--t3);text-decoration:underline;transition:color .15s}
 .site-footer-links{display:flex;align-items:center;gap:20px;flex:1;justify-content:center;text-transform:uppercase;font-weight:800}
-.site-footer-link{font-family:var(--f);font-size:13px;color:#cfcfcf;letter-spacing:1px;cursor:pointer;text-decoration:none;transition:color .15s}
+.site-footer-link{font-family:var(--f);font-size:13px;color:var(--t3);letter-spacing:1px;cursor:pointer;text-decoration:none;transition:color .15s}
 .site-footer-link.on{color:var(--g)}
-.site-footer-note{font-family:var(--f);font-size:13px;color:#cfcfcf;letter-spacing:.3px;margin-right:12px}
+.site-footer-note{font-family:var(--f);font-size:13px;color:var(--t3);letter-spacing:.3px;margin-right:12px}
 .site-footer-right{display:flex;align-items:center;gap:18px;margin-left:auto}
 /* Competition dropdown styles */
 .fp-comp-group{margin-bottom:8px;border:1px solid #2a2a2a;border-radius:6px;overflow:hidden}
@@ -1171,7 +1174,7 @@ table.ht tbody tr:hover{background:#232323}
 <style>
 @media (min-width:601px){
   /* use a single, consistent vertical rhythm for stacked footer rows */
-  .site-footer{flex-direction:column;align-items:center;text-align:center;gap:8px}
+  .site-footer{background:#1b1b1b;flex-direction:column;align-items:center;text-align:center;gap:8px}
   .site-footer{padding:10px 14px 0}
   .site-footer-brand{align-items:center;gap:8px}
   .site-footer-logo{width:52px;margin-bottom:0}
@@ -1208,21 +1211,21 @@ table.ht tbody tr:hover{background:#232323}
 /* Mobile footer: position logo top-left, stacked content to the right */
 @media (max-width:600px){
   /* Use a single gap for consistent vertical rhythm */
-  .site-footer{flex-direction:column;align-items:center;text-align:center;gap:16px;padding:22px 16px calc(34px + env(safe-area-inset-bottom));position:relative;min-height:92px}
+  .site-footer{background:#1b1b1b;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:22px 16px calc(34px + env(safe-area-inset-bottom));position:relative;min-height:92px}
   /* logo centered and no per-element margin so gap controls spacing */
   .site-footer-logo{position:static;display:block;margin:0 auto;width:64px;height:auto}
   .site-footer-brand{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:0;width:100%;text-align:center;margin:0}
-  .site-footer-brandline{font-size:13px;color:#e6e6e6;letter-spacing:0.6px;text-transform:none;margin:0}
+  .site-footer-brandline{font-size:13px;color:var(--t3);letter-spacing:0.6px;text-transform:none;margin:0}
   .site-footer-brandline strong{font-weight:700}
-  .site-footer-site{font-size:12px;color:#dcdcdc;text-decoration:underline;margin:0}
+  .site-footer-site{font-size:12px;color:var(--t3);text-decoration:underline;margin:0}
   /* slight spacing below the built-by line */
   .site-footer-site{margin-top:8px}
   /* Use flex gap to control consistent vertical rhythm */
   .site-footer > *{margin:0;padding:0}
   .site-footer-brandline,.site-footer-site,.site-footer-links,.site-footer-note{display:block;line-height:1.35}
   .site-footer-links{width:100%;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin:0}
-  .site-footer-link{font-size:13px;color:#e6e6e6;font-weight:700;letter-spacing:1px}
-  .site-footer-note{width:100%;text-align:center;margin:0;color:#cfcfcf;font-size:12px;order:1}
+  .site-footer-link{font-size:13px;color:var(--t3);font-weight:700;letter-spacing:1px}
+  .site-footer-note{width:100%;text-align:center;margin:0;color:var(--t3);font-size:12px;order:1}
   /* Ensure the logo block still appears before the brand */
   .site-footer-right{order:-1;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;margin:0;padding:0}
 }
@@ -1920,12 +1923,12 @@ table.ht tbody tr:hover{background:#232323}
     <div class="site-footer">
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">www.contender.studio</a>
+        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">www.contender.studio</a>
       </div>
       <div class="site-footer-links">
-        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">TERMS OF USE</a>
-        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">PRIVACY</a>
-        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#cfcfcf'">CONTACT</a>
+        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">TERMS OF USE</a>
+        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">PRIVACY</a>
+        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">CONTACT</a>
       </div>
       <div class="site-footer-right">
         <div class="site-footer-note">Data:StatsBomb</div>
@@ -2018,11 +2021,11 @@ table.ht tbody tr:hover{background:#232323}
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
       </div>
-      <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
+      <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">www.contender.studio</a>
       <div class="site-footer-links">
         <a onclick="go('terms')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">TERMS OF USE</a>
-        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
-        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">PRIVACY POLICY</a>
+        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">CONTACT</a>
       </div>
       <div class="site-footer-right">
         <div class="site-footer-note">Data: StatsBomb Open Data</div>
@@ -2081,12 +2084,12 @@ table.ht tbody tr:hover{background:#232323}
     <div class="site-footer">
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
+        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">www.contender.studio</a>
       </div>
       <div class="site-footer-links">
-        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
+        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">TERMS OF USE</a>
         <a onclick="go('privacy')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">PRIVACY POLICY</a>
-        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">CONTACT</a>
       </div>
       <div class="site-footer-right">
         <div class="site-footer-note">Data: StatsBomb Open Data</div>
@@ -2118,11 +2121,11 @@ table.ht tbody tr:hover{background:#232323}
     <div class="site-footer">
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
+        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">www.contender.studio</a>
       </div>
       <div class="site-footer-links">
-        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
-        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
+        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">TERMS OF USE</a>
+        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">PRIVACY POLICY</a>
         <a onclick="go('contact')" class="site-footer-link on" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--g)'">CONTACT</a>
       </div>
       <div class="site-footer-right">
@@ -34152,12 +34155,12 @@ function injectSharedFooter(){
     <div class="site-footer">
       <div class="site-footer-brand">
         <div class="site-footer-brandline"><span>BUILT BY <strong>CONTENDER STUDIO</strong> · © 2026</span></div>
-        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">www.contender.studio</a>
+        <a href="https://www.contender.studio" target="_blank" rel="noopener" class="site-footer-site" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">www.contender.studio</a>
       </div>
       <div class="site-footer-links">
-        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">TERMS OF USE</a>
-        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">PRIVACY POLICY</a>
-        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='#878787'">CONTACT</a>
+        <a onclick="go('terms')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">TERMS OF USE</a>
+        <a onclick="go('privacy')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">PRIVACY POLICY</a>
+        <a onclick="go('contact')" class="site-footer-link" onmouseover="this.style.color='#00e676'" onmouseout="this.style.color='var(--t3)'">CONTACT</a>
       </div>
       <div class="site-footer-note">Data: StatsBomb Open Data</div>
       <div class="site-footer-right">
@@ -35460,7 +35463,7 @@ function viewP(name){
           return parts.join('<span style="color:#fff;margin:0 4px;font-weight:300;opacity:.75">·</span>');
         })()}
       </div>
-      <div class="pd-team">${p.comp} · ${p.season}</div>
+      <div class="pd-team"><span class="pd-league">${p.comp}</span> · <span class="pd-season">${p.season}</span></div>
       <div class="pd-actions">
         <button class="pd-star ${isFav?'on':''}" data-player-name="${esc(name)}" onclick="toggleFav('${esc(name)}',this)">${isFav?'★':'☆'}</button>
         <button onclick="toggleCompare('${esc(name)}',this)" class="icon-btn${compareIds.includes(name)?' on':''}" id="pd-cmp-btn" style="pointer-events:auto;font-size:24px;vertical-align:middle;margin-left:4px" title="Compare">${compareIds.includes(name)?'✓':'+'}</button>
@@ -35748,18 +35751,20 @@ function updateFavUI(name){
   // Update any player-detail star buttons that have data-player-name
   document.querySelectorAll('.pd-star[data-player-name="'+name+'"]').forEach(btn=>{
     try{
-      btn.classList.toggle('on', favIds.includes(name));
-      btn.textContent = favIds.includes(name) ? '★' : '☆';
-      btn.style.color = favIds.includes(name) ? 'var(--g)' : '';
+      const on = favIds.includes(name);
+      btn.classList.toggle('on', on);
+      btn.textContent = on ? '★' : '☆';
+      btn.style.color = on ? 'var(--g)' : '#555';
     }catch(e){}
   });
 
   // featured star (header/featured card)
   const fstar = document.getElementById('feat-star-btn');
   if(fstar){
-    fstar.textContent = favIds.includes(name) ? '★' : '☆';
-    fstar.classList.toggle('on', favIds.includes(name));
-    fstar.style.color = favIds.includes(name) ? 'var(--g)' : '';
+    const onF = favIds.includes(name);
+    fstar.textContent = onF ? '★' : '☆';
+    fstar.classList.toggle('on', onF);
+    fstar.style.color = onF ? 'var(--g)' : '#fff';
   }
 
   // card / grid stars — elements with data-player-name or cards with data-fav-name
@@ -35771,9 +35776,15 @@ function updateFavUI(name){
       if(!v) return;
       // compare in a forgiving way (exact or contains)
       if(v === name || v.indexOf(name) > -1){
-        el.classList.toggle('on', favIds.includes(name));
-        if(el.tagName === 'BUTTON' || el.tagName === 'SPAN') el.textContent = favIds.includes(name) ? '★' : '☆';
-        el.style.color = favIds.includes(name) ? 'var(--g)' : '';
+        const onEl = favIds.includes(name);
+        el.classList.toggle('on', onEl);
+        if(el.tagName === 'BUTTON' || el.tagName === 'SPAN') el.textContent = onEl ? '★' : '☆';
+        // choose sensible default color depending on element type
+        if(onEl){ el.style.color = 'var(--g)'; }
+        else if(el.classList && el.classList.contains('pd-star')){ el.style.color = '#555'; }
+        else if(el.classList && el.classList.contains('feat-star')){ el.style.color = '#fff'; }
+        else if(el.classList && el.classList.contains('icon-btn')){ el.style.color = '#555'; }
+        else { el.style.color = ''; }
       }
     }catch(e){}
   });
@@ -35782,7 +35793,12 @@ function updateFavUI(name){
 function toggleFav(name,btn){
   favIds = favIds.includes(name) ? favIds.filter(x=>x!==name) : [...favIds,name];
   // Ensure the clicked button reflects the new state immediately
-  if(btn){ btn.classList.toggle('on', favIds.includes(name)); }
+  if(btn){ 
+    const on = favIds.includes(name);
+    btn.classList.toggle('on', on);
+    try{ btn.textContent = on ? '★' : '☆'; }catch(e){}
+    try{ btn.style.color = on ? 'var(--g)' : '#555'; }catch(e){}
+  }
   // Sync other instances of the star UI across the page
   try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
   toast(favIds.includes(name)?'Added to favourites ★':'Removed');
@@ -35858,6 +35874,7 @@ function toggleFavFC(name,el){
   // Update the clicked element's class/text and sync other instances
   el.classList.toggle('on', favIds.includes(name));
   el.textContent = favIds.includes(name)?'★':'☆';
+  el.style.color = favIds.includes(name)?'var(--g)':'#fff';
   try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
   toast(favIds.includes(name)?'Added to favourites ★':'Removed from favourites');
   saveFavs();
@@ -36070,7 +36087,7 @@ function renderCompare(){
               return parts.join('<span style="color:#fff;margin:0 4px;opacity:.5">·</span>');
             })()}
           </div>
-          ${(p.comp&&p.comp!=='—')||p.season?`<div style="font-size:13px;font-weight:300;color:#878787;margin-top:2px">${[p.comp,p.season].filter(v=>v&&v!=='—').join(' · ')}</div>`:''}
+          ${(p.comp&&p.comp!=='—')||p.season?`<div style="font-size:13px;font-weight:300;color:#878787;margin-top:2px">${p.comp&&p.comp!=='—'?`<span class="pd-league">${p.comp}</span>`:''}${p.comp&&p.comp!=='—'&&p.season?' · ':''}${p.season?`<span class="pd-season">${p.season}</span>`:''}</div>`:''}
         </div>
         <div class="cp-ring">${ring(p.score,playerColor,120,10)}</div>
       </div>

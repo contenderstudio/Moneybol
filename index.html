@@ -1179,17 +1179,17 @@ table.ht tbody tr:hover{background:#232323}
 </style>
 <style>
 @media (min-width:601px){
-  /* use a single, consistent vertical rhythm for stacked footer rows */
-  .site-footer{background:#1b1b1b;flex-direction:column;align-items:center;text-align:center;gap:8px}
-  .site-footer{padding:10px 14px 0}
-  .site-footer-brand{align-items:center;gap:8px}
-  .site-footer-logo{width:52px;margin-bottom:0}
-  .site-footer-brandline{font-size:11px;letter-spacing:.4px}
-  .site-footer-site{font-size:10px}
-  .site-footer-link{font-size:11px;letter-spacing:.4px}
-  .site-footer-note{font-size:11px}
-  .site-footer-links{flex-direction:row;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}
-  .site-footer-note{flex-basis:100%;text-align:center;margin-top:0}
+  /* Desktop footer: three columns (left brand, center links, right note+logo) */
+  .site-footer{background:#1b1b1b;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:12px;padding:18px 36px;border-top:1px solid rgba(255,255,255,0.02)}
+  .site-footer-brand{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+  .site-footer-logo{width:84px;height:auto;margin:0}
+  .site-footer-brandline{font-size:13px;color:var(--t3);letter-spacing:.6px}
+  .site-footer-site{font-size:12px;color:var(--t3);text-decoration:none}
+  .site-footer-links{display:flex;flex-direction:row;gap:18px;align-items:center;justify-content:center;flex:1}
+  .site-footer-link{font-size:13px;color:var(--t3);font-weight:700;letter-spacing:1px}
+  .site-footer-note{font-size:12px;color:var(--t3);margin-left:12px}
+  /* Right column aligns items to the end */
+  .site-footer-right{display:flex;align-items:center;gap:12px;justify-content:flex-end}
 }
 
 

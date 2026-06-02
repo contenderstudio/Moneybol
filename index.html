@@ -325,6 +325,8 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-topbar .bk{font-family:var(--f);font-size:13px;font-weight:600;color:#878787;cursor:pointer}
 .pd-topbar .bk:hover{color:var(--g)}
 .pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:13px;color:#878787;font-weight:300;max-width:calc(100% - 140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;z-index:2}
+#pg-compare .topbar{position:relative}
+#pg-compare .topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:13px;color:#878787;font-weight:300;max-width:calc(100% - 140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;z-index:2}
 .pd-hero{display:grid;grid-template-columns:205px 1fr auto;min-height:220px;background:#1d1d1d;border-bottom:1px solid var(--border)}
 .pd-img{position:relative;background:#555;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;width:200px;height:200px;justify-self:end;align-self:center;transform:translateX(22px)}
 .pd-crest{display:none}
@@ -1675,7 +1677,7 @@ table.ht tbody tr:hover{background:#232323}
 
 <!-- COMPARE -->
 <div class="pg" id="pg-compare">
-  <div class="topbar"><span class="tb-bk" onclick="back()">&lt; BACK</span></div>
+  <div class="topbar"><span class="tb-bk" onclick="back()">&lt; BACK</span><span class="pd-disclaimer">Disclaimer: Data displayed is historical and may not reflect current market conditions.</span></div>
   <div id="cp-body"></div>
 </div>
 

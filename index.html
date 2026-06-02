@@ -98,6 +98,10 @@
       window.updateSidebarUser?.();
       if(!window.dataLoaded){ window.bootData?.(); }
       window.toast?.('Welcome back, ' + name + ' 👋');
+      // If the user signed in while on the favs page, refresh it now that favIds is loaded
+      if(window.currentPage && window.currentPage() === 'favs'){
+        window.renderFavs?.();
+      }
     } else {
       // Only show sign-out state after first auth check completes
       // and only if we were previously signed in
@@ -125,6 +129,10 @@
       resetAuthForm();
       const overlayEl = document.getElementById('auth-overlay');
       if(overlayEl) overlayEl.style.display = 'flex';
+      // Refresh favs page so it shows the sign-in prompt, not stale data
+      if(window.currentPage && window.currentPage() === 'favs'){
+        window.renderFavs?.();
+      }
     }
     } catch(err){
       console.error('[Auth] onAuthStateChanged handler error:', err);
@@ -811,8 +819,8 @@ table.ht tbody tr:hover{background:#232323}
   /* About page: remove topbar divider and align back button with hamburger */
   #pg-about .topbar{border-bottom:none !important;position:relative}
   #pg-about .topbar .tb-bk{position:absolute !important;left:64px !important;top:12px !important;height:40px !important;display:inline-flex !important;align-items:center !important;z-index:380 !important}
-  .pd-topbar{position:relative;padding:0 12px 0 48px;min-height:56px;border-bottom:none}
-  .pd-topbar .bk{position:absolute !important;left:64px !important;top:12px !important;display:inline-flex;align-items:center;height:40px;line-height:1}
+  .pd-topbar{display:flex !important;align-items:center !important;justify-content:space-between !important;padding:8px 12px 8px 48px !important;min-height:0 !important;border-bottom:none}
+  .pd-topbar .bk{position:absolute !important;left:64px !important;top:50% !important;transform:translateY(-50%) !important;display:inline-flex;align-items:center;height:40px;line-height:1}
   .tb-bk{order:1}
   .tb-sb{order:4;max-width:none;flex:1 1 100%;width:100%}
   .tb-btn{order:2}
@@ -948,8 +956,9 @@ table.ht tbody tr:hover{background:#232323}
   #pg-listresults .topbar { border-bottom: none !important; justify-content: center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important; padding-top:32px !important; padding-bottom:8px !important }
   #pg-listresults .topbar .tb-bk { position:absolute !important; left:64px !important; top:12px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
   /* Compare page header: remove top border and align BACK with hamburger */
-  #pg-compare .topbar { border-bottom: none !important; justify-content:center !important; position:relative !important; padding-left:48px !important; padding-right:48px !important }
-  #pg-compare .topbar .tb-bk { position:absolute !important; left:64px !important; top:12px !important; height:40px !important; display:inline-flex !important; align-items:center !important; transform:none !important; z-index:380 !important }
+  #pg-compare .topbar { border-bottom: none !important; display:flex !important; align-items:center !important; justify-content:space-between !important; position:relative !important; padding:8px 12px 8px 48px !important }
+  #pg-compare .topbar .tb-bk { position:absolute !important; left:64px !important; top:50% !important; transform:translateY(-50%) !important; height:40px !important; display:inline-flex !important; align-items:center !important; z-index:380 !important }
+  #pg-compare .topbar .pd-disclaimer { font-size:11px !important; white-space:normal !important; overflow:visible !important; max-width:calc(100% - 110px) !important; line-height:1.4 !important; text-align:right !important; position:static !important; left:auto !important; right:auto !important; top:auto !important; bottom:auto !important; transform:none !important; display:block !important; margin-left:auto !important; }
   #pg-listresults #lr-lbl { margin:32px 0 0 !important; text-align:center !important; font-weight:800 !important; letter-spacing:1px !important; font-size:15px !important; color:#fff !important }
   /* Stronger rules: target inline-styled header and force centering */
   #list-results > div[style*="border-bottom"] { border-bottom: none !important; display:flex !important; justify-content:center !important; align-items:center !important; position:relative !important; padding-left:64px !important; padding-top:32px !important; padding-bottom:8px !important }
@@ -1300,9 +1309,17 @@ table.ht tbody tr:hover{background:#232323}
     font-size:11px !important;
     white-space:normal !important;
     overflow:visible !important;
-    max-width:calc(100% - 120px) !important;
+    max-width:calc(100% - 110px) !important;
+    line-height:1.4 !important;
+    text-align:right !important;
+    position:static !important;
+    left:auto !important;
+    right:auto !important;
+    top:auto !important;
+    bottom:auto !important;
+    transform:none !important;
     display:block !important;
-    line-height:1.1 !important;
+    margin-left:auto !important;
   }
 }
 </style>
@@ -2273,6 +2290,10 @@ function continueAsGuest(){
   dataLoaded=false;
   injectSharedFooter();
   bootData();
+  // Refresh favs page so it shows the sign-in prompt, not stale data
+  if(window.currentPage && window.currentPage() === 'favs'){
+    window.renderFavs?.();
+  }
 }
 
 async function signOut(){

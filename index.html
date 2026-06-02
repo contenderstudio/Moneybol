@@ -36308,7 +36308,7 @@ function renderCompare(){
 /* ════ COMPETITIONS ════ */
 function renderCompetitions(){
   if(!competitionsData.length)return;
-  const visibleCompetitions = competitionsData.filter(c=>isSeason2019Onward(c.season_name));
+  const visibleCompetitions = competitionsData.filter(c=>isSeason2019Onward(c.season_name) && !/indian super league/i.test(c.competition_name));
   document.getElementById('comp-grid').innerHTML=visibleCompetitions.sort((a,b)=>a.competition_name.localeCompare(b.competition_name)).map(c=>{
     const key=`${c.competition_id}_${c.season_id}`;const done=loadedComps.has(key);
     return `<div class="comp-card ${done?'loaded':''}" id="cc-${key}" onclick="loadAndBrowse(${c.competition_id},${c.season_id},'${esc(c.competition_name)}','${esc(c.season_name)}')">
@@ -37102,10 +37102,12 @@ async function bootData(){
 
     const priorityKeys = new Set(PRIORITY_COMPS.map(c=>`${c.id}_${c.sid}`));
     const WOMENS_KEYWORDS = /women|female|wsl|nwsl|fawsl|w-league/i;
+    const EXCLUDED_LEAGUES = /indian super league/i;
     const rest = competitionsData.filter(c =>
       !priorityKeys.has(`${c.competition_id}_${c.season_id}`) &&
       isSeason2019Onward(c.season_name) &&
-      !WOMENS_KEYWORDS.test(c.competition_name)
+      !WOMENS_KEYWORDS.test(c.competition_name) &&
+      !EXCLUDED_LEAGUES.test(c.competition_name)
     );
 
     const BATCH = 2; // smaller batches = less network congestion

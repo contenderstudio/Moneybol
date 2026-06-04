@@ -33799,18 +33799,16 @@ function goCompare(){
 function clearCompare(){
   compareIds=[];
   updateCompareBar();
-  document.querySelectorAll('.fc.cmp-selected').forEach(card=>{
-    card.classList.remove('cmp-selected');
-  });
-  document.querySelectorAll('.fc-cmp-btn').forEach(btn=>{
-    btn.className='fc-cmp-btn';
-    btn.innerHTML='+';
-  });
+  document.querySelectorAll('.fc.cmp-selected').forEach(card=>card.classList.remove('cmp-selected'));
+  document.querySelectorAll('.fc-cmp-btn').forEach(btn=>{ btn.className='fc-cmp-btn'; btn.innerHTML='+'; });
+  document.querySelectorAll('[data-cmp]').forEach(btn=>{ btn.className='icon-btn'; btn.innerHTML='+'; });
+  document.querySelectorAll(`[id^="cmpbtn-"]`).forEach(btn=>{ btn.className='icon-btn'; btn.innerHTML='+'; btn.style.color='#aaa'; });
   const pdBtn=document.getElementById('pd-cmp-btn');
-  if(pdBtn){
-    pdBtn.className='icon-btn';
-    pdBtn.innerHTML='+';
-  }
+  if(pdBtn){ pdBtn.className='icon-btn'; pdBtn.innerHTML='+'; }
+  const goBtn=document.getElementById('cmp-go-btn');
+  if(goBtn){ goBtn.disabled=true; goBtn.style.opacity='0.35'; goBtn.style.cursor='not-allowed'; goBtn.style.background=''; }
+  const favCmpBtn=document.getElementById('fav-cmp-btn');
+  if(favCmpBtn){ favCmpBtn.disabled=true; favCmpBtn.style.opacity='0.4'; favCmpBtn.style.background='#333'; favCmpBtn.style.color='#878787'; favCmpBtn.style.cursor='not-allowed'; }
   toast('Comparison cleared');
 }
 

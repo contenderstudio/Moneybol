@@ -225,9 +225,9 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .btn-filter-out{font-family:var(--f);font-size:15px;font-weight:700;letter-spacing:.3px;padding:8px 16px;background:#fff;color:#000;border:1.5px solid #000;border-radius:5px;cursor:pointer;display:flex;align-items:center;gap:8px}
 .btn-filter-out:hover{background:#f0f0f0}
 /* AI chips row */
-.ai-chips-row{display:flex;align-items:center;gap:12px;margin:32px auto 40px;flex-wrap:nowrap;justify-content:flex-start;max-width:100%;padding:0 16px;overflow-x:visible}
-.ai-chips-label{font-family:var(--f);font-size:18px;font-weight:800;letter-spacing:.8px;color:var(--g);white-space:nowrap}
-.ai-chip-btn{font-family:var(--f);font-size:16px;font-weight:700;padding:8px 16px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:rgba(0,230,118,.9);border-radius:24px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.ai-chips-row{display:flex;align-items:center;gap:12px;margin:0 0 0;flex-wrap:nowrap;justify-content:flex-start;width:100%;padding:32px 16px;background:transparent;overflow-x:auto}
+.ai-chips-label{font-family:var(--f);font-size:20px;font-weight:900;letter-spacing:1px;color:var(--g);white-space:nowrap;margin-right:4px}
+.ai-chip-btn{font-family:var(--f);font-size:15px;font-weight:700;padding:14px 0;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);color:rgba(0,230,118,.9);border-radius:8px;cursor:pointer;transition:all .15s;white-space:nowrap;flex:1;text-align:center}
 .ai-chip-btn:hover{background:rgba(0,230,118,.18);border-color:var(--g);color:var(--g)}
 @media (max-width:900px){
   .ai-chips-row{flex-wrap:wrap;gap:8px;margin:22px 12px 28px}
@@ -248,21 +248,37 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .chips{display:none}
 .chip{font-family:var(--f);font-size:13px;font-weight:600;padding:4px 12px;background:#232323;border:1px solid #3a3a3a;color:#878787;border-radius:20px;cursor:pointer;transition:all .15s}
 .chip:hover{border-color:var(--g);color:var(--g);background:#1a2a1a}
-.home-lower{display:grid;grid-template-columns:1fr 560px;gap:0;padding:16px 16px 24px;align-items:start}
-.ai-panel{background:#252525;border:1px solid #3a3a3a;border-radius:8px;padding:16px;margin-right:16px}
+/* HOME LOWER — 3 columns: recently-viewed | featured+radar | ai-lists */
+.home-lower{display:grid;grid-template-columns:200px 1fr 230px;gap:14px;padding:0 16px 24px;align-items:start}
+.hl-col-rv{display:flex;flex-direction:column}
+.hl-col-center{display:flex;flex-direction:column}
+.hl-col-ai{display:flex;flex-direction:column}
+/* recently viewed col scrollable list */
+.hl-col-rv .recent-col{max-height:480px;overflow-y:auto}
+/* radar panel beside the feat card */
+.feat-radar-panel{display:flex;flex-direction:column;padding:10px 8px 10px;background:#252525;border-radius:8px;border:1px solid #3a3a3a}
+.feat-radar-panel canvas{opacity:1;display:block;margin:0 auto 12px}
+/* stat bars inside radar panel */
+.feat-stat-bars{display:flex;flex-direction:column;gap:5px;margin-top:6px}
+.feat-stat-bar-row{display:flex;flex-direction:column;gap:5px;padding:8px 12px;background:#1e1e1e;border-radius:6px}
+.feat-stat-bar-label{display:flex;justify-content:space-between;font-family:var(--f);font-size:15px;color:#fff;font-weight:700;letter-spacing:.4px}
+.feat-stat-bar-track{height:4px;background:#333;border-radius:2px;overflow:hidden}
+.feat-stat-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.feat-stat-bar-desc{font-family:var(--f);font-size:12px;color:#555;letter-spacing:.2px;margin-top:1px}
+.ai-panel{background:#252525;border:1px solid #3a3a3a;border-radius:8px;padding:16px}
 .panel-lbl{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--t3);margin-bottom:16px}
-.ai-btn{width:100%;padding:24px 16px;border-radius:6px;margin-bottom:8px;font-family:var(--f);font-size:19px;font-weight:700;color:#fff;border:none;cursor:pointer;text-align:center;transition:opacity .15s;display:block}
+.ai-btn{width:100%;padding:14px 12px;border-radius:6px;margin-bottom:8px;font-family:var(--f);font-size:14px;font-weight:700;color:#fff;border:none;cursor:pointer;text-align:center;transition:opacity .15s;display:block}
 .ai-btn:last-child{margin-bottom:0}
 .ai-btn:hover{opacity:.85}
 .ab1{background:linear-gradient(135deg,#0d1f14 0%,#1a4a2e 40%,#1e6e3a 100%)}
 .ab2{background:linear-gradient(135deg,#1a0d08 0%,#4a1e10 40%,#6b2a12 100%)}
 .ab3{background:linear-gradient(135deg,#1a0820 0%,#4a1255 40%,#6b1a7a 100%)}
 .rv-label{font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--t3);margin-bottom:12px}
-.rv-inner{display:grid;grid-template-columns:1fr 200px;gap:16px}
+.rv-inner{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
 /* Featured card — wireframe exact */
-.feat{background:#5A5A5A;border-radius:10px;overflow:hidden;cursor:pointer;border:3px solid #3a3a3a;transition:border-color .15s,box-shadow .15s}
+.feat{background:#5A5A5A;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;height:100%;border:3px solid #3a3a3a;transition:border-color .15s,box-shadow .15s}
 .feat:hover{border-color:var(--g);box-shadow:0 0 0 3px rgba(0,230,118,0.25)}
-.feat-img{position:relative;height:280px;background:#5A5A5A;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.feat-img{position:relative;height:270px;background:#5A5A5A;overflow:hidden;display:flex;align-items:flex-start;justify-content:center;flex-shrink:0;padding-top:40px;padding-bottom:0}
 /* Club crest circle — prominent, centered */
 .feat-crest{
   width:220px;height:220px;border-radius:50%;
@@ -272,6 +288,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
   position:relative;
   overflow:hidden;
   z-index:1;
+
 }
 
 .feat-crest{background-size:cover;background-position:center center;background-repeat:no-repeat}
@@ -279,7 +296,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .feat-star{position:absolute;top:10px;left:12px;color:#fff;font-size:18px;z-index:4;line-height:1;cursor:pointer;transition:color .15s,transform .15s}
 .feat-star:hover{color:#fff;transform:scale(1.2)}
 .feat-plus{position:absolute;top:33px;left:12px;color:#878787;font-size:22px;z-index:4;line-height:1}
-.feat-score{position:absolute;top:10px;right:12px;font-family:var(--f);font-size:40px;font-weight:800;color:var(--g);z-index:4}
+.feat-score{position:absolute;top:10px;right:12px;font-family:var(--f);font-size:48px;font-weight:800;color:var(--g);z-index:4}
 /* Bottom meta bar — #10 | Team | POS */
 .feat-bar{
   position:absolute;bottom:0;left:0;right:0;z-index:4;
@@ -288,15 +305,15 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
   background:transparent;
   font-family:var(--f);font-size:13px;color:#878787;
 }
-.feat-body{padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.feat-body{padding:8px 16px 16px;display:flex;flex-direction:column;flex:1;align-items:center;justify-content:flex-start;gap:8px}
 /* Large name like wireframe */
-.feat-name{font-family:var(--f);font-size:28px;font-weight:300;text-align:center;margin-bottom:16px;margin-top:0;color:#fff}
+.feat-name{font-family:var(--f);font-size:28px;font-weight:300;text-align:center;margin-bottom:0;margin-top:0;color:#fff;white-space:normal}
 .feat-name .fn{display:block}
 .feat-name .ln{display:block;margin-top:6px}
 .feat-club{font-size:14px;color:#878787;text-align:center;margin-bottom:16px}
-.feat-stats{display:flex;gap:16px;font-size:13px;margin-bottom:16px;flex-wrap:wrap;justify-content:center}
+.feat-stats{display:flex;gap:16px;font-size:14px;margin-bottom:0;flex-wrap:wrap;justify-content:center;}
 .hi{color:var(--g);font-weight:600}.hio{color:var(--or);font-weight:600}
-.btn-vm{
+.btn-vm{margin-top:auto;
   width:100%;background:#fff;color:#000;border:none;border-radius:6px;
   font-family:var(--f);font-size:15px;font-weight:800;letter-spacing:.5px;
   padding:12px;cursor:pointer;
@@ -327,7 +344,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
   overflow:hidden;
 }
 .ri-av-init{font-family:var(--f);font-size:13px;font-weight:700;color:#878787}
-.ri-n{font-family:var(--f);font-size:13px;font-weight:300;letter-spacing:.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ri-n{font-family:var(--f);font-size:13px;font-weight:300;letter-spacing:.5px;color:#fff;white-space:normal}
 .ri-m{font-size:13px;color:#fff;margin-top:2px}
 
 /* player detail */
@@ -400,7 +417,7 @@ table.ht tbody tr:hover{background:#232323}
 .pg#pg-favs .topbar{flex-shrink:0}
 .pg#pg-favs .favs-wrap{flex:1}
 .pg#pg-favs .favs-wrap{padding-bottom:0}
-.pg#pg-favs .site-footer{margin-top:auto}
+.pg#pg-favs .site-footer{}
 @media (max-width:520px){
   .pg#pg-favs .favs-grid{grid-template-columns:1fr !important;padding:0 12px}
 }
@@ -465,14 +482,14 @@ table.ht tbody tr:hover{background:#232323}
 .fc-grab,.fr-grab{position:absolute;left:10px;top:10px;z-index:6;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:5px;background:rgba(0,0,0,.25);color:#878787;font-size:15px;cursor:grab;user-select:none}
 .fc-grab:active,.fr-grab:active{cursor:grabbing}
 .fc-top{position:relative;background:#272727;overflow:hidden;display:flex;align-items:center;justify-content:center;height:200px;width:100%}
-.fc-crest{width:160px;height:160px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);background:#4a4a4a;overflow:hidden;z-index:2;flex-shrink:0;position:relative}
+.fc-crest{width:220px;height:220px;border-radius:50%;border:2px solid rgba(255,255,255,0.12);background:#4a4a4a;overflow:hidden;z-index:2;flex-shrink:0;position:relative}
 .fc-init{position:relative;z-index:1;font-family:var(--f);font-size:64px;font-weight:900;color:#878787;line-height:1}
 .fc-star{position:absolute;top:4px;left:4px;font-size:15px;z-index:2;cursor:pointer;transition:color .15s}
 .fc-plus{position:absolute;top:23px;left:4px;color:#878787;font-size:18px;z-index:2;line-height:1;cursor:pointer}
 .fc-score{position:absolute;top:8px;right:9px;font-family:var(--f);font-size:48px;font-weight:800;z-index:2}
 .fc-bar{display:none}
 .fc-body{padding:12px 16px}
-.fc-name{font-family:var(--f);font-size:19px;font-weight:300;text-align:center;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-name{font-family:var(--f);font-size:19px;font-weight:300;text-align:center;margin-bottom:4px;white-space:normal}
 .fc-club{font-size:13px;color:#878787;text-align:center;margin-bottom:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fc-stats{display:flex;justify-content:space-between;font-size:13px;color:#878787;margin-bottom:12px}
 .fc-btn{width:100%;background:transparent;border:1.5px solid #aaa;color:#fff;font-family:var(--f);font-size:13px;font-weight:800;padding:8px;border-radius:4px;cursor:pointer;transition:all .15s}
@@ -612,7 +629,7 @@ table.ht tbody tr:hover{background:#232323}
 .db-row.drag-over-bot{border-bottom:2px solid var(--g);padding-bottom:16px}
 .db-rank{font-family:var(--f);font-size:13px;font-weight:700;color:#555;width:22px;flex-shrink:0;text-align:right}
 .db-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222}
-.db-name{font-family:var(--f);font-size:13px;font-weight:300;color:#fff;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.db-name{font-family:var(--f);font-size:13px;font-weight:300;color:#fff;flex:1;white-space:normal}
 .db-meta{font-family:var(--f);font-size:12px;color:#555;white-space:nowrap}
 .db-remove{background:none;border:none;color:#555;font-size:16px;cursor:pointer;padding:0 4px;flex-shrink:0;transition:color .15s;line-height:1}
 .db-remove:hover{color:#e05a2b}
@@ -752,7 +769,7 @@ table.ht tbody tr:hover{background:#232323}
   .sb{width:140px;min-width:140px}
   .main{margin-left:140px}
   .home-lower{grid-template-columns:1fr 420px}
-  .feat-img{height:240px}
+  .feat-img{height:200px}
   .feat-crest{width:180px;height:180px}
   .pd-hero{grid-template-columns:160px 1fr auto}
   .pd-img{width:160px;height:160px;transform:translateX(16px)}
@@ -1476,48 +1493,57 @@ table.ht tbody tr:hover{background:#232323}
     <div class="load-sub" id="load-sub">Fetching La Liga 2020/21…</div>
   </div>
 
-  <!-- Main lower grid -->
+  <!-- Main lower grid: 3 columns -->
+  <div class="rv-label" id="rv-label-outer" style="padding:0 16px 8px;display:none">RECENTLY VIEWED</div>
   <div class="home-lower" id="home-lower" style="display:none">
 
-    <!-- LEFT: AI Lists panel -->
-    <div class="ai-panel">
-      <div class="panel-lbl">AI LISTS</div>
-      <button class="ai-btn ab1" onclick="showList('undervalued')">50 Undervalued Players</button>
-      <button class="ai-btn ab2" onclick="showList('hidden_scorers')">Hidden Goalscorers</button>
-      <button class="ai-btn ab3" onclick="showList('undervalued_defenders')">Undervalued Defenders</button>
+    <!-- COL 1: Recently Viewed list -->
+    <div class="hl-col-rv">
+      <div class="recent-col" id="recent-col">
+        <div class="ri" style="justify-content:center;color:var(--t3);font-size:13px;padding:20px">Loading...</div>
+      </div>
     </div>
 
-    <!-- RIGHT: Recently Viewed -->
-    <div>
-      <div class="rv-label">RECENTLY VIEWED</div>
+    <!-- COL 2: Featured card + radar side by side -->
+    <div class="hl-col-center">
       <div class="rv-inner">
-
         <!-- Featured card -->
         <div class="feat" id="feat-card">
           <div class="feat-img" id="feat-img-area" style="cursor:default">
             <div class="feat-crest" id="feat-crest-main"><img id="feat-sil-img" src="https://raw.githubusercontent.com/OliviaWeiss/moneybol-players/refs/heads/main/silhouette.png" style="width:100%;height:100%;object-fit:cover;opacity:1;transform:scale(1.03);transform-origin:center center" onerror="this.style.display='none'"></div>
-            <div class="feat-init" id="feat-init" style="display:none">—</div>
-            <span class="feat-star" id="feat-star-btn" onclick="event.stopPropagation();toggleFeatFav()">☆</span>
-            <span class="feat-score" id="feat-score">—</span>
-            <div class="feat-bar">
-              <span id="feat-pos" style="color:#fff"></span>
-              <span id="feat-comp" style="color:#fff"></span>
-            </div>
+            <div class="feat-init" id="feat-init" style="display:none">--</div>
+            <span class="feat-star" id="feat-star-btn" onclick="event.stopPropagation();toggleFeatFav()">&#9734;</span>
+            <span class="feat-score" id="feat-score">--</span>
           </div>
           <div class="feat-body">
-            <div class="feat-name" id="feat-name">Loading…</div>
+            <div class="feat-bar" style="position:static;background:transparent;padding:0;margin-bottom:2px">
+              <span id="feat-pos" style="color:#878787"></span>
+              <span id="feat-comp" style="color:#878787"></span>
+            </div>
+            <div class="feat-name" id="feat-name">Loading...</div>
             <div class="feat-stats" id="feat-stats"></div>
             <button class="btn-vm" onclick="viewFeatured()">VIEW MORE</button>
           </div>
         </div>
 
-        <!-- Scrollable recent list -->
-        <div class="recent-col" id="recent-col">
-          <div class="ri" style="justify-content:center;color:var(--t3);font-size:13px;padding:20px">Loading…</div>
+        <!-- Radar / stat bars panel -->
+        <div class="feat-radar-panel" id="feat-radar-panel">
+          <canvas id="feat-radar-canvas" width="180" height="180" style="display:block;margin:0 auto 16px"></canvas>
+          <div class="feat-stat-bars" id="feat-stat-bars"></div>
         </div>
-
       </div>
     </div>
+
+    <!-- COL 3: AI Lists -->
+    <div class="hl-col-ai">
+      <div class="ai-panel">
+        <div class="panel-lbl">AI LISTS</div>
+        <button class="ai-btn ab1" onclick="showList('undervalued')">50 Undervalued Players</button>
+        <button class="ai-btn ab2" onclick="showList('hidden_scorers')">Hidden Goalscorers</button>
+        <button class="ai-btn ab3" onclick="showList('undervalued_defenders')">Undervalued Defenders</button>
+      </div>
+    </div>
+
   </div>
 
 </div>
@@ -34269,7 +34295,7 @@ function go(id, addToStack=true){
         return `<div onclick="viewP('${esc(p.name)}')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:#1e1e1e;border-radius:6px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='#1e1e1e'">
           <div id="lriav-${safeId}" style="width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#222;background-image:url('${PLAYER_IMAGES[p.name]||SILHOUETTE_URL}');background-size:120%;background-position:center top"></div>
           <div style="flex:1;min-width:0">
-            <div style="font-family:var(--f);font-size:13px;font-weight:300;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${abbr}</div>
+            <div style="font-family:var(--f);font-size:13px;font-weight:300;color:#fff;white-space:normal">${abbr}</div>
             <div style="font-size:13px;font-family:var(--f);font-weight:500;color:${p.rc}">${p.score}</div>
           </div>
         </div>`;
@@ -34647,25 +34673,39 @@ function renderValue(){
   el.innerHTML = `
     <div style="margin-bottom:16px">
       ${isMobileValueTab ? '' : '<div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">EA FC ATTRIBUTES</div>'}
-      <div style="display:grid;grid-template-columns:1fr;gap:10px">
-        ${attrDefs.map(({key, label, abbr, color, desc}) => {
-          const val = attrs[key] || 0;
-          const pct = val; // already 0-99
-          return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:14px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
-              <div style="flex:1;min-width:0">
-                <div style="font-family:var(--f);font-size:16px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
-                <div style="font-size:13px;color:#878787;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${desc}</div>
+      <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap">
+        <!-- Radar chart -->
+        <div style="flex-shrink:0;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:16px;display:flex;align-items:center;justify-content:center">
+          <canvas id="profile-radar-canvas" width="240" height="240" style="display:block"></canvas>
+        </div>
+        <!-- Attribute bars -->
+        <div style="flex:1;min-width:240px;display:grid;grid-template-columns:1fr;gap:10px">
+          ${attrDefs.map(({key, label, abbr, color, desc}) => {
+            const val = attrs[key] || 0;
+            return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:14px">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-family:var(--f);font-size:16px;font-weight:700;color:#fff;white-space:normal">${label}</div>
+                  <div style="font-size:13px;color:#878787;margin-top:6px;white-space:normal">${desc}</div>
+                </div>
+                <div style="margin-left:12px;flex-shrink:0;font-family:var(--f);font-size:32px;font-weight:300;color:${color};line-height:1">${val}</div>
               </div>
-              <div style="margin-left:12px;flex-shrink:0;font-family:var(--f);font-size:32px;font-weight:300;color:${color};line-height:1">${val}</div>
-            </div>
-            <div style="height:6px;background:#2a2a2a;border-radius:3px;overflow:hidden">
-              <div class="value-bar-inner" data-pct="${pct}" style="height:100%;width:0;background:${color};border-radius:3px;transition:width .6s ease"></div>
-            </div>
-          </div>`;
-        }).join('')}
+              <div style="height:6px;background:#2a2a2a;border-radius:3px;overflow:hidden">
+                <div class="value-bar-inner" data-pct="${val}" style="height:100%;width:0;background:${color};border-radius:3px;transition:width .6s ease"></div>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
       </div>
     </div>`;
+  // Draw profile radar chart
+  setTimeout(() => {
+    const profileCanvas = document.getElementById('profile-radar-canvas');
+    if(profileCanvas && attrs) {
+      drawProfileRadar(profileCanvas, attrs, attrDefs);
+    }
+  }, 50);
+
   // Trigger animations for value and league bars after render
   setTimeout(() => {
     const inners = document.querySelectorAll('#value-content .value-bar-inner, #leagues-content .score-bar-inner, #leagues-content .comp-bar-inner');
@@ -35303,7 +35343,7 @@ function refreshHome(){
   // Featured card core data
   const featInitEl=document.getElementById('feat-init');
   if(featInitEl){ featInitEl.style.display='none'; }
-  document.getElementById('feat-name').textContent=fp.name;
+  const fpNameParts=fp.name.trim().split(' '); const fpFirst=fpNameParts.slice(0,-1).join(' '); const fpLast=fpNameParts.slice(-1)[0]; document.getElementById('feat-name').innerHTML=fpFirst+'<br>'+fpLast;
   document.getElementById('feat-score').textContent=fp.score;
   document.getElementById('feat-score').style.color=fp.rc;
   document.getElementById('feat-pos').textContent=fp.pos&&fp.pos!=='—'?fp.pos:'';
@@ -35328,6 +35368,13 @@ function refreshHome(){
     fstarBtn.style.color = isFav ? 'var(--g)' : '#999';
   }
   document.getElementById('feat-stats').innerHTML = featStatsHTML(fp);
+
+  // Draw radar + stat bars only if not already drawn for this player
+  if(!document.getElementById('feat-radar-canvas')?._lastPlayer || document.getElementById('feat-radar-canvas')._lastPlayer !== fp.name){
+    const rc = document.getElementById('feat-radar-canvas');
+    if(rc) rc._lastPlayer = fp.name;
+    drawFeatRadar(fp);
+  }
 
   // Build recent list — show generated avatar immediately, swap for real photo if key set
   const listPlayers=combined.slice(0,10);
@@ -35382,6 +35429,235 @@ function refreshHome(){
     });
   });
 }
+function drawProfileRadar(canvas, attrs, attrDefs){
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const SIZE = 240;
+  canvas.width = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  canvas.style.width = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+  ctx.scale(dpr, dpr);
+
+  const W = SIZE, H = SIZE;
+  ctx.clearRect(0,0,W,H);
+
+  const axes = attrDefs.map(a => ({...a, val: attrs[a.key]||0}));
+  const n = axes.length;
+  const cx = W/2, cy = H/2;
+  const maxR = Math.min(W,H)/2 - 34;
+  const angleStep = (Math.PI*2)/n;
+  const startAngle = -Math.PI/2;
+
+  // Concentric grid rings
+  [0.2,0.4,0.6,0.8,1].forEach((f,fi)=>{
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a = startAngle + i*angleStep;
+      const r = maxR*f;
+      const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = fi===4 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = fi===4 ? 1.5 : 1;
+    ctx.stroke();
+  });
+
+  // Axis spokes
+  for(let i=0;i<n;i++){
+    const a = startAngle + i*angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+maxR*Math.cos(a), cy+maxR*Math.sin(a));
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Filled polygon
+  ctx.beginPath();
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const r = maxR*(ax.val/100);
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,175,75,0.45)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,230,118,1)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Coloured vertex dots
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const r = maxR*(ax.val/100);
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    ctx.beginPath();
+    ctx.arc(x,y,4,0,Math.PI*2);
+    ctx.fillStyle = ax.color;
+    ctx.fill();
+  });
+
+  // Labels + values outside each axis
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const labelR = maxR + 20;
+    const x = cx + labelR*Math.cos(a), y = cy + labelR*Math.sin(a);
+    ctx.font = 'bold 10px Roboto Condensed, sans-serif';
+    ctx.fillStyle = '#888';
+    ctx.fillText(ax.abbr, x, y - 6);
+    ctx.font = 'bold 12px Roboto Condensed, sans-serif';
+    ctx.fillStyle = ax.color;
+    ctx.fillText(ax.val||'—', x, y + 7);
+  });
+}
+
+function drawFeatRadar(p){
+  const canvas = document.getElementById('feat-radar-canvas');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const dpr = window.devicePixelRatio || 1;
+  const SIZE = 190;
+  canvas.width = SIZE * dpr;
+  canvas.height = SIZE * dpr;
+  canvas.style.width = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+  ctx.scale(dpr, dpr);
+
+  const W = SIZE, H = SIZE;
+  ctx.clearRect(0,0,W,H);
+
+  // EA attribute colours — same as player profile page
+  const attrDefs = [
+    { key:'pac', label:'Pace',        abbr:'PAC', color:'#00e676', desc:'Speed & acceleration' },
+    { key:'sho', label:'Shooting',    abbr:'SHO', color:'#4fc3f7', desc:'Finishing & shot power' },
+    { key:'pas', label:'Passing',     abbr:'PAS', color:'#ffb74d', desc:'Short & long passing' },
+    { key:'dri', label:'Dribbling',   abbr:'DRI', color:'#ce93d8', desc:'Ball control & agility' },
+    { key:'def', label:'Defending',   abbr:'DEF', color:'#ff7043', desc:'Tackling & marking' },
+    { key:'phy', label:'Physicality', abbr:'PHY', color:'#80cbc4', desc:'Strength & stamina' },
+  ];
+
+  // Get EA attributes for this player
+  const ea = (typeof EA_PLAYER_INFO !== 'undefined' && EA_PLAYER_INFO[p.name]) ? EA_PLAYER_INFO[p.name] : null;
+  const vals = {};
+  attrDefs.forEach(a => { vals[a.key] = ea ? (ea[a.key]||0) : 0; });
+
+  // 6 axes — PAC top, clockwise
+  const axes = attrDefs.map(a => ({...a, val: vals[a.key]}));
+
+  const n = axes.length;
+  const cx = W/2, cy = H/2;
+  const maxR = Math.min(W,H)/2 - 30;
+  const angleStep = (Math.PI*2)/n;
+  const startAngle = -Math.PI/2;
+
+  // Concentric grid rings (5 rings)
+  [0.2,0.4,0.6,0.8,1].forEach((f,fi)=>{
+    ctx.beginPath();
+    for(let i=0;i<n;i++){
+      const a = startAngle + i*angleStep;
+      const r = maxR*f;
+      const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = fi===4 ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = fi===4 ? 1.5 : 1;
+    ctx.stroke();
+  });
+
+  // Axis spokes
+  for(let i=0;i<n;i++){
+    const a = startAngle + i*angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+maxR*Math.cos(a), cy+maxR*Math.sin(a));
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  // Filled polygon
+  ctx.beginPath();
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const r = maxR*(ax.val/100);
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(0,175,75,0.45)';
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(0,230,118,1)';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // Vertex dots (coloured by axis)
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const r = maxR*(ax.val/100);
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a);
+    ctx.beginPath();
+    ctx.arc(x,y,3.5,0,Math.PI*2);
+    ctx.fillStyle = ax.color;
+    ctx.fill();
+  });
+
+  // Axis labels + values
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  axes.forEach((ax,i)=>{
+    const a = startAngle + i*angleStep;
+    const labelR = maxR + 19;
+    const x = cx + labelR*Math.cos(a), y = cy + labelR*Math.sin(a);
+    ctx.font = 'bold 10px Roboto Condensed, sans-serif';
+    ctx.fillStyle = '#888';
+    ctx.fillText(ax.abbr, x, y - 6);
+    ctx.font = 'bold 12px Roboto Condensed, sans-serif';
+    ctx.fillStyle = ax.color;
+    ctx.fillText(ax.val || '—', x, y + 7);
+  });
+
+  // --- Stat bars: SHO, PAS, DEF — matching player profile card style ---
+  const bars = document.getElementById('feat-stat-bars');
+  if(!bars) return;
+
+  const showAttrs = ['sho','pas','def'];
+  const attrMap = {};
+  attrDefs.forEach(a => attrMap[a.key] = a);
+
+  bars.innerHTML = showAttrs.map(key => {
+    const a = attrMap[key];
+    const val = vals[key];
+    return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+        <div>
+          <div style="font-family:var(--f);font-size:14px;font-weight:700;color:#fff">${a.label}</div>
+          <div style="font-size:12px;color:#878787;margin-top:3px">${a.desc}</div>
+        </div>
+        <div style="font-family:var(--f);font-size:26px;font-weight:300;color:${a.color};line-height:1;margin-left:10px;flex-shrink:0">${val}</div>
+      </div>
+      <div style="height:5px;background:#2a2a2a;border-radius:3px;overflow:hidden">
+        <div class="feat-ea-bar" data-pct="${val}" style="height:100%;width:0;background:${a.color};border-radius:3px;transition:width .6s ease"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Animate bars — only once per render
+  setTimeout(()=>{
+    document.querySelectorAll('.feat-ea-bar:not([data-animated])').forEach((el,i)=>{
+      el.setAttribute('data-animated','1');
+      setTimeout(()=>{ el.style.width = (el.dataset.pct||'0')+'%'; }, i*100);
+    });
+  }, 30);
+}
+
 function viewFeatured(){
   if(featuredName) viewP(featuredName);
 }
@@ -35395,7 +35671,7 @@ function selectFeatured(name){
 
   // Update featured card content
   // no initials - silhouette handles placeholder
-  document.getElementById('feat-name').textContent = p.name;
+  const pNameParts=p.name.trim().split(' '); const pFirst=pNameParts.slice(0,-1).join(' '); const pLast=pNameParts.slice(-1)[0]; document.getElementById('feat-name').innerHTML=pFirst+'<br>'+pLast;
   document.getElementById('feat-score').textContent = p.score;
   document.getElementById('feat-score').style.color = p.rc;
   document.getElementById('feat-pos').textContent = p.pos&&p.pos!=='—'?p.pos:'';
@@ -35417,7 +35693,8 @@ function selectFeatured(name){
   const topComp2 = Object.values(byComp2).sort((a,b) => b.mins - a.mins)[0];
   document.getElementById('feat-comp').textContent = topComp2?.comp || p.comp || '';
 
-  // Load photo into the circle (feat-crest-main)
+  // Draw radar + stat bars for the newly selected player
+  drawFeatRadar(p);
   const circle = document.getElementById('feat-crest-main');
   if(circle){
     // Reset to silhouette first
@@ -36295,7 +36572,7 @@ function renderCompare(){
 /* ════ COMPETITIONS ════ */
 function renderCompetitions(){
   if(!competitionsData.length)return;
-  const visibleCompetitions = competitionsData.filter(c=>isSeason2019Onward(c.season_name) && !/indian super league/i.test(c.competition_name));
+  const visibleCompetitions = competitionsData.filter(c=>isSeason2019Onward(c.season_name) && !/indian super league|african cup|africa cup|afcon/i.test(c.competition_name));
   document.getElementById('comp-grid').innerHTML=visibleCompetitions.sort((a,b)=>a.competition_name.localeCompare(b.competition_name)).map(c=>{
     const key=`${c.competition_id}_${c.season_id}`;const done=loadedComps.has(key);
     return `<div class="comp-card ${done?'loaded':''}" id="cc-${key}" onclick="loadAndBrowse(${c.competition_id},${c.season_id},'${esc(c.competition_name)}','${esc(c.season_name)}')">
@@ -37072,7 +37349,7 @@ async function bootData(){
   await loadCompetitionCapped(first.id, first.sid, first.name, first.season, MATCHES_TIER1);
 
   document.getElementById('home-status').style.display = 'none';
-  document.getElementById('home-lower').style.display = 'grid';
+  document.getElementById('home-lower').style.display = 'grid'; const rvOuter = document.getElementById('rv-label-outer'); if(rvOuter) rvOuter.style.display = 'block';
   refreshHome();
 
   /* ── TIER 2: Rest of priority comps — parallel, no await ── */
@@ -37089,7 +37366,7 @@ async function bootData(){
 
     const priorityKeys = new Set(PRIORITY_COMPS.map(c=>`${c.id}_${c.sid}`));
     const WOMENS_KEYWORDS = /women|female|wsl|nwsl|fawsl|w-league/i;
-    const EXCLUDED_LEAGUES = /indian super league/i;
+    const EXCLUDED_LEAGUES = /indian super league|african cup|africa cup|afcon/i;
     const rest = competitionsData.filter(c =>
       !priorityKeys.has(`${c.competition_id}_${c.season_id}`) &&
       isSeason2019Onward(c.season_name) &&
@@ -37229,16 +37506,25 @@ boot();
           </div>
         </div>
 
-        <!-- Other Leagues -->
-        <div class="fp-comp-group" id="fpg-other">
-          <div class="fp-comp-group-header" onclick="toggleCompGroup('fpg-other')">
-            <span class="fp-comp-group-name">🌍 OTHER LEAGUES</span>
+        <!-- Ligue 1 -->
+        <div class="fp-comp-group" id="fpg-ligue1">
+          <div class="fp-comp-group-header" onclick="toggleCompGroup('fpg-ligue1')">
+            <span class="fp-comp-group-name">🇫🇷 LIGUE 1</span>
             <span class="fp-comp-group-arrow">▼</span>
           </div>
           <div class="fp-comp-group-body">
-            <div class="fp-comp-item"><input type="checkbox" id="fc-serie" data-comp="Serie A" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-serie">Serie A 2020/21</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-ligue" data-comp="Ligue 1" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-ligue">Ligue 1 2020/21</label></div>
-            <div class="fp-comp-item"><input type="checkbox" id="fc-copa" data-comp="Copa del Rey" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-copa">Copa del Rey 2020/21</label></div>
+            <div class="fp-comp-item"><input type="checkbox" id="fc-ligue-2021" data-comp="Ligue 1" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-ligue-2021">2020/21 <span>Neymar, Mbappe</span></label></div>
+          </div>
+        </div>
+
+        <!-- MLS -->
+        <div class="fp-comp-group" id="fpg-mls">
+          <div class="fp-comp-group-header" onclick="toggleCompGroup('fpg-mls')">
+            <span class="fp-comp-group-name">🇺🇸 MLS</span>
+            <span class="fp-comp-group-arrow">▼</span>
+          </div>
+          <div class="fp-comp-group-body">
+            <div class="fp-comp-item"><input type="checkbox" id="fc-mls-2020" data-comp="MLS" data-season="2020" onchange="updateCompFilter()"><label for="fc-mls-2020">2020</label></div>
           </div>
         </div>
 
@@ -37249,7 +37535,6 @@ boot();
             <span class="fp-comp-group-arrow">▼</span>
           </div>
           <div class="fp-comp-group-body">
-            <div class="fp-comp-item"><input type="checkbox" id="fc-ucl" data-comp="UEFA Champions League" data-season="2020/21" onchange="updateCompFilter()"><label for="fc-ucl">Champions League 2020/21</label></div>
             <div class="fp-comp-item"><input type="checkbox" id="fc-wc22" data-comp="FIFA World Cup" data-season="2022" onchange="updateCompFilter()"><label for="fc-wc22">World Cup 2022 <span>Mbappe, Messi</span></label></div>
             <div class="fp-comp-item"><input type="checkbox" id="fc-euro20" data-comp="UEFA Euro" data-season="2020" onchange="updateCompFilter()"><label for="fc-euro20">UEFA Euro 2020</label></div>
           </div>

@@ -366,6 +366,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-team .pd-season{color:var(--g)}
 .pd-team .pd-league{color:var(--g)}
 .pd-league{color:var(--g)}
+.pd-season{color:var(--g)}
 .pd-actions{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin-top:12px}
 .pd-star{background:none;border:none;color:#555;font-size:20px;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:color .15s,transform .15s;text-align:center;align-self:flex-start;transform-origin:center center;width:22px;height:22px}
 .pd-star:hover{color:var(--g);transform:scale(1.25)}
@@ -1756,11 +1757,20 @@ table.ht tbody tr:hover{background:#232323}
   <div class="sr-wrap"><div class="sr-lbl" id="sr-lbl" style="display:none"></div><div class="sr-grid" id="sr-grid"></div></div>
 </div>
 
-<!-- LIST RESULTS PAGE -->
-<div class="pg" id="pg-listresults" style="width:100%">
+<!-- LIST RESULTS PAGE --><div class="pg" id="pg-listresults" style="width:100%">
   <div class="topbar">
     <span class="tb-bk" onclick="go('lists')">&lt; ALL LISTS</span>
     <span id="lr-lbl" style="font-family:var(--f);font-size:14px;font-weight:700;letter-spacing:.5px;color:#fff;margin-left:12px"></span>
+    <div id="uv-info-btn" style="display:none;margin-left:8px;flex-shrink:0;position:relative"
+      onmouseenter="document.getElementById('uv-info-banner').style.opacity='1';document.getElementById('uv-info-banner').style.pointerEvents='auto'"
+      onmouseleave="document.getElementById('uv-info-banner').style.opacity='0';document.getElementById('uv-info-banner').style.pointerEvents='none'">
+      <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.2);color:#aaa;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center">ⓘ</div>
+      <div id="uv-info-banner" style="position:fixed;top:52px;width:300px;background:#1a1f1a;border:1px solid #2a3a2a;border-radius:8px;padding:14px 16px;box-shadow:0 8px 24px rgba(0,0,0,0.7);z-index:9999;opacity:0;pointer-events:none;transition:opacity .2s;white-space:normal">
+        <div style="font-family:var(--f);font-size:13px;font-weight:700;color:#fff;margin-bottom:6px">⚠️ How this list works</div>
+        <div style="font-family:var(--f);font-size:12px;color:#aaa;line-height:1.7">Players appear here when their <span style="color:#00e676;font-weight:600">xG per 90 mins</span> is significantly higher than their <span style="color:#00e676;font-weight:600">EA FC rating</span> suggests — meaning they're statistically outperforming their reputation.</div>
+        <div style="font-family:var(--f);font-size:12px;color:#666;line-height:1.7;margin-top:6px">This is <strong style="color:#aaa">not a best players list</strong>. It may surface players from smaller leagues, younger players, or those with deflated EA ratings.</div>
+      </div>
+    </div>
   </div>
   <div id="lr-viewbar" class="lr-view-toggle" style="display:none;margin:10px 16px 0;width:max-content;align-self:center">
     <button class="lr-vbtn on" id="lr-vbtn-cards" onclick="setListResultsView('cards')" title="Card view">CARDS</button>
@@ -35359,7 +35369,7 @@ function refreshHome(){
     const top = Object.values(byComp).sort((a,b) => b.mins - a.mins)[0];
     return {team: fp.team, comp: top?.comp || fp.comp};
   })();
-  document.getElementById('feat-comp').textContent = primaryMatch.comp||'';
+  document.getElementById('feat-comp').textContent = fp.country||'';
   // Update star state
   const fstarBtn = document.getElementById('feat-star-btn');
   if(fstarBtn){
@@ -35691,7 +35701,7 @@ function selectFeatured(name){
     byComp2[m.comp].mins += m.mins||0;
   });
   const topComp2 = Object.values(byComp2).sort((a,b) => b.mins - a.mins)[0];
-  document.getElementById('feat-comp').textContent = topComp2?.comp || p.comp || '';
+  document.getElementById('feat-comp').textContent = p.country||'';
 
   // Draw radar + stat bars for the newly selected player
   drawFeatRadar(p);
@@ -36178,9 +36188,9 @@ function fcHtml(p){
     <span class="feat-star${isFav? ' on' : ''}" data-player-name="${esc(p.name)}" style="width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">${isFav? '★' : '☆'}</span>
       <button class="icon-btn${isCmp?' on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:14px;z-index:5;color:${isCmp?'var(--g)':'#aaa'};font-size:24px" title="Compare">${isCmp?'✓':'+'}</button>
       <span class="feat-score" style="color:${p.rc}">${p.score}</span>
-      <div class="feat-bar"><span style="color:#fff">${p.pos||''}</span><span style="color:#fff;margin-left:8px">${p.comp||''}</span></div>
     </div>
     <div class="feat-body">
+      <div style="font-size:13px;color:#878787;text-align:center">${p.country||''}</div>
       <div class="feat-name"><div class="fn">${_firstEsc}</div><div class="ln">${_lastEsc}</div></div>
       <div class="feat-stats">
         ${(()=>{
@@ -36677,6 +36687,12 @@ function setListResults(players, title){
   resetListFilters();
 }
 
+function toggleUVInfo(){
+  const banner = document.getElementById('uv-info-banner');
+  if(!banner) return;
+  banner.style.display = banner.style.display === 'none' ? 'block' : 'none';
+}
+
 function showList(type,title){
   /* Use ALL players with any minutes — be as inclusive as possible */
   const base=Object.values(allPlayers).filter(p=>p.mins>0);
@@ -36755,6 +36771,10 @@ function showList(type,title){
     players=base.sort((a,b)=>b.score-a.score).slice(0,20);
   }
   go('listresults');
+  const uvInfoBtn = document.getElementById('uv-info-btn');
+  const uvInfoBanner = document.getElementById('uv-info-banner');
+  if(uvInfoBtn){ uvInfoBtn.style.display = type === 'undervalued' ? 'flex' : 'none'; }
+  if(uvInfoBanner){ uvInfoBanner.style.opacity = '0'; uvInfoBanner.style.pointerEvents = 'none'; }
   const posSpecific = ['top_midfielders','top_offensive','undervalued_defenders'];
   const posEl = document.getElementById('lr-filter-pos');
   if(posEl) posEl.style.display = posSpecific.includes(type) ? 'none' : '';

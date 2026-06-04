@@ -840,7 +840,16 @@ table.ht tbody tr:hover{background:#232323}
   /* move user block up more so it's not clipped on small screens */
   .sb-user{transform:translateY(-28px); margin-bottom:calc(8px + env(safe-area-inset-bottom));}
   .mobile-nav-open .sb{transform:translateX(0)}
-  .main{margin-left:0;padding-bottom:24px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+  .main{margin-left:0;padding-bottom:24px;padding-bottom:calc(24px + env(safe-area-inset-bottom));overflow-x:hidden}
+  body{overflow-x:hidden}
+  #pg-home.on{display:flex;flex-direction:column;align-items:center}
+  #pg-home .search-brand,
+  #pg-home .search-hero,
+  #pg-home .ai-chips-row,
+  #pg-home .ai-resp,
+  #pg-home #home-status,
+  #pg-home #rv-label-outer,
+  #pg-home .home-lower{width:100%;max-width:100%;box-sizing:border-box}
   .topbar{padding:8px 8px 8px 56px;flex-wrap:wrap}
   /* Align topbar back button across all primary pages on mobile */
   .pg .topbar{border-bottom:none !important;position:relative}
@@ -867,13 +876,16 @@ table.ht tbody tr:hover{background:#232323}
   .sh-input-wrap{width:100%;padding:10px 12px;border-radius:6px}
   .sh-input-wrap input{font-size:14px}
   .btn-search-blk{width:100%;padding:10px 18px;font-size:14px}
-  .ai-chips-row{margin:18px 12px 24px;gap:8px;justify-content:flex-start}
+  .feat-radar-panel{max-width:100%;width:100%;align-self:center;box-sizing:border-box}
+  .ai-chips-row{margin:18px 12px 24px;gap:8px;justify-content:flex-start;overflow-x:hidden;flex-wrap:wrap}
   .ai-chips-label{font-size:15px}
   .ai-chip-btn{font-size:13px;padding:7px 11px;border-radius:18px}
   .ai-panel{margin:0 12px 12px;padding:14px}
   .panel-lbl{margin-bottom:12px;letter-spacing:1.4px}
   .ai-btn{padding:18px 14px;font-size:16px;border-radius:6px}
   .rv-label{margin:0 12px 10px}
+  .hl-col-rv{padding-right:0;width:100%;padding:0 12px;box-sizing:border-box}
+  .recent-col{max-height:none}
   .rv-inner{grid-template-columns:1fr;gap:10px;padding:0 12px}
   .home-lower{grid-template-columns:1fr}
   .feat{border-width:2px;border-radius:10px}
@@ -967,7 +979,7 @@ table.ht tbody tr:hover{background:#232323}
     padding:60px 12px 16px !important;
   }
   #pg-lists #list-buttons > div:last-child{
-    min-height:320px;
+    display:none !important;
   }
   #pg-lists #list-buttons > div:first-child > div:nth-of-type(2),
   #pg-lists #list-buttons > div:first-child > div:nth-of-type(4){
@@ -1806,7 +1818,7 @@ table.ht tbody tr:hover{background:#232323}
       <!-- AI Lists -->
       <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">AI LISTS</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px">
-        <button class="ai-btn ab1" onclick="showList('undervalued')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">50 Undervalued Players</button>
+        <button class="ai-btn ab1" onclick="showList('undervalued')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">Clinical Finishers</button>
         <button class="ai-btn ab2" onclick="showList('top_100')" style="padding:28px 16px;border-radius:8px;font-size:18px;background:linear-gradient(135deg,#1a1a0d 0%,#3a3a12 40%,#555518 100%)">Top 100</button>
         <button class="ai-btn ab2" onclick="showList('hidden_scorers')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">High Scoring Players</button>
         <button style="padding:28px 16px;border-radius:8px;font-size:18px;font-family:var(--f);font-weight:700;color:#fff;border:none;cursor:pointer;background:linear-gradient(135deg,#0d1a3a 0%,#122255 40%,#1a3070 100%)" onclick="showList('top_midfielders')">Top Midfielders</button>

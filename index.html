@@ -1581,7 +1581,7 @@ table.ht tbody tr:hover{background:#232323}
     <div class="hl-col-ai">
       <div class="ai-panel">
         <div class="panel-lbl">AI LISTS</div>
-        <button class="ai-btn ab1" onclick="showList('undervalued')">Clinical Finishers</button>
+        <button class="ai-btn ab1" onclick="showList('undervalued')">Top Finishers</button>
         <button class="ai-btn ab2" onclick="showList('hidden_scorers')">Hidden Goalscorers</button>
         <button class="ai-btn ab3" onclick="showList('undervalued_defenders')">Undervalued Defenders</button>
       </div>
@@ -1839,7 +1839,7 @@ table.ht tbody tr:hover{background:#232323}
       <!-- AI Lists -->
       <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">AI LISTS</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px">
-        <button class="ai-btn ab1" onclick="showList('undervalued')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">Clinical Finishers</button>
+        <button class="ai-btn ab1" onclick="showList('undervalued')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">Top Finishers</button>
         <button class="ai-btn ab2" onclick="showList('top_100')" style="padding:28px 16px;border-radius:8px;font-size:18px;background:linear-gradient(135deg,#1a1a0d 0%,#3a3a12 40%,#555518 100%)">Top 100</button>
         <button class="ai-btn ab2" onclick="showList('hidden_scorers')" style="padding:28px 16px;border-radius:8px;font-size:18px;line-height:1.3">High Scoring Players</button>
         <button style="padding:28px 16px;border-radius:8px;font-size:18px;font-family:var(--f);font-weight:700;color:#fff;border:none;cursor:pointer;background:linear-gradient(135deg,#0d1a3a 0%,#122255 40%,#1a3070 100%)" onclick="showList('top_midfielders')">Top Midfielders</button>
@@ -31557,13 +31557,13 @@ function renderValue(){
   el.innerHTML = `
     <div style="margin-bottom:16px">
       ${isMobileValueTab ? '' : '<div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.5px;color:#878787;margin-bottom:14px">EA FC ATTRIBUTES</div>'}
-      <div style="display:flex;gap:24px;align-items:stretch;flex-wrap:wrap">
+      <div style="${isMobileValueTab ? 'display:flex;flex-direction:column;gap:12px' : 'display:flex;gap:24px;align-items:stretch;flex-wrap:wrap'}">
         <!-- Radar chart -->
-        <div style="flex-shrink:0;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:center">
-          <canvas id="profile-radar-canvas" width="180" height="180" style="display:block"></canvas>
+        <div style="${isMobileValueTab ? 'width:100%;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:12px;box-sizing:border-box;display:flex;align-items:center;justify-content:center' : 'flex-shrink:0;background:#1e1e1e;border:1px solid #2a2a2a;border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:center'}">
+          <canvas id="profile-radar-canvas" width="180" height="180" style="display:block;${isMobileValueTab ? 'width:100%;max-width:100%' : ''}"></canvas>
         </div>
         <!-- Attribute bars — 2 column grid -->
-        <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(3,1fr);gap:10px;align-self:stretch">
+        <div style="flex:1;min-width:${isMobileValueTab ? '0' : '300px'};display:grid;grid-template-columns:${isMobileValueTab ? '1fr' : '1fr 1fr'};grid-template-rows:repeat(${isMobileValueTab ? '6' : '3'},1fr);gap:10px;align-self:stretch">
           ${attrDefs.map(({key, label, abbr, color, desc}) => {
             const val = attrs[key] || 0;
             return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:12px;display:flex;flex-direction:column;justify-content:space-between">
@@ -32318,7 +32318,9 @@ function refreshHome(){
 function drawProfileRadar(canvas, attrs, attrDefs){
   const ctx = canvas.getContext('2d');
   const dpr = window.devicePixelRatio || 1;
-  const SIZE = 240;
+  const isMobile = window.matchMedia('(max-width:600px)').matches;
+  // On mobile use the full container width; cap at 480 for very wide phones
+  const SIZE = isMobile ? Math.min(canvas.parentElement.clientWidth - 24, 480) : 240;
   canvas.width = SIZE * dpr;
   canvas.height = SIZE * dpr;
   canvas.style.width = SIZE + 'px';
@@ -33371,6 +33373,14 @@ function renderCompare(){
 
   // Generate rule-based scout summary
   const p1 = players[0], p2 = players[1];
+  const COLOR_P1 = PLAYER_COLORS[0]; // green
+  const COLOR_P2 = PLAYER_COLORS[1]; // blue
+
+  // Helper: wrap a player name in a coloured strong tag
+  function pName(player) {
+    const color = player === p1 ? COLOR_P1 : COLOR_P2;
+    return `<strong style="color:${color}">${player.name}</strong>`;
+  }
 
   function generateScoutSummary(a, b) {
     const pct = p => p.passAtt > 0 ? Math.round((p.passComp / p.passAtt) * 100) : 0;
@@ -33382,18 +33392,24 @@ function renderCompare(){
     const xgDiff = Math.abs(a.xG - b.xG);
     const xgWinner = a.xG >= b.xG ? a : b;
     const xgLoser  = a.xG >= b.xG ? b : a;
+    const cW = xgWinner === a ? COLOR_P1 : COLOR_P2;
+    const cL = xgLoser  === a ? COLOR_P1 : COLOR_P2;
     if(xgDiff > 0.05){
-      lines.push(`<strong>${xgWinner.name}</strong> leads in total xG with <strong style="color:var(--g)">${xgWinner.xG.toFixed(2)}</strong> vs ${xgLoser.xG.toFixed(2)}, generating more high-quality chances across their appearances.`);
+      lines.push(`${pName(xgWinner)} leads in total xG with <strong style="color:${cW}">${xgWinner.xG.toFixed(2)}</strong> vs <strong style="color:${cL}">${xgLoser.xG.toFixed(2)}</strong>, generating more high-quality chances across their appearances.`);
     } else {
-      lines.push(`Both players are closely matched in xG — <strong>${a.name}</strong> posts ${a.xG.toFixed(2)} against <strong>${b.name}</strong>'s ${b.xG.toFixed(2)}, suggesting similar threat levels in front of goal.`);
+      lines.push(`Both players are closely matched in xG — ${pName(a)} posts <strong style="color:${COLOR_P1}">${a.xG.toFixed(2)}</strong> against ${pName(b)}'s <strong style="color:${COLOR_P2}">${b.xG.toFixed(2)}</strong>, suggesting similar threat levels in front of goal.`);
     }
 
     // Shot volume & efficiency
     const shotWinner = a.shots >= b.shots ? a : b;
     const shotLoser  = a.shots >= b.shots ? b : a;
     const xgPerShot = p => p.shots > 0 ? (p.xG / p.shots).toFixed(3) : '0.000';
+    const xgQualityWinner = xgPerShot(a) > xgPerShot(b) ? a : b;
+    const cSW = shotWinner === a ? COLOR_P1 : COLOR_P2;
+    const cSL = shotLoser  === a ? COLOR_P1 : COLOR_P2;
+    const cQW = xgQualityWinner === a ? COLOR_P1 : COLOR_P2;
     if(shotWinner.shots !== shotLoser.shots){
-      lines.push(`<strong>${shotWinner.name}</strong> is the more active shooter with <strong>${shotWinner.shots}</strong> attempts compared to ${shotLoser.shots}, though <strong>${xgPerShot(a) > xgPerShot(b) ? a.name : b.name}</strong> shows better shot quality (xG/shot: ${xgPerShot(a) > xgPerShot(b) ? xgPerShot(a) : xgPerShot(b)}).`);
+      lines.push(`${pName(shotWinner)} is the more active shooter with <strong style="color:${cSW}">${shotWinner.shots}</strong> attempts compared to <strong style="color:${cSL}">${shotLoser.shots}</strong>, though ${pName(xgQualityWinner)} shows better shot quality (xG/shot: <strong style="color:${cQW}">${xgPerShot(xgQualityWinner)}</strong>).`);
     }
 
     // Passing
@@ -33402,10 +33418,13 @@ function renderCompare(){
     if(passDiff >= 3 && (a.passAtt > 10 || b.passAtt > 10)){
       const passWinner = passA >= passB ? a : b;
       const passLoser  = passA >= passB ? b : a;
-      lines.push(`In the passing game, <strong>${passWinner.name}</strong> is the cleaner operator with <strong>${passA >= passB ? passA : passB}%</strong> accuracy vs ${passA >= passB ? passB : passA}%, and also edges his opponent with <strong>${passWinner.keyPasses}</strong> key passes to ${passLoser.keyPasses}.`);
+      const cPW = passWinner === a ? COLOR_P1 : COLOR_P2;
+      const cPL = passLoser  === a ? COLOR_P1 : COLOR_P2;
+      lines.push(`In the passing game, ${pName(passWinner)} is the cleaner operator with <strong style="color:${cPW}">${passA >= passB ? passA : passB}%</strong> accuracy vs <strong style="color:${cPL}">${passA >= passB ? passB : passA}%</strong>, and also edges their opponent with <strong style="color:${cPW}">${passWinner.keyPasses}</strong> key passes to <strong style="color:${cPL}">${passLoser.keyPasses}</strong>.`);
     } else if(a.keyPasses !== b.keyPasses) {
       const kpWinner = a.keyPasses >= b.keyPasses ? a : b;
-      lines.push(`Both players show similar pass accuracy, but <strong>${kpWinner.name}</strong> creates more danger with <strong>${kpWinner.keyPasses}</strong> key passes — an edge in chance creation.`);
+      const cKW = kpWinner === a ? COLOR_P1 : COLOR_P2;
+      lines.push(`Both players show similar pass accuracy, but ${pName(kpWinner)} creates more danger with <strong style="color:${cKW}">${kpWinner.keyPasses}</strong> key passes — an edge in chance creation.`);
     }
 
     // Minutes / per-90 context
@@ -33413,8 +33432,10 @@ function renderCompare(){
     if(minsDiff > 150){
       const moreMin = a.mins > b.mins ? a : b;
       const lessMin = a.mins > b.mins ? b : a;
+      const cMM = moreMin === a ? COLOR_P1 : COLOR_P2;
+      const cLM = lessMin  === a ? COLOR_P1 : COLOR_P2;
       const xg90More = per90(moreMin, 'xG'), xg90Less = per90(lessMin, 'xG');
-      lines.push(`Context matters here — <strong>${moreMin.name}</strong> has accumulated significantly more minutes (${Math.round(moreMin.mins)} vs ${Math.round(lessMin.mins)}), while <strong>${lessMin.name}</strong> posts a ${xg90Less >= xg90More ? 'higher' : 'lower'} xG/90 rate of <strong>${xg90Less}</strong>, suggesting ${xg90Less >= xg90More ? 'strong efficiency in less game time' : 'he still has more to prove with consistent minutes'}.`);
+      lines.push(`Context matters here — ${pName(moreMin)} has accumulated significantly more minutes (<strong style="color:${cMM}">${Math.round(moreMin.mins)}</strong> vs <strong style="color:${cLM}">${Math.round(lessMin.mins)}</strong>), while ${pName(lessMin)} posts a ${xg90Less >= xg90More ? 'higher' : 'lower'} xG/90 rate of <strong style="color:${cLM}">${xg90Less}</strong>, suggesting ${xg90Less >= xg90More ? 'strong efficiency in less game time' : 'he still has more to prove with consistent minutes'}.`);
     }
 
     // Verdict
@@ -33425,9 +33446,10 @@ function renderCompare(){
     if(scoreDiff >= 5){
       const winner = scoreA >= scoreB ? a : b;
       const loser  = scoreA >= scoreB ? b : a;
-      const winnerXg90 = per90(winner, 'xG');
+      const cWin = winner === a ? COLOR_P1 : COLOR_P2;
+      const cLos = loser  === a ? COLOR_P1 : COLOR_P2;
       verdictName = winner.name;
-      verdictReason = `${winner.name} edges this comparison overall — a higher MoneyBol score of ${Math.round(scoreA >= scoreB ? scoreA : scoreB)} vs ${Math.round(scoreA >= scoreB ? scoreB : scoreA)} reflects a consistently stronger all-round profile across xG, shot creation, and passing.`;
+      verdictReason = `${pName(winner)} edges this comparison overall — a higher MoneyBol score of <strong style="color:${cWin}">${Math.round(scoreA >= scoreB ? scoreA : scoreB)}</strong> vs <strong style="color:${cLos}">${Math.round(scoreA >= scoreB ? scoreB : scoreA)}</strong> reflects a consistently stronger all-round profile across xG, shot creation, and passing.`;
     } else {
       // Scores close — use a multi-stat tiebreak
       let aPoints = 0, bPoints = 0;
@@ -33438,7 +33460,7 @@ function renderCompare(){
       if(per90(a,'xG') > per90(b,'xG')) aPoints++; else bPoints++;
       const winner = aPoints >= bPoints ? a : b;
       verdictName = winner.name;
-      verdictReason = `These players are very evenly matched, but ${winner.name} shades it on balance — winning more individual stat categories and demonstrating a slightly more complete attacking profile.`;
+      verdictReason = `These players are very evenly matched, but ${pName(winner)} shades it on balance — winning more individual stat categories and demonstrating a slightly more complete attacking profile.`;
     }
 
     return { lines, verdictName, verdictReason };
@@ -33602,7 +33624,7 @@ function showList(type,title){
     lbl.textContent=`TOP ${players.length} OFFENSIVE PLAYERS`;
   }
   else if(type==='undervalued'){
-    // Clinical Finishers — best goals-to-xG ratio, attacking positions only
+    // Top Finishers — best goals-to-xG ratio, attacking positions only
     // Min 1.5 xG, min 5 shots, min 90 mins, must outperform xG (ratio > 1.0)
     players = base.filter(p => {
       if(p.xG < 1.5 || p.goals < 1 || p.shots < 5 || p.mins < 90) return false;

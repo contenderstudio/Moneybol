@@ -31569,10 +31569,10 @@ function renderValue(){
             return `<div style="background:#1e1e1e;border:1px solid #2a2a2a;border-radius:7px;padding:12px;display:flex;flex-direction:column;justify-content:space-between">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
                 <div style="flex:1;min-width:0">
-                  <div style="font-family:var(--f);font-size:15px;font-weight:700;color:#fff">${label}</div>
-                  <div style="font-size:12px;color:#878787;margin-top:4px">${desc}</div>
+                  <div style="font-family:var(--f);font-size:${isMobileValueTab ? '19px' : '15px'};font-weight:700;color:#fff">${label}</div>
+                  <div style="font-size:${isMobileValueTab ? '13px' : '12px'};color:#878787;margin-top:4px">${desc}</div>
                 </div>
-                <div style="margin-left:10px;flex-shrink:0;font-family:var(--f);font-size:26px;font-weight:300;color:${color};line-height:1">${val}</div>
+                <div style="margin-left:10px;flex-shrink:0;font-family:var(--f);font-size:${isMobileValueTab ? '32px' : '26px'};font-weight:300;color:${color};line-height:1">${val}</div>
               </div>
               <div style="height:5px;background:#2a2a2a;border-radius:3px;overflow:hidden">
                 <div class="value-bar-inner" data-pct="${val}" style="height:100%;width:0;background:${color};border-radius:3px;transition:width .6s ease"></div>

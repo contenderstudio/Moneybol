@@ -1362,11 +1362,13 @@ table.ht tbody tr:hover{background:#232323}
 </style>
 <style>
 @media (max-width:600px){
-  /* Reduce overall font sizes on narrow screens so text fits better */
-  body, body * { font-size:13px !important; }
   /* Keep primary headings slightly larger but constrained */
   .search-hero h1, .pd-name, .cp-name { font-size:20px !important; }
   .feat-name { font-size:20px !important; }
+  /* EA attribute name — large and bold */
+  .feat-stat-bar-label { font-size:19px !important; }
+  /* EA attribute description — clearly smaller */
+  .feat-stat-bar-desc { font-size:11px !important; color:#666 !important; }
   /* Scale down large stat numbers to avoid wrapping */
   .pds-val, .pds .pds-val, .pds-name, .feat-score, .fc-score, .cp-num { font-size:16px !important; }
   /* Make player page disclaimer smaller and allow wrapping on narrow screens */

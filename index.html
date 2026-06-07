@@ -899,8 +899,8 @@ table.ht tbody tr:hover{background:#232323}
   .feat-score{font-size:40px;top:12px;right:12px}
   .feat-star{top:10px;left:10px}
   .feat-body{padding:14px 14px 16px}
-  .feat-name{font-size:26px;margin-bottom:12px}
-  .feat-stats{gap:12px;margin-bottom:12px;font-size:14px}
+  .feat-name{font-size:28px;margin-bottom:12px}
+  .feat-stats{gap:12px;margin-bottom:12px;font-size:16px}
   .btn-vm{font-size:16px;padding:13px}
   .pd-hero{grid-template-columns:1fr;gap:10px;padding:14px}
   .pd-img{width:140px;height:140px;transform:translateX(0);justify-self:center}
@@ -916,14 +916,14 @@ table.ht tbody tr:hover{background:#232323}
   .pd-actions .icon-btn{margin-left:0 !important}
   .pds{padding:12px}
   .pds-val{font-size:34px}
-  .pds-name{font-size:15px}
+  .pds-name{font-size:16px}
   .pd-ring{padding:20px 22px}
   .pd-ring{transform:translateY(-18px);justify-self:center}
   /* stack numbers above labels and present stats in two columns on small screens */
   .pd-stats{grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
   .pds{display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px;border-radius:6px;background:transparent;text-align:center}
-  .pds-val{font-size:36px;line-height:1;margin-bottom:6px;color:var(--g)}
-  .pds-name{font-size:15px;font-weight:800;color:#fff;margin-top:6px}
+  .pds-val{font-size:38px;line-height:1;margin-bottom:6px;color:var(--g)}
+  .pds-name{font-size:16px;font-weight:800;color:#fff;margin-top:6px}
   .pds .pds-avg{display:block;font-size:13px;color:#878787;margin-bottom:6px}
   .pd-ring .rw{width:clamp(128px,40vw,176px)!important;height:clamp(128px,40vw,176px)!important}
   .pd-ring .rl{font-size:clamp(52px,20vw,70px)!important}
@@ -1364,13 +1364,15 @@ table.ht tbody tr:hover{background:#232323}
 @media (max-width:600px){
   /* Keep primary headings slightly larger but constrained */
   .search-hero h1, .pd-name, .cp-name { font-size:20px !important; }
-  .feat-name { font-size:20px !important; }
+  .feat-name { font-size:26px !important; }
   /* EA attribute name — large and bold */
   .feat-stat-bar-label { font-size:19px !important; }
   /* EA attribute description — clearly smaller */
   .feat-stat-bar-desc { font-size:11px !important; color:#666 !important; }
-  /* Scale down large stat numbers to avoid wrapping */
-  .pds-val, .pds .pds-val, .pds-name, .feat-score, .fc-score, .cp-num { font-size:16px !important; }
+  /* Profile stat values — large and readable */
+  .pds-val, .pds .pds-val { font-size:32px !important; }
+  .pds-name { font-size:16px !important; }
+  .feat-score, .fc-score, .cp-num { font-size:22px !important; }
   /* Make player page disclaimer smaller and allow wrapping on narrow screens */
   .pd-topbar .pd-disclaimer{
     font-size:11px !important;

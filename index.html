@@ -34065,8 +34065,8 @@ function renderTableHTML(players, opts={}){
             onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
             <td data-label="#" style="padding:12px 8px;font-family:var(--f);font-weight:800;font-size:15px;color:${rankColor};width:36px">${i+1}</td>
             <td data-label="ACTIONS" style="padding:12px 8px;white-space:nowrap;pointer-events:none" onclick="event.stopPropagation()">
-              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:8px;pointer-events:auto;font-size:18px;vertical-align:middle" title="Favourite">★</button>
-              <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" class="icon-btn${compareIds.includes(p.name)?' on':''}" data-cmp="${esc(p.name)}" style="pointer-events:auto;font-size:24px;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'+'}</button>
+              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:4px;pointer-events:auto;font-size:16px;line-height:1;display:inline-flex;align-items:center;vertical-align:middle" title="Favourite">★</button>
+              <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" class="icon-btn${compareIds.includes(p.name)?' on':''}" data-cmp="${esc(p.name)}" style="pointer-events:auto;font-size:22px;line-height:1;display:inline-flex;align-items:center;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'+'}</button>
             </td>
             <td data-label="PLAYER" style="padding:12px 8px">
               <div class="fr-name">

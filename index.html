@@ -541,7 +541,7 @@ table.ht tbody tr:hover{background:#232323}
 .cmp-clear{font-family:var(--f);font-size:13px;font-weight:700;color:#878787;background:none;border:none;cursor:pointer;padding:0 8px;white-space:nowrap}
 .cmp-clear:hover{color:#878787}
 .icon-btn{background:none;border:none;cursor:pointer;padding:0;font-size:16px;line-height:1;transition:color .15s,transform .15s;vertical-align:middle;color:#555}
-.icon-btn:hover{color:var(--g);transform:scale(1.25)}
+@media(hover:hover){.icon-btn:hover{color:var(--g);transform:scale(1.25)}}
 .icon-btn.on{color:var(--g)}
 
 /* compare — wireframe exact match */
@@ -33113,6 +33113,7 @@ function toggleFavList(name){
   toast(on?'Added to favourites ★':'Removed from favourites');
   document.querySelectorAll('.icon-btn[data-fav="'+name.replace(/"/g,'&quot;')+'"]').forEach(b=>{
     b.classList.toggle('on', on);
+    b.textContent = on ? '★' : '☆';
   });
   try{ updateFavUI(name); }catch(e){console.warn('updateFavUI',e)}
   saveFavs();
@@ -34065,7 +34066,7 @@ function renderTableHTML(players, opts={}){
             onclick="if(!blockFavClick())viewP('${esc(p.name)}')">
             <td data-label="#" style="padding:12px 8px;font-family:var(--f);font-weight:800;font-size:15px;color:${rankColor};width:36px">${i+1}</td>
             <td data-label="ACTIONS" style="padding:12px 8px;white-space:nowrap;pointer-events:none" onclick="event.stopPropagation()">
-              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:4px;pointer-events:auto;font-size:16px;line-height:1;display:inline-flex;align-items:center;vertical-align:middle" title="Favourite">★</button>
+              <button onclick="event.stopPropagation();toggleFavList('${esc(p.name)}')" class="icon-btn${favIds.includes(p.name)?' on':''}" data-fav="${esc(p.name)}" style="margin-right:4px;pointer-events:auto;font-size:16px;line-height:1;display:inline-flex;align-items:center;vertical-align:middle" title="Favourite">${favIds.includes(p.name)?'★':'☆'}</button>
               <button onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" class="icon-btn${compareIds.includes(p.name)?' on':''}" data-cmp="${esc(p.name)}" style="pointer-events:auto;font-size:22px;line-height:1;display:inline-flex;align-items:center;vertical-align:middle" title="Compare">${compareIds.includes(p.name)?'✓':'+'}</button>
             </td>
             <td data-label="PLAYER" style="padding:12px 8px">

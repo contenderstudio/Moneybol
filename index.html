@@ -33275,7 +33275,7 @@ function renderCompare(){
 
     const statsHtml = defs.map(([l,fn,cmp], i)=>{
       return `<div class="cps">
-        <span class="cps-val">${fn(p)}</span>
+        <span class="cps-val" style="color:${playerColor}">${fn(p)}</span>
         <div class="cps-nm">${l}</div>
       </div>`;
     }).join('');

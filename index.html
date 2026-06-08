@@ -1470,6 +1470,9 @@ table.ht tbody tr:hover{background:#232323}
     <div class="sb-item" id="nav-about" onclick="go('about')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ABOUT
     </div>
+    <div class="sb-item" id="nav-trivia" onclick="go('trivia')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>TRIVIA
+    </div>
   </nav>
   <div class="sb-user" id="sb-user">
   <div class="sb-user-row" onclick="showProfileMenu()">
@@ -2047,6 +2050,13 @@ table.ht tbody tr:hover{background:#232323}
 </div>
 
 
+<!-- TRIVIA PAGE -->
+<div class="pg" id="pg-trivia">
+  <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span></div>
+  <div id="trivia-root" style="max-width:900px;margin:0 auto;padding:12px 24px 40px"></div>
+</div>
+
+
 <!-- TERMS OF USE -->
 <div class="pg" id="pg-terms">
   <div class="topbar"><span class="tb-bk" onclick="go('about')">&lt; BACK</span></div>
@@ -2260,19 +2270,29 @@ const SB='https://raw.githubusercontent.com/statsbomb/open-data/master/data';
 const IS_LOCAL = location.protocol === 'file:';
 /* Multiple CORS proxies — tries each in order until one works */
 const PROXIES=[
-  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   u=>`https://corsproxy.io/?${encodeURIComponent(u)}`,
-  u=>`https://cors-anywhere.herokuapp.com/${u}`,
+  u=>`https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+  u=>`https://thingproxy.freeboard.io/fetch/${u}`,
 ];
 async function sbFetch(path){
   const url=`${SB}/${path}`;
-  /* 1. Try direct (works from http/https servers) */
-  try{const r=await fetch(url,{mode:'cors'});if(r.ok)return r.json();}catch(_){}
+  /* 1. Try direct (works from http/https servers with CORS headers) */
+  try{
+    const r=await fetch(url,{mode:'cors',credentials:'omit'});
+    if(r.ok){
+      const ct=r.headers.get('content-type')||'';
+      if(ct.includes('json')||ct.includes('text')) return r.json();
+    }
+  }catch(_){}
   /* 2. Try each proxy in sequence */
   for(const proxy of PROXIES){
     try{
-      const r=await fetch(proxy(url),{signal:AbortSignal.timeout(8000)});
-      if(r.ok)return r.json();
+      const r=await fetch(proxy(url),{
+        signal:AbortSignal.timeout(10000),
+        credentials:'omit',
+        headers:{'Accept':'application/json'}
+      });
+      if(r.ok) return r.json();
     }catch(_){}
   }
   throw new Error(`All sources failed for: ${path}`);
@@ -31158,9 +31178,11 @@ function go(id, addToStack=true){
   el.classList.add('on');
   const mainScroll = document.querySelector('.main');
   if(mainScroll) mainScroll.scrollTop = 0;
-  ['home','lists','favs','about'].forEach((pg,i)=>{
-    document.querySelectorAll('.sb-item')[i].classList.toggle('on', pg===id || (pg==='lists' && id==='listresults'));
+  ['home','lists','favs','about','trivia'].forEach((pg,i)=>{
+    const navEl = document.querySelectorAll('.sb-item')[i];
+    if(navEl) navEl.classList.toggle('on', pg===id || (pg==='lists' && id==='listresults'));
   });
+  if(id==='trivia'){ if(typeof initTrivia==='function') initTrivia(); }
   if(id==='favs') renderFavs();
   if(id==='compare') renderCompare();
   if(id==='competitions') renderCompetitions();
@@ -32667,7 +32689,7 @@ function viewP(name){
     <div class="pd-img">${PLAYER_IMAGES[name] ? '' : `<img src="${SILHOUETTE_URL}" style="width:110%;height:110%;object-fit:contain;margin:-5%;opacity:1;transform:scale(1.08);transform-origin:center center" onerror="this.style.display='none'">`}<div class="pd-crest"></div></div>
     <div class="pd-info">
       <div class="pd-name">${p.name}</div>
-      <div class="pd-sub" style="color:#fff">${p.team}</div>
+      <div class="pd-sub" style="color:#fff">${p.country||p.team||''}</div>
       <div class="pd-positions" style="font-size:13px;margin:4px 0;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
         ${(()=>{
           const eaPos = getEAPositions(name);
@@ -34565,5 +34587,457 @@ boot();
   </div>
 </div>
 
+
+<style>
+#trivia-root{font-family:'Barlow Condensed',var(--f),sans-serif}
+.tv-header{text-align:center;padding:8px 0 4px}
+.tv-header h1{font-size:22px;letter-spacing:3px;color:var(--g);font-weight:700}
+.tv-header p{font-size:11px;letter-spacing:2px;color:#666;margin-top:2px}
+.tv-score-bar{display:flex;justify-content:center;gap:24px;padding:8px 0;border-bottom:1px solid #1e1e1e;margin-bottom:12px}
+.tv-score-item{text-align:center}
+.tv-score-val{font-size:22px;font-weight:700;color:var(--g)}
+.tv-score-lbl{font-size:10px;letter-spacing:1.5px;color:#666}
+.tv-clue{background:#1a1a1a;border:1px solid #222;border-radius:10px;padding:12px;margin-bottom:10px}
+.tv-clue-title{font-size:10px;letter-spacing:2px;color:#555;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.tv-clue-title::after{content:'';flex:1;height:1px;background:#222}
+.tv-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tv-pill{background:#242424;border:1px solid #2a2a2a;border-radius:20px;padding:4px 10px;font-size:12px;color:#f0f0f0;animation:tvFadeIn .4s ease}
+.tv-pill span{color:var(--g);font-weight:700}
+.tv-lives{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
+.tv-life{width:10px;height:10px;border-radius:50%;background:var(--g);transition:all .3s}
+.tv-life.lost{background:#ef5350;transform:scale(0.7)}
+.tv-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.tv-opt{background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:8px;padding:16px 10px;cursor:pointer;text-align:center;font-family:inherit;font-size:15px;font-weight:300;color:#f0f0f0;letter-spacing:.5px;transition:all .2s;position:relative;overflow:hidden}
+.tv-opt:not(:disabled):hover{border-color:var(--g);color:var(--g);transform:translateY(-1px)}
+.tv-opt.tv-correct{border-color:var(--g);background:rgba(0,230,118,.08);color:var(--g);animation:tvPulse .4s ease}
+.tv-opt.tv-wrong{border-color:#ef5350;background:rgba(239,83,80,.08);color:#ef5350;cursor:not-allowed}
+.tv-opt:disabled{cursor:not-allowed;opacity:.7}
+.tv-reveal{background:#1a1a1a;border:1.5px solid var(--g);border-radius:12px;padding:16px;text-align:center;animation:tvSlideUp .5s ease;margin-bottom:10px}
+.tv-reveal-score{font-size:52px;font-weight:700;color:var(--g);line-height:1}
+.tv-reveal-sub{font-size:12px;color:#555;letter-spacing:1px;margin:4px 0}
+.tv-reveal-name{font-size:26px;font-weight:700;color:#f0f0f0;letter-spacing:1px}
+.tv-reveal-meta{display:flex;justify-content:center;gap:10px;margin:8px 0;flex-wrap:wrap}
+.tv-tag{background:#242424;border:1px solid #2a2a2a;border-radius:4px;padding:3px 8px;font-size:11px;letter-spacing:.5px;color:#f0f0f0}
+.tv-reveal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.tv-stat{background:#0d0d0d;border-radius:6px;padding:8px 4px;text-align:center}
+.tv-stat-val{font-size:20px;font-weight:700;color:var(--g)}
+.tv-stat-lbl{font-size:9px;letter-spacing:1px;color:#555}
+.tv-msg{text-align:center;font-size:16px;font-weight:700;letter-spacing:1px;padding:8px;border-radius:6px;margin-bottom:8px}
+.tv-msg.ok{background:rgba(0,230,118,.08);color:var(--g);border:1px solid rgba(0,230,118,.25)}
+.tv-msg.bad{background:rgba(239,83,80,.08);color:#ef5350;border:1px solid rgba(239,83,80,.25)}
+.tv-msg.gold{background:rgba(255,215,64,.08);color:#ffd740;border:1px solid rgba(255,215,64,.25)}
+.tv-next{width:100%;padding:14px;background:var(--g);border:none;border-radius:8px;font-family:inherit;font-size:16px;font-weight:700;letter-spacing:2px;color:#000;cursor:pointer;transition:all .2s}
+.tv-next:hover{background:#00c864;transform:translateY(-1px)}
+.tv-heat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;border:1px solid #222;border-radius:4px;overflow:hidden;background:#242424;padding:4px}
+.tv-heat-cell{border-radius:2px;height:24px}
+.tv-shot-zone{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;max-width:200px;margin:0 auto}
+.tv-shot-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px}
+.tv-pos-badge{display:inline-block;background:#242424;border:1.5px solid var(--g);border-radius:6px;padding:10px 20px;font-size:18px;font-weight:700;color:var(--g);letter-spacing:2px}
+.tv-hint{font-size:14px;color:#f0f0f0;background:#242424;border-radius:6px;padding:10px;text-align:center;letter-spacing:.5px}
+.tv-hint span{color:var(--g);font-weight:700}
+@keyframes tvFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes tvSlideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes tvPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes tvShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+</style>
+
+
 </body>
 </html>
+<script>
+/* TRIVIA */
+var PSVG=[
+'<rect x="1" y="1" width="118" height="78"/>',
+'<line x1="60" y1="1" x2="60" y2="79"/>',
+'<circle cx="60" cy="40" r="9.15"/>',
+'<circle cx="60" cy="40" r=".8" fill="#fff" stroke="none"/>',
+'<rect x="1" y="13.84" width="16.5" height="52.32"/>',
+'<rect x="1" y="24.84" width="5.5" height="30.32"/>',
+'<path d="M17.5 31.5 A9.15 9.15 0 0 1 17.5 48.5"/>',
+'<circle cx="11" cy="40" r=".8" fill="#fff" stroke="none"/>',
+'<rect x="-1.5" y="30.34" width="2.5" height="19.32" stroke-width=".8"/>',
+'<rect x="102.5" y="13.84" width="16.5" height="52.32"/>',
+'<rect x="113" y="24.84" width="5.5" height="30.32"/>',
+'<path d="M102.5 31.5 A9.15 9.15 0 0 0 102.5 48.5"/>',
+'<circle cx="109" cy="40" r=".8" fill="#fff" stroke="none"/>',
+'<rect x="119" y="30.34" width="2.5" height="19.32" stroke-width=".8"/>'
+].join('');
+
+var TV_OC={'Goal':'#00e676','Saved':'#4fc3f7','Saved To Post':'#4fc3f7','Saved Off Target':'#4fc3f7','Blocked':'#888','Off Target':'#e05a2b','Wayward':'#e05a2b','Post':'#fff'};
+var tvState={score:0,streak:0,bestStreak:0,roundQ:0,guesses:0,used:[],current:null,options:[],done:false,clueLevel:0};
+var TV_ROUND=10;
+
+function tvHeatColor(n,mx){
+  if(n===0)return'rgba(119,118,109,0.08)';
+  var PAL=['#77766D','#B7A2A2','#9B4D4D','#B32626','#531616'];
+  var t=Math.min(1,n/mx),pos=t*(PAL.length-1),i=Math.floor(pos),f=pos-i;
+  function h2r(h){var x=h.replace('#','');return[parseInt(x.slice(0,2),16),parseInt(x.slice(2,4),16),parseInt(x.slice(4,6),16)];}
+  var a=h2r(PAL[i]),b=h2r(PAL[Math.min(i+1,PAL.length-1)]);
+  return'rgba('+a.map(function(v,j){return Math.round(v+(b[j]-v)*f);}).join(',')+',0.94)';
+}
+
+function tvBuildHeat(shots){
+  var COLS=6,ROWS=5,CW=20,CH=16;
+  var grid=[];for(var r=0;r<ROWS;r++){grid.push([]);for(var c=0;c<COLS;c++)grid[r].push(0);}
+  shots.forEach(function(s){
+    var c=Math.min(COLS-1,Math.max(0,Math.floor(s.x/CW)));
+    var r=Math.min(ROWS-1,Math.max(0,Math.floor(s.y/CH)));
+    grid[r][c]++;
+  });
+  var mx=Math.max(1);grid.forEach(function(row){row.forEach(function(v){if(v>mx)mx=v;});});
+  var cells='';
+  for(var r=0;r<ROWS;r++)for(var c=0;c<COLS;c++)
+    cells+='<rect x="'+(c*CW)+'" y="'+(r*CH)+'" width="'+CW+'" height="'+CH+'" fill="'+tvHeatColor(grid[r][c],mx)+'" stroke="#111" stroke-width="0.8"/>';
+  var svg='<svg viewBox="0 0 120 80" style="width:100%;display:block;border-radius:6px" role="img">'
+    +'<rect x="0" y="0" width="120" height="80" fill="#e8e8e8"/>'
+    +'<g>'+cells+'</g>'
+    +'<g stroke="#fff" stroke-width="1" fill="none">'+PSVG+'</g>'
+    +'</svg>';
+  return svg+'<div style="display:flex;gap:6px;align-items:center;margin-top:6px;font-size:11px;color:#555">'
+    +'<div style="height:8px;flex:1;border-radius:4px;background:linear-gradient(90deg,#77766D,#B7A2A2,#9B4D4D,#B32626,#531616)"></div>'
+    +'<span>Low to High</span></div>';
+}
+
+function tvBuildShots(shots){
+  var dots=shots.map(function(s){
+    var color=TV_OC[s.outcome]||'#e05a2b';
+    var r=Math.max(1.2,Math.min(5,1.2+s.xg*20));
+    var isGoal=s.outcome==='Goal';
+    var ring=isGoal?'<circle cx="'+s.x+'" cy="'+s.y+'" r="'+(r+1.5)+'" fill="none" stroke="#00e676" stroke-width=".5" stroke-opacity=".6"/>':'';
+    return ring+'<circle cx="'+s.x+'" cy="'+s.y+'" r="'+r+'" fill="'+color+'" fill-opacity="'+(isGoal?1:.75)+'" stroke="rgba(255,255,255,.3)" stroke-width=".5"><title>'+s.outcome+' xG:'+s.xg+'</title></circle>';
+  }).join('');
+  var leg=[['#00e676','GOAL'],['#4fc3f7','ON TARGET'],['#e05a2b','OFF TARGET'],['#888','BLOCKED']]
+    .map(function(cl){return'<span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:50%;background:'+cl[0]+';flex-shrink:0"></span><span style="font-size:11px;color:#666">'+cl[1]+'</span></span>';}).join('');
+  return'<svg viewBox="0 0 120 80" style="width:100%;display:block;border-radius:6px;background:#1a3d1f" role="img">'
+    +'<rect x="0" y="0" width="120" height="80" fill="#1a3d1f" rx="4"/>'
+    +'<g>'+dots+'</g>'
+    +'<g stroke="#fff" stroke-width="1" fill="none">'+PSVG+'</g>'
+    +'</svg><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">'+leg+'</div>';
+}
+
+function tvGetAttrs(name){
+  var a=typeof EA_PLAYER_INFO!=='undefined'&&EA_PLAYER_INFO[name];
+  if(!a)return null;
+  return{PAC:a.pac||50,SHO:a.sho||50,PAS:a.pas||50,DRI:a.dri||50,DEF:a.def||50,PHY:a.phy||50};
+}
+
+function tvGetPool(){
+  if(typeof EA_RATINGS==='undefined'||typeof EA_PLAYER_INFO==='undefined')return[];
+  if(typeof allPlayers==='undefined'||Object.keys(allPlayers).length===0)return[];
+  return Object.entries(EA_RATINGS)
+    .filter(function(e){
+      var name=e[0],score=e[1];
+      return score>=75&&EA_PLAYER_INFO[name]&&allPlayers[name]&&allPlayers[name].shots>0;
+    })
+    .map(function(e){
+      var name=e[0],score=e[1],info=EA_PLAYER_INFO[name],lp=allPlayers[name];
+      return{name:name,score:score,pos:info.pos||null,foot:info.foot||null,
+        country:lp.country||null,team:lp.team||null,
+        comp:lp.comp||null,season:lp.season||null,
+        shotLog:lp.shotLog||[]};
+    });
+}
+
+function tvGenHeat(p){
+  var pos=(p.pos||'').toUpperCase();
+  var base;
+  if(pos.includes('GK'))       base=[[8,7,2,0,0,0],[9,9,3,0,0,0],[9,9,3,0,0,0],[9,9,3,0,0,0],[8,7,2,0,0,0]];
+  else if(pos.includes('CB'))  base=[[5,8,2,0,0,0],[4,9,3,0,0,0],[4,9,3,0,0,0],[4,9,3,0,0,0],[5,8,2,0,0,0]];
+  else if(pos.includes('LB')||pos.includes('RB')||pos.includes('WB')) base=[[2,5,6,3,2,0],[1,3,7,4,2,0],[1,3,6,3,1,0],[1,2,5,3,1,0],[1,2,4,2,1,0]];
+  else if(pos.includes('CDM')) base=[[1,2,5,3,1,0],[1,3,8,5,2,0],[1,3,9,6,2,0],[1,3,8,5,2,0],[1,2,5,3,1,0]];
+  else if(pos.includes('CAM')||pos.includes('AM')) base=[[0,0,2,5,4,2],[0,1,3,7,6,3],[0,1,4,8,7,4],[0,1,3,7,6,3],[0,0,2,5,4,2]];
+  else if(pos.includes('CM'))  base=[[0,1,4,5,2,1],[0,2,6,7,3,1],[0,2,7,8,4,2],[0,2,6,7,3,1],[0,1,4,5,2,1]];
+  else if(pos.includes('LW')||pos.includes('RW')||pos.includes('LM')||pos.includes('RM')) base=[[0,0,1,3,6,5],[0,0,2,5,8,7],[0,0,1,4,7,6],[0,0,1,3,5,4],[0,0,1,2,4,3]];
+  else if(pos.includes('ST')||pos.includes('CF'))  base=[[0,0,0,2,5,7],[0,0,1,3,7,8],[0,0,1,3,8,9],[0,0,1,3,7,8],[0,0,0,2,5,7]];
+  else base=[[1,2,4,5,3,1],[1,3,6,6,4,2],[1,3,7,7,5,2],[1,3,6,6,4,2],[1,2,4,5,3,1]];
+  var cells='';
+  for(var r=0;r<5;r++)for(var c=0;c<6;c++)
+    cells+='<rect x="'+(c*20)+'" y="'+(r*16)+'" width="20" height="16" fill="'+tvHeatColor(base[r][c],9)+'" stroke="#111" stroke-width="0.8"/>';
+  return'<svg viewBox="0 0 120 80" style="width:100%;display:block;border-radius:6px" role="img">'
+    +'<rect x="0" y="0" width="120" height="80" fill="#e8e8e8"/>'
+    +'<g>'+cells+'</g>'
+    +'<g stroke="#fff" stroke-width="1" fill="none">'+PSVG+'</g>'
+    +'</svg><div style="display:flex;gap:6px;align-items:center;margin-top:6px;font-size:11px;color:#555">'
+    +'<div style="height:8px;flex:1;border-radius:4px;background:linear-gradient(90deg,#77766D,#B7A2A2,#9B4D4D,#B32626,#531616)"></div>'
+    +'<span>Low to High</span></div>';
+}
+
+function tvGenShots(p){
+  var attrs=tvGetAttrs(p.name),sho=attrs?attrs.SHO:60;
+  var pos=(p.pos||'').toUpperCase();
+  var isST=pos.includes('ST')||pos.includes('CF'),isWing=pos.includes('LW')||pos.includes('RW');
+  var shots=[],seed=p.name.split('').reduce(function(a,c){return a+c.charCodeAt(0);},0);
+  function rng(i){var x=(seed*9301+i*49297+233455)%233280;return x/233280;}
+  var count=Math.round(8+sho/10);
+  for(var i=0;i<count;i++){
+    var x=isST?90+rng(i*7)*18:isWing?85+rng(i*7)*20:82+rng(i*7)*22;
+    var y=15+rng(i*3)*50,xg=Math.min(0.6,(sho/100)*rng(i*11)*0.8+0.05);
+    var roll=rng(i*13),outcome=roll<xg*1.2?'Goal':roll<0.45?'Saved':roll<0.65?'Blocked':'Off Target';
+    shots.push({x:Math.min(119,x),y:y,xg:xg,outcome:outcome});
+  }
+  return tvBuildShots(shots);
+}
+
+function tvDrawRadar(canvas,attrs,hidden){
+  var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
+  var keys=Object.keys(attrs),n=keys.length,R=Math.min(W,H)*0.34,lR=R+26;
+  ctx.clearRect(0,0,W,H);
+  function angle(i){return-Math.PI/2+(2*Math.PI*i/n);}
+  function pt(r,i){return{x:cx+r*Math.cos(angle(i)),y:cy+r*Math.sin(angle(i))};}
+  [.2,.4,.6,.8,1].forEach(function(t){
+    ctx.beginPath();for(var i=0;i<n;i++){var p=pt(R*t,i);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}
+    ctx.closePath();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=1;ctx.stroke();
+  });
+  for(var i=0;i<n;i++){var p=pt(R,i);ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=1;ctx.stroke();}
+  var vals=Object.values(attrs),dc=['#00e676','#4fc3f7','#ffd740','#ef5350','#ce93d8','#ff8a65'];
+  ctx.beginPath();for(var i=0;i<n;i++){var v=vals[i]/100,p=pt(R*v,i);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}
+  ctx.closePath();ctx.fillStyle='rgba(0,230,118,.15)';ctx.fill();ctx.strokeStyle='#00e676';ctx.lineWidth=2;ctx.stroke();
+  for(var i=0;i<n;i++){var v=vals[i]/100,p=pt(R*v,i);ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=dc[i];ctx.fill();}
+  /* Always show axis labels; show values only after reveal */
+  for(var i=0;i<n;i++){
+    var lp=pt(lR,i);
+    ctx.font='bold 11px Barlow Condensed,sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.7)';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(keys[i],lp.x,lp.y);
+    if(!hidden){
+      var vp=pt(R*(vals[i]/100)+16,i);
+      ctx.fillStyle=dc[i];
+      ctx.font='bold 13px Barlow Condensed,sans-serif';
+      ctx.fillText(vals[i],vp.x,vp.y);
+    }
+  }
+}
+
+function initTrivia(){
+  var root=document.getElementById('trivia-root');
+  if(!root)return;
+  var isMobile=window.innerWidth<=600;
+  root.innerHTML='<div class="tv-header"><h1>MONEYBOL</h1><p>PLAYER IDENTIFICATION</p></div>'
+    +'<div class="tv-score-bar">'
+    +'<div class="tv-score-item"><div class="tv-score-val" id="tv-score">'+tvState.score+'</div><div class="tv-score-lbl">SCORE</div></div>'
+    +'<div class="tv-score-item"><div class="tv-score-val" id="tv-streak">'+tvState.streak+'</div><div class="tv-score-lbl">STREAK</div></div>'
+    +'<div class="tv-score-item"><div class="tv-score-val" id="tv-qnum">'+(tvState.roundQ+1)+'/'+TV_ROUND+'</div><div class="tv-score-lbl">QUESTION</div></div>'
+    +'</div>'
+    +'<div class="tv-lives" id="tv-lives"></div>'
+    +(isMobile
+      ? '<div id="tv-clues"></div><div id="tv-opts"></div><div id="tv-result"></div>'
+      : '<div id="tv-clues"></div><div id="tv-opts"></div><div id="tv-result"></div>'
+    );
+  tvStartQ();
+}
+
+function tvStartQ(){
+  tvState.guesses=0;tvState.done=false;tvState.clueLevel=0;
+  var pool=tvGetPool();
+  if(pool.length<4){
+    // allPlayers not yet loaded — wait and retry
+    document.getElementById('tv-clues').innerHTML='<div style="color:#555;padding:30px;text-align:center;font-size:14px">Loading player data...<br><span style="font-size:12px">This takes a few seconds on first load</span></div>';
+    setTimeout(function(){
+      var pool2=tvGetPool();
+      if(pool2.length>=4){ tvStartQ(); }
+      else {
+        document.getElementById('tv-clues').innerHTML='<div style="color:#555;padding:20px;text-align:center;font-size:14px">Still loading — please wait a moment and tap TRIVIA again.</div>';
+      }
+    },3000);
+    return;
+  }
+  var avail=pool.filter(function(p){return tvState.used.indexOf(p.name)<0;});
+  var src=avail.length>=4?avail:pool;
+  var player=src[Math.floor(Math.random()*src.length)];
+  tvState.used.push(player.name);tvState.current=player;
+  var others=src.filter(function(p){return p.name!==player.name;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  tvState.options=[player].concat(others).sort(function(){return Math.random()-.5;});
+  document.getElementById('tv-qnum').textContent=(tvState.roundQ+1)+'/'+TV_ROUND;
+  tvRenderLives();tvRenderClues();tvRenderOpts();
+  document.getElementById('tv-result').innerHTML='';
+}
+
+function tvRenderLives(){
+  var el=document.getElementById('tv-lives');if(!el)return;
+  el.innerHTML='';
+  for(var i=0;i<4;i++){var d=document.createElement('div');d.className='tv-life'+(i<tvState.guesses?' lost':'');el.appendChild(d);}
+}
+
+function tvRenderClues(){
+  var p=tvState.current,attrs=tvGetAttrs(p.name);
+  var isMobile=window.innerWidth<=600;
+  var canvasSize=isMobile?220:340;
+  var html='<div class="tv-clue"><div class="tv-clue-title">STATISTICAL PROFILE</div>'
+    +'<div style="display:flex;justify-content:center"><canvas id="tv-radar" width="'+canvasSize+'" height="'+canvasSize+'" role="img" aria-label="Radar chart"></canvas></div>';
+  if(tvState.clueLevel>=1){
+    var shots=p.shotLog&&p.shotLog.length?p.shotLog:[];
+    html+='<div style="margin-top:10px"><div class="tv-clue-title">HEAT MAP</div>';
+    html+=shots.length>0?tvBuildHeat(shots):tvGenHeat(p);
+    html+='</div>';
+  }
+  if(tvState.clueLevel>=2){
+    var shots=p.shotLog&&p.shotLog.length?p.shotLog:[];
+    html+='<div style="margin-top:10px"><div class="tv-clue-title">SHOT MAP</div>';
+    html+=shots.length>0?tvBuildShots(shots):tvGenShots(p);
+    html+='</div>';
+  }
+  if(tvState.clueLevel>=3){
+    var posTags=(p.pos||'?').split(',').map(function(x){return'<span class="tv-pos-badge">'+x.trim()+'</span>';}).join('');
+    html+='<div style="margin-top:10px"><div class="tv-clue-title">POSITION / ROLE</div><div style="display:flex;gap:8px;justify-content:center">'+posTags+'</div></div>';
+  }
+  if(tvState.clueLevel>=4){
+    html+='<div style="margin-top:10px"><div class="tv-clue-title">TEAM HINT</div>'
+      +'<div class="tv-hint">Plays in <span>'+(p.comp||'—')+'</span> · Season <span>'+(p.season||'—')+'</span></div></div>';
+  }
+  var AC={'PAC':'#00e676','SHO':'#4fc3f7','PAS':'#ffd740','DRI':'#ef5350','DEF':'#ce93d8','PHY':'#ff8a65'};
+  html+='</div>';
+  document.getElementById('tv-clues').innerHTML=html;
+  var cv=document.getElementById('tv-radar');
+  if(cv&&attrs)tvDrawRadar(cv,attrs,true);
+}
+
+function tvRenderOpts(){
+  var isMobile=window.innerWidth<=600;
+  var html='<div class="tv-opts" style="'+(isMobile?'':'grid-template-columns:1fr 1fr;gap:12px;')+'">';
+  tvState.options.forEach(function(o){
+    html+='<button class="tv-opt" id="tvopt-'+o.name.replace(/[\s\'.]/g,'_')+'" onclick="tvGuess(this)" style="'+(isMobile?'':'padding:22px 16px;font-size:17px;')+'">'
+      +o.name+'</button>';
+  });
+  html+='</div>';
+  document.getElementById('tv-opts').innerHTML=html;
+}
+
+function tvGuess(btn){
+  if(tvState.done)return;
+  var name=btn.textContent.trim(),p=tvState.current;
+  if(btn.disabled)return;
+  if(name===p.name){
+    btn.className+=' tv-correct';
+    document.querySelectorAll('.tv-opt').forEach(function(b){b.disabled=true;});
+    tvState.done=true;
+    var pts=Math.max(1,5-tvState.guesses);
+    tvState.score+=pts;
+    if(tvState.guesses===0){
+      tvState.streak++;
+      if(tvState.streak>tvState.bestStreak)tvState.bestStreak=tvState.streak;
+    } else {
+      tvState.streak=0;
+    }
+    tvState.roundQ++;
+    document.getElementById('tv-score').textContent=tvState.score;
+    document.getElementById('tv-streak').textContent=tvState.streak;
+    tvShowReveal(true,pts);
+  } else {
+    btn.className+=' tv-wrong';btn.disabled=true;
+    var x=document.createElement('span');x.style.cssText='position:absolute;top:4px;right:6px;color:#ef5350;font-size:16px';x.textContent='X';btn.appendChild(x);
+    tvState.guesses++;tvState.clueLevel=tvState.guesses;
+    tvRenderLives();
+    if(tvState.guesses>=4){
+      document.querySelectorAll('.tv-opt').forEach(function(b){b.disabled=true;});
+      var cb=document.getElementById('tvopt-'+p.name.replace(/[\s\'.]/g,'_'));
+      if(cb)cb.className+=' tv-correct';
+      tvState.done=true;tvState.streak=0;tvState.roundQ++;
+      document.getElementById('tv-score').textContent=tvState.score;
+      document.getElementById('tv-streak').textContent=tvState.streak;
+      tvShowReveal(false,0);
+    } else {
+      document.getElementById('tv-result').innerHTML='<div class="tv-msg bad">WRONG - clue unlocked</div>';
+      setTimeout(tvRenderClues,100);
+    }
+  }
+}
+
+function tvShowReveal(won,pts){
+  var p=tvState.current,attrs=tvGetAttrs(p.name);
+  var cv=document.getElementById('tv-radar');
+  if(cv&&attrs)tvDrawRadar(cv,attrs,false);
+  var isEnd=tvState.roundQ>=TV_ROUND;
+  var msg=won?'<div class="tv-msg ok">CORRECT! +'+pts+' point'+(pts!==1?'s':'')+'</div>'
+    :'<div class="tv-msg gold">The answer was '+p.name+'</div>';
+  var nextBtn=isEnd?'<button class="tv-next" onclick="tvEndRound()">SEE ROUND RESULTS</button>'
+    :'<button class="tv-next" onclick="tvNextQ()">NEXT PLAYER</button>';
+
+  /* Build a player card matching the favs card style */
+  var lp=typeof allPlayers!=='undefined'&&allPlayers[p.name];
+  var rc=lp&&lp.rc||'var(--g)';
+  var score=lp&&lp.score||p.score||'?';
+  var imgSrc=typeof PLAYER_IMAGES!=='undefined'&&PLAYER_IMAGES[p.name]||'';
+  var silhouette=typeof SILHOUETTE_URL!=='undefined'?SILHOUETTE_URL:'';
+  var nameParts=p.name.trim().split(' ');
+  var firstName=nameParts.slice(0,-1).join(' ');
+  var lastName=nameParts.slice(-1)[0];
+
+  /* Stats line */
+  var statsLine='';
+  if(lp){
+    var passAcc=lp.passAtt>0?Math.round((lp.passComp/lp.passAtt)*100):0;
+    var pos=(lp.posFull||lp.pos||p.pos||'').toLowerCase();
+    var isDef=/back|defend|stopper|sweeper|wing.back|\bcb\b|\blb\b|\brb\b/i.test(pos);
+    var isGK=/goalkeeper|keeper|\bgk\b/i.test(pos);
+    if(isDef||isGK){
+      statsLine='Pass: '+passAcc+'%&nbsp;&nbsp;Aerials: '+('<span style="color:var(--g)">'+(lp.aerialWon||0)+'</span>')+'&nbsp;&nbsp;Key Pass: '+lp.keyPasses;
+    } else {
+      statsLine='xG: '+lp.xG.toFixed(2)+'&nbsp;&nbsp;Shots: '+lp.shots+'&nbsp;&nbsp;Goals: '+lp.goals;
+    }
+  }
+
+  var card='<div class="feat" style="max-width:380px;margin:0 auto 12px;cursor:default">'
+    +'<div class="feat-img">'
+    +'<div class="feat-crest" style="background-image:url(\''+imgSrc+'\');background-size:120%;background-position:center top;background-repeat:no-repeat">'
+    +(imgSrc?'':'<img src="'+silhouette+'" style="width:100%;height:100%;object-fit:cover;opacity:1" onerror="this.style.display=\'none\'">')
+    +'</div>'
+    +'<span class="feat-score" style="color:'+rc+'">'+score+'</span>'
+    +'</div>'
+    +'<div class="feat-body">'
+    +'<div style="font-size:13px;color:#fff;text-align:center;margin-bottom:2px">'+(p.country||'')+'</div>'
+    +'<div class="feat-name"><div class="fn">'+firstName+'</div><div class="ln">'+lastName+'</div></div>'
+    +(statsLine?'<div class="feat-stats" style="font-size:13px;color:#ccc;text-align:center;margin-bottom:8px">'+statsLine+'</div>':'')
+    +'<button class="btn-vm" onclick="if(typeof viewP===\'function\')viewP(\''+p.name.replace(/'/g,"\\'")+'\')" style="width:100%">VIEW MORE</button>'
+    +'</div>'
+    +'</div>';
+
+  document.getElementById('tv-result').innerHTML=msg+card+nextBtn;
+
+  /* Load real headshot async */
+  if(typeof getPlayerImg==='function'){
+    getPlayerImg(p.name).then(function(url){
+      if(!url)return;
+      var crest=document.querySelector('#tv-result .feat-crest');
+      if(crest){crest.style.backgroundImage='url(\''+url+'\')';crest.style.backgroundSize='120%';crest.style.backgroundPosition='center top';}
+    });
+  }
+}
+
+function tvNextQ(){
+  document.getElementById('tv-result').innerHTML='';
+  document.getElementById('tv-qnum').textContent=(tvState.roundQ+1)+'/'+TV_ROUND;
+  tvStartQ();
+}
+
+function tvEndRound(){
+  var root=document.getElementById('trivia-root');
+  var grade=tvState.score>=45?'A+':tvState.score>=35?'A':tvState.score>=25?'B':tvState.score>=15?'C':'D';
+  var msg=tvState.score>=45?'Perfect round!':tvState.score>=35?'Great knowledge!':tvState.score>=25?'Decent - keep scouting!':tvState.score>=15?'Getting there!':'Keep watching more football!';
+  var isMobile=window.innerWidth<=600;
+  var wrap=isMobile?'max-width:480px;margin:0 auto':'max-width:600px;margin:0 auto';
+  var html='<div class="tv-header"><h1>MONEYBOL</h1><p>ROUND COMPLETE</p></div>'
+    +'<div class="tv-reveal" style="'+wrap+';margin-top:16px">'
+    +'<div style="font-size:'+( isMobile?'72':'96')+'px;font-weight:700;color:var(--g);line-height:1">'+grade+'</div>'
+    +'<div style="font-size:13px;color:#555;letter-spacing:1px;margin:6px 0">ROUND SCORE</div>'
+    +'<div style="font-size:'+(isMobile?'48':'64')+'px;font-weight:700;color:#f0f0f0;line-height:1">'+tvState.score+'<span style="font-size:20px;color:#555"> / '+(TV_ROUND*5)+'</span></div>'
+    +'<div style="margin:16px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+    +'<div class="tv-stat"><div class="tv-stat-val">'+TV_ROUND+'</div><div class="tv-stat-lbl">QUESTIONS</div></div>'
+    +'<div class="tv-stat"><div class="tv-stat-val">'+tvState.bestStreak+'</div><div class="tv-stat-lbl">BEST STREAK</div></div>'
+    +'<div class="tv-stat"><div class="tv-stat-val">'+tvState.score+'</div><div class="tv-stat-lbl">TOTAL PTS</div></div>'
+    +'<div class="tv-stat"><div class="tv-stat-val">'+Math.round(tvState.score/(TV_ROUND*5)*100)+'%</div><div class="tv-stat-lbl">ACCURACY</div></div>'
+    +'</div>'
+    +'<div style="font-size:14px;color:#555;margin-bottom:16px">'+msg+'</div>'
+    +'</div>'
+    +'<div style="'+wrap+'">'
+    +'<button class="tv-next" onclick="tvNewRound()">PLAY ANOTHER ROUND</button>'
+    +'<button onclick="go(\'home\')" style="width:100%;padding:12px;margin-top:8px;background:transparent;border:1.5px solid #2a2a2a;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:1.5px;color:#555;cursor:pointer">BACK TO HOME</button>'
+    +'</div>';
+  root.innerHTML=html;
+}
+
+function tvNewRound(){
+  tvState.roundQ=0;tvState.score=0;tvState.streak=0;tvState.bestStreak=0;tvState.used=[];
+  initTrivia();
+}
+</script>

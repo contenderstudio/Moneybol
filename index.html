@@ -356,12 +356,12 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .ri-m{font-size:13px;color:#fff;margin-top:2px}
 
 /* player detail */
-.pd-topbar{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);position:relative}
+.pd-topbar{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);position:relative;min-height:52px}
 .pd-topbar .bk{font-family:var(--f);font-size:13px;font-weight:600;color:#878787;cursor:pointer}
 .pd-topbar .bk:hover{color:var(--g)}
-.pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:13px;color:#878787;font-weight:300;max-width:calc(100% - 140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;z-index:2}
+.pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:8px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
 #pg-compare .topbar{position:relative}
-#pg-compare .topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:13px;color:#878787;font-weight:300;max-width:calc(100% - 140px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;z-index:2}
+#pg-compare .topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:8px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
 .pd-hero{display:grid;grid-template-columns:205px 1fr auto;min-height:220px;background:#1d1d1d;border-bottom:1px solid var(--border)}
 .pd-img{position:relative;background:#555;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;width:200px;height:200px;justify-self:end;align-self:center;transform:translateX(22px)}
 .pd-crest{display:none}
@@ -1599,10 +1599,13 @@ table.ht tbody tr:hover{background:#232323}
 
   </div>
 
+
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 <!-- PLAYER -->
 <div class="pg" id="pg-player">
-  <div class="pd-topbar"><span class="bk" onclick="back()">&lt; BACK</span><span class="pd-disclaimer">Disclaimer: Data displayed is historical and may not reflect current market conditions.</span></div>
+  <div class="pd-topbar"><span class="bk" onclick="back()">&lt; BACK</span></div>
   <div class="pd-hero" id="pd-hero"></div>
   <div class="pd-stats" id="pd-stats"></div>
   <div class="pd-hist">
@@ -1739,6 +1742,8 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
   </div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 <!-- FAVS -->
@@ -1771,11 +1776,13 @@ table.ht tbody tr:hover{background:#232323}
     </div>
     <div id="favs-grid"><div class="loading" style="grid-column:1/-1"><div class="spinner"></div><div class="load-txt">LOADING</div></div></div>
   </div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 <!-- COMPARE -->
 <div class="pg" id="pg-compare">
-  <div class="topbar"><span class="tb-bk" onclick="back()">&lt; BACK</span><span class="pd-disclaimer">Disclaimer: Data displayed is historical and may not reflect current market conditions.</span></div>
+  <div class="topbar"><span class="tb-bk" onclick="back()">&lt; BACK</span></div>
   <div id="cp-body"></div>
 </div>
 
@@ -1834,6 +1841,8 @@ table.ht tbody tr:hover{background:#232323}
       style="background:transparent;border:1px solid #333;border-radius:5px;padding:8px 12px;color:#878787;font-family:var(--f);font-size:13px;cursor:pointer">Reset</button>
   </div>
   <div id="lr-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:16px;width:100%;box-sizing:border-box"></div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 <!-- LISTS -->
@@ -1886,6 +1895,8 @@ table.ht tbody tr:hover{background:#232323}
     </div>
     <div class="sr-grid" id="list-grid"></div>
   </div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 <!-- ABOUT -->
@@ -1921,6 +1932,22 @@ table.ht tbody tr:hover{background:#232323}
       <p style="font-size:14px;color:#878787;line-height:1.85">
         MoneyBol is an independent experimental platform created by Contender Studio and JSNJAY Design Inc. and is not affiliated with or endorsed by any football club, league, federation, or data provider unless explicitly stated.
       </p>
+    </div>
+
+    <!-- Who Are We -->
+    <div style="margin-bottom:28px">
+      <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--g);margin-bottom:12px">WHO ARE WE?</div>
+      <div style="background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:28px">
+        <p style="font-size:14px;color:#878787;line-height:1.85;margin-bottom:12px">
+          <strong style="color:#fff">Contender Studio</strong> — Sports Design Consultancy. 
+        </p>
+        <p style="font-size:14px;color:#878787;line-height:1.85;margin-bottom:12px">
+          Designing the future of sport. We help athletic brands connect with people through game-changing experiences.
+        </p>
+        <p style="font-size:14px;color:#878787;line-height:1.85">
+          From identity to interface, we help athletes, teams, and sports tech companies build brands that win on and off the field.
+        </p>
+      </div>
     </div>
 
     <!-- Features grid -->
@@ -2047,6 +2074,8 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
   </div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 
@@ -2054,6 +2083,8 @@ table.ht tbody tr:hover{background:#232323}
 <div class="pg" id="pg-trivia">
   <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span></div>
   <div id="trivia-root" style="max-width:900px;margin:0 auto;padding:12px 24px 40px"></div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 
@@ -2150,6 +2181,8 @@ table.ht tbody tr:hover{background:#232323}
         <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
       </div>
     </div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+
 </div>
 
 <!-- PRIVACY POLICY -->

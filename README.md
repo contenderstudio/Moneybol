@@ -1,4 +1,4 @@
-
+<h1 tabindex="-1" class="heading-element" dir="auto">Contender Studio</h1>
 
 Contender Studio is a sports design consultancy specializing in brand identity, NIL, and digital experiences. We design the future of sport—helping athletic brands connect through game-changing experiences.
 

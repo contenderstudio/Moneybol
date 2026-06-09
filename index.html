@@ -137,6 +137,11 @@
       if(window.currentPage && window.currentPage() === 'favs'){
         window.renderFavs?.();
       }
+      // If on leaderboard page, reload it now that user is authenticated
+      if(document.getElementById('pg-leaderboard')?.classList.contains('on')){
+        if(typeof lbLoad === 'function') lbLoad();
+        else setTimeout(function(){ if(typeof lbLoad==='function') lbLoad(); }, 500);
+      }
     } else {
       // Only show sign-out state after first auth check completes
       // and only if we were previously signed in
@@ -35285,7 +35290,12 @@ function lbLoad(){
   list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Loading rankings...</div>';
 
   if(!window.currentUser){
-    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Sign in to view the leaderboard.</div>';
+    // Retry once after short delay in case auth just fired
+    setTimeout(function(){
+      if(window.currentUser){ lbLoad(); }
+      else { list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Sign in to view the leaderboard.</div>'; }
+    }, 1500);
+    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Loading...</div>';
     return;
   }
 

@@ -33281,7 +33281,7 @@ function fcHtml(p){
     <div class="feat-img" style="cursor:pointer">
       <div id="fc-crest-${safeId}" class="feat-crest" style="background-image:url('${imgSrc}');background-size:cover;background-position:center center;background-repeat:no-repeat"></div>
     <span class="feat-star${isFav? ' on' : ''}" data-player-name="${esc(p.name)}" style="width:18px;text-align:center" onclick="event.stopPropagation();toggleFavFC('${esc(p.name)}',this)">${isFav? '★' : '☆'}</span>
-      <button class="icon-btn${isCmp?' on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:9px;z-index:5;color:${isCmp?'var(--g)':'#aaa'};font-size:18px;width:18px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:none" title="Compare">${isCmp?'✓':'+'}</button>
+      <button class="icon-btn${isCmp?' on':''}" id="cmpbtn-${safeId}" onclick="event.stopPropagation();toggleCompare('${esc(p.name)}',this)" style="position:absolute;top:30px;left:9px;z-index:5;color:${isCmp?'var(--g)':'#aaa'};font-size:18px;width:24px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:none" title="Compare">${isCmp?'✓':'+'}</button>
       <span class="feat-score" style="color:${p.rc}">${p.score}</span>
     </div>
     <div class="feat-body">

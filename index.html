@@ -65,6 +65,34 @@
     await updateDoc(doc(db, 'users', uid), { favs });
   };
 
+  // Leaderboard: submit a round score
+  import { collection, addDoc, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  window.firebaseSubmitScore = async (uid, displayName, score, roundData) => {
+    await addDoc(collection(db, 'leaderboard'), {
+      uid, displayName, score,
+      roundData, // array of per-question breakdowns
+      playedAt: Date.now()
+    });
+  };
+
+  window.firebaseGetLeaderboard = async (period) => {
+    // period: 'all' | 'today'
+    let q;
+    if(period === 'today'){
+      const start = new Date(); start.setHours(0,0,0,0);
+      q = query(collection(db,'leaderboard'), where('playedAt','>=',start.getTime()), orderBy('playedAt','desc'));
+    } else {
+      q = query(collection(db,'leaderboard'), orderBy('score','desc'), limit(50));
+    }
+    const snap = await getDocs(q);
+    const rows = [];
+    snap.forEach(d => rows.push({id:d.id, ...d.data()}));
+    // For 'today' sort by score desc client-side
+    if(period==='today') rows.sort((a,b)=>b.score-a.score);
+    return rows.slice(0,50);
+  };
+
   // Auth state listener — fires on page load and on sign in/out
   let authInitialized = false;
   onAuthStateChanged(auth, async (user) => {
@@ -253,7 +281,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .chip{font-family:var(--f);font-size:13px;font-weight:600;padding:4px 12px;background:#232323;border:1px solid #3a3a3a;color:#878787;border-radius:20px;cursor:pointer;transition:all .15s}
 .chip:hover{border-color:var(--g);color:var(--g);background:#1a2a1a}
 /* HOME LOWER — 3 columns: recently-viewed | featured+radar | ai-lists */
-.home-lower{display:grid;grid-template-columns:260px 1fr 290px;gap:16px;padding:0 20px 24px 20px;align-items:start;max-width:1280px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box}
+.home-lower{display:grid;grid-template-columns:260px 1fr 290px;gap:16px;padding:0 20px 24px 20px;align-items:stretch;max-width:1280px;margin-left:auto;margin-right:auto;width:100%;box-sizing:border-box}
 .hl-col-rv{display:flex;flex-direction:column;padding-right:10px}
 .hl-col-center{display:flex;flex-direction:column}
 .hl-col-ai{display:flex;flex-direction:column}
@@ -359,9 +387,9 @@ body{background:var(--bg);color:var(--t1);font-family:var(--fb);display:flex}
 .pd-topbar{display:flex;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border);position:relative;min-height:52px}
 .pd-topbar .bk{font-family:var(--f);font-size:13px;font-weight:600;color:#878787;cursor:pointer}
 .pd-topbar .bk:hover{color:var(--g)}
-.pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:8px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
+.pd-topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:11px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
 #pg-compare .topbar{position:relative}
-#pg-compare .topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:8px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
+#pg-compare .topbar .pd-disclaimer{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:var(--f);font-size:11px;color:#878787;font-weight:300;max-width:calc(100% - 140px);text-align:right;z-index:2;white-space:normal;line-height:1.4}
 .pd-hero{display:grid;grid-template-columns:205px 1fr auto;min-height:220px;background:#1d1d1d;border-bottom:1px solid var(--border)}
 .pd-img{position:relative;background:#555;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;width:200px;height:200px;justify-self:end;align-self:center;transform:translateX(22px)}
 .pd-crest{display:none}
@@ -1473,6 +1501,9 @@ table.ht tbody tr:hover{background:#232323}
     <div class="sb-item" id="nav-trivia" onclick="go('trivia')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>TRIVIA
     </div>
+    <div class="sb-item" id="nav-leaderboard" onclick="go('leaderboard')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/></svg>RANKINGS
+    </div>
   </nav>
   <div class="sb-user" id="sb-user">
   <div class="sb-user-row" onclick="showProfileMenu()">
@@ -1588,19 +1619,28 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
     <!-- COL 3: AI Lists -->
-    <div class="hl-col-ai">
+    <div class="hl-col-ai" style="display:flex;flex-direction:column;height:100%">
       <div class="ai-panel">
         <div class="panel-lbl">AI LISTS</div>
         <button class="ai-btn ab1" onclick="showList('undervalued')">Top Finishers</button>
         <button class="ai-btn ab2" onclick="showList('hidden_scorers')">Hidden Goalscorers</button>
         <button class="ai-btn ab3" onclick="showList('undervalued_defenders')">Undervalued Defenders</button>
       </div>
+
+      <!-- Trivia promo card -->
+      <div onclick="go('trivia')" style="margin-top:14px;background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:20px;cursor:pointer;display:flex;flex-direction:column;flex:1">
+        <div class="panel-lbl">TRIVIA</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;text-align:center;margin-top:-10px">
+          <div style="font-size:18px;font-weight:300;color:#fff;line-height:1.8;text-align:center">Test your<br>Footy<br>Knowledge</div>
+        </div>
+        <button onclick="event.stopPropagation();go('trivia')" class="ai-btn" style="background:var(--g);color:#000;font-weight:700;letter-spacing:.5px;margin-top:0" onmouseover="this.style.opacity='.85';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">Play</button>
+      </div>
     </div>
 
   </div>
 
 
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 <!-- PLAYER -->
@@ -1742,7 +1782,7 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
   </div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -1776,7 +1816,7 @@ table.ht tbody tr:hover{background:#232323}
     </div>
     <div id="favs-grid"><div class="loading" style="grid-column:1/-1"><div class="spinner"></div><div class="load-txt">LOADING</div></div></div>
   </div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -1841,7 +1881,7 @@ table.ht tbody tr:hover{background:#232323}
       style="background:transparent;border:1px solid #333;border-radius:5px;padding:8px 12px;color:#878787;font-family:var(--f);font-size:13px;cursor:pointer">Reset</button>
   </div>
   <div id="lr-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;padding:16px;width:100%;box-sizing:border-box"></div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -1895,7 +1935,7 @@ table.ht tbody tr:hover{background:#232323}
     </div>
     <div class="sr-grid" id="list-grid"></div>
   </div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -1936,10 +1976,10 @@ table.ht tbody tr:hover{background:#232323}
 
      <!-- Who Are We -->
     <div style="margin-bottom:28px">
-      <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--g);margin-bottom:12px">WHO ARE WE?</div>
       <div style="background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:28px">
+        <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--g);margin-bottom:12px">WHO ARE WE?</div>
         <p style="font-size:14px;color:#878787;line-height:1.85;margin-bottom:12px">
-          <strong style="color:#fff">Contender Studio</strong> — Sports Design Consultancy. Designing the future of sport.
+          <a href="https://www.contender.studio/" target="_blank" rel="noopener noreferrer" style="color:#fff;text-decoration:none;border-bottom:1px solid #444;padding-bottom:1px;transition:border-color .2s" onmouseover="this.style.borderColor='var(--g)'" onmouseout="this.style.borderColor='#444'"><strong>Contender Studio</strong></a> — Sports Design Consultancy. Designing the future of sport.
         </p>
         <p style="font-size:14px;color:#878787;line-height:1.85;margin-bottom:12px">
           We help athletic brands connect with people through game-changing experiences.
@@ -1951,8 +1991,8 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
 <div style="margin-bottom:28px">
-      <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--g);margin-bottom:12px">OUR PROCESS</div>
       <div style="background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:20px;overflow-x:auto">
+        <div style="font-family:var(--f);font-size:13px;font-weight:700;letter-spacing:1.8px;color:var(--g);margin-bottom:12px">OUR PROCESS</div>
         <svg width="100%" viewBox="0 0 780 200" role="img" xmlns="http://www.w3.org/2000/svg">
           <title>MoneyBol development process flow</title>
           <desc>Six steps: Initial Idea, Layout and Structure, Visual Style and Direction, AI Enhancements, AI Build / Development, Human Review. Steps 4 and 5 are AI steps shown in green.</desc>
@@ -1966,7 +2006,7 @@ table.ht tbody tr:hover{background:#232323}
           </defs>
 
           <!-- Box 1: Initial Idea -->
-          <rect x="10" y="60" width="100" height="70" rx="4" fill="#2a2a2a" stroke="#444" stroke-width="1.5"/>
+          <rect x="10" y="60" width="100" height="70" rx="4" fill="#2a2a2a" stroke="#00e676" stroke-width="1.5"/>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="60" y="91">Initial</text>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="60" y="107">Idea</text>
 
@@ -1974,7 +2014,7 @@ table.ht tbody tr:hover{background:#232323}
           <line x1="110" y1="95" x2="128" y2="95" stroke="#555" stroke-width="1.5" marker-end="url(#arr-p)"/>
 
           <!-- Box 2: Layout and Structure -->
-          <rect x="130" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#444" stroke-width="1.5"/>
+          <rect x="130" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#00e676" stroke-width="1.5"/>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="185" y="91">Layout &amp;</text>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="185" y="107">Structure</text>
 
@@ -1982,9 +2022,9 @@ table.ht tbody tr:hover{background:#232323}
           <line x1="240" y1="95" x2="258" y2="95" stroke="#555" stroke-width="1.5" marker-end="url(#arr-p)"/>
 
           <!-- Box 3: Visual Style and Direction -->
-          <rect x="260" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#444" stroke-width="1.5"/>
-          <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="315" y="84">Visual Style</text>
-          <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="315" y="100">&amp; Direction</text>
+          <rect x="260" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#00e676" stroke-width="1.5"/>
+          <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="315" y="91">Visual Style</text>
+          <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="315" y="107">&amp; Direction</text>
 
           <!-- Arrow 3->4 -->
           <line x1="370" y1="95" x2="388" y2="95" stroke="#555" stroke-width="1.5" marker-end="url(#arr-p)"/>
@@ -2006,12 +2046,12 @@ table.ht tbody tr:hover{background:#232323}
           <line x1="630" y1="95" x2="648" y2="95" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr-d)"/>
 
           <!-- Box 6: Human Review -->
-          <rect x="650" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#444" stroke-width="1.5"/>
+          <rect x="650" y="60" width="110" height="70" rx="4" fill="#2a2a2a" stroke="#00e676" stroke-width="1.5"/>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="705" y="91">Human</text>
           <text font-family="Barlow Condensed, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" x="705" y="107">Review</text>
 
-          <!-- Feedback loop dashed box from box 4 down and back -->
-          <path d="M445 130 L445 160 L575 160 L575 130" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="4 3"/>
+          <!-- Feedback loop dashed box from box 4 down and back to Human Review -->
+          <path d="M445 130 L445 160 L705 160 L705 130" fill="none" stroke="#555" stroke-width="1" stroke-dasharray="4 3"/>
 
         </svg>
       </div>
@@ -2143,7 +2183,7 @@ table.ht tbody tr:hover{background:#232323}
     </div>
 
   </div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -2152,8 +2192,49 @@ table.ht tbody tr:hover{background:#232323}
 <div class="pg" id="pg-trivia">
   <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span></div>
   <div id="trivia-root" style="max-width:900px;margin:0 auto;padding:12px 24px 40px"></div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+</div>
 
+<!-- LEADERBOARD -->
+<div class="pg" id="pg-leaderboard">
+  <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span><span class="tb-title">RANKINGS</span></div>
+  <div style="max-width:700px;margin:0 auto;padding:24px 20px 40px">
+
+    <!-- Header -->
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:2px;color:#555;margin-bottom:8px">GLOBAL</div>
+      <div style="font-family:var(--f);font-size:28px;font-weight:900;color:#fff;letter-spacing:1px">LEADERBOARD</div>
+      <div style="font-family:var(--f);font-size:13px;color:#555;margin-top:4px">Top trivia scores from all players</div>
+    </div>
+
+    <!-- Tab switcher -->
+    <div style="display:flex;gap:8px;margin-bottom:20px;background:#1a1a1a;border-radius:8px;padding:4px">
+      <button id="lb-tab-all" onclick="lbSetTab('all')" style="flex:1;padding:8px;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;background:var(--g);color:#000;transition:all .2s">ALL TIME</button>
+      <button id="lb-tab-today" onclick="lbSetTab('today')" style="flex:1;padding:8px;border:none;border-radius:6px;font-family:inherit;font-size:13px;font-weight:700;letter-spacing:1px;cursor:pointer;background:transparent;color:#555;transition:all .2s">TODAY</button>
+    </div>
+
+    <!-- Your best score -->
+    <div id="lb-my-score" style="display:none;background:#1a2a1a;border:1px solid #2a3a2a;border-radius:10px;padding:16px 20px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-family:var(--f);font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--g);margin-bottom:2px">YOUR BEST</div>
+        <div id="lb-my-name" style="font-size:14px;color:#fff;font-weight:600"></div>
+      </div>
+      <div style="text-align:right">
+        <div id="lb-my-pts" style="font-size:28px;font-weight:900;color:var(--g)"></div>
+        <div style="font-size:11px;color:#555;letter-spacing:1px">POINTS</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard list -->
+    <div id="lb-list" style="display:flex;flex-direction:column;gap:8px">
+      <div style="text-align:center;color:#555;padding:40px;font-size:14px">Loading rankings...</div>
+    </div>
+
+    <!-- Play trivia CTA -->
+    <div style="margin-top:24px;text-align:center">
+      <button onclick="go('trivia')" style="background:var(--g);border:none;border-radius:8px;padding:14px 40px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:1px;color:#000;cursor:pointer;transition:opacity .2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">PLAY TRIVIA</button>
+    </div>
+  </div>
 </div>
 
 
@@ -2250,7 +2331,7 @@ table.ht tbody tr:hover{background:#232323}
         <img src="assets/contender.png" alt="Contender Studio" class="site-footer-logo">
       </div>
     </div>
-  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:8px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
+  <div style="display:block;width:100%;box-sizing:border-box;text-align:right;padding:12px 24px 20px;font-family:var(--f);font-size:11px;color:#555;font-weight:300;line-height:1.6">Disclaimer: MoneyBol is an AI-assisted proof of concept. Data displayed is historical and may not reflect current market conditions. AI is used throughout the development of content, analysis, and visualizations, and results may vary or contain inaccuracies. Information is provided for demonstration purposes only and should be independently verified.</div>
 
 </div>
 
@@ -31280,11 +31361,12 @@ function go(id, addToStack=true){
   el.classList.add('on');
   const mainScroll = document.querySelector('.main');
   if(mainScroll) mainScroll.scrollTop = 0;
-  ['home','lists','favs','about','trivia'].forEach((pg,i)=>{
+  ['home','lists','favs','about','trivia','leaderboard'].forEach((pg,i)=>{
     const navEl = document.querySelectorAll('.sb-item')[i];
     if(navEl) navEl.classList.toggle('on', pg===id || (pg==='lists' && id==='listresults'));
   });
   if(id==='trivia'){ if(typeof initTrivia==='function') initTrivia(); }
+  if(id==='leaderboard'){ if(typeof initLeaderboard==='function') initLeaderboard(); }
   if(id==='favs') renderFavs();
   if(id==='compare') renderCompare();
   if(id==='competitions') renderCompetitions();
@@ -31929,7 +32011,7 @@ function renderLeagues(){
             style="background:${col}18;border-top:3px solid ${col};border-radius:6px 6px 0 0;padding:12px 12px 14px;text-align:center;cursor:grab;user-select:none;transition:transform .15s,box-shadow .15s,border-color .15s;display:flex;flex-direction:column;align-items:center;gap:4px">
             <div style="font-family:var(--f);font-size:16px;font-weight:400;color:#fff;line-height:1">${c.comp}</div>
             <div style="font-family:var(--f);font-size:13px;color:#9a9a9a;line-height:1">${c.matches} match${c.matches!==1?'es':''}</div>
-            <div style="font-family:var(--f);font-size:10px;color:#878787;letter-spacing:0.8px;opacity:0.9;line-height:1">Drag to reorder</div>
+            <div style="font-family:var(--f);font-size:11px;color:#878787;letter-spacing:0.8px;opacity:0.9;line-height:1">Drag to reorder</div>
             <div style="font-size:12px;color:#878787;opacity:0.0;height:1px;margin-top:2px">${c.season}</div>
           </div>`;
         }).join('')}
@@ -34709,7 +34791,7 @@ boot();
 .tv-life{width:10px;height:10px;border-radius:50%;background:var(--g);transition:all .3s}
 .tv-life.lost{background:#ef5350;transform:scale(0.7)}
 .tv-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.tv-opt{background:#1a1a1a;border:1.5px solid #2a2a2a;border-radius:8px;padding:16px 10px;cursor:pointer;text-align:center;font-family:inherit;font-size:15px;font-weight:300;color:#f0f0f0;letter-spacing:.5px;transition:all .2s;position:relative;overflow:hidden}
+.tv-opt{background:#242424;border:1.5px solid #444;border-radius:8px;padding:16px 10px;cursor:pointer;text-align:center;font-family:inherit;font-size:15px;font-weight:400;color:#f0f0f0;letter-spacing:.5px;transition:all .2s;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .tv-opt:not(:disabled):hover{border-color:var(--g);color:var(--g);transform:translateY(-1px)}
 .tv-opt.tv-correct{border-color:var(--g);background:rgba(0,230,118,.08);color:var(--g);animation:tvPulse .4s ease}
 .tv-opt.tv-wrong{border-color:#ef5350;background:rgba(239,83,80,.08);color:#ef5350;cursor:not-allowed}
@@ -34766,8 +34848,8 @@ var PSVG=[
 ].join('');
 
 var TV_OC={'Goal':'#00e676','Saved':'#4fc3f7','Saved To Post':'#4fc3f7','Saved Off Target':'#4fc3f7','Blocked':'#888','Off Target':'#e05a2b','Wayward':'#e05a2b','Post':'#fff'};
-var tvState={score:0,streak:0,bestStreak:0,roundQ:0,guesses:0,used:[],current:null,options:[],done:false,clueLevel:0};
-var TV_ROUND=10;
+var tvState={score:0,streak:0,bestStreak:0,roundQ:0,guesses:0,used:[],current:null,options:[],done:false,clueLevel:0,roundData:[],qStartTime:0};
+var TV_ROUND=5;
 
 function tvHeatColor(n,mx){
   if(n===0)return'rgba(119,118,109,0.08)';
@@ -34882,7 +34964,7 @@ function tvGenShots(p){
 
 function tvDrawRadar(canvas,attrs,hidden){
   var ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height,cx=W/2,cy=H/2;
-  var keys=Object.keys(attrs),n=keys.length,R=Math.min(W,H)*0.34,lR=R+26;
+  var keys=Object.keys(attrs),n=keys.length,R=Math.min(W,H)*0.34,lR=R+34;
   ctx.clearRect(0,0,W,H);
   function angle(i){return-Math.PI/2+(2*Math.PI*i/n);}
   function pt(r,i){return{x:cx+r*Math.cos(angle(i)),y:cy+r*Math.sin(angle(i))};}
@@ -34898,16 +34980,14 @@ function tvDrawRadar(canvas,attrs,hidden){
   /* Always show axis labels; show values only after reveal */
   for(var i=0;i<n;i++){
     var lp=pt(lR,i);
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    /* Always show label + value stacked */
     ctx.font='bold 11px Barlow Condensed,sans-serif';
     ctx.fillStyle='rgba(255,255,255,.7)';
-    ctx.textAlign='center';ctx.textBaseline='middle';
-    ctx.fillText(keys[i],lp.x,lp.y);
-    if(!hidden){
-      var vp=pt(R*(vals[i]/100)+16,i);
-      ctx.fillStyle=dc[i];
-      ctx.font='bold 13px Barlow Condensed,sans-serif';
-      ctx.fillText(vals[i],vp.x,vp.y);
-    }
+    ctx.fillText(keys[i],lp.x,lp.y-8);
+    ctx.font='bold 14px Barlow Condensed,sans-serif';
+    ctx.fillStyle=dc[i];
+    ctx.fillText(vals[i],lp.x,lp.y+8);
   }
 }
 
@@ -34915,7 +34995,7 @@ function initTrivia(){
   var root=document.getElementById('trivia-root');
   if(!root)return;
   var isMobile=window.innerWidth<=600;
-  root.innerHTML='<div class="tv-header"><h1>MONEYBOL</h1><p>PLAYER IDENTIFICATION</p></div>'
+  root.innerHTML='<div class="tv-header"><img src="assets/moneybol.png" alt="MONEYBOL" style="height:36px;width:auto;display:block;margin:0 auto 4px"><p>PLAYER IDENTIFICATION</p></div>'
     +'<div class="tv-score-bar">'
     +'<div class="tv-score-item"><div class="tv-score-val" id="tv-score">'+tvState.score+'</div><div class="tv-score-lbl">SCORE</div></div>'
     +'<div class="tv-score-item"><div class="tv-score-val" id="tv-streak">'+tvState.streak+'</div><div class="tv-score-lbl">STREAK</div></div>'
@@ -34930,7 +35010,7 @@ function initTrivia(){
 }
 
 function tvStartQ(){
-  tvState.guesses=0;tvState.done=false;tvState.clueLevel=0;
+  tvState.guesses=0;tvState.done=false;tvState.clueLevel=0;tvState.qStartTime=Date.now();
   var pool=tvGetPool();
   if(pool.length<4){
     // allPlayers not yet loaded — wait and retry
@@ -34958,7 +35038,7 @@ function tvStartQ(){
 function tvRenderLives(){
   var el=document.getElementById('tv-lives');if(!el)return;
   el.innerHTML='';
-  for(var i=0;i<4;i++){var d=document.createElement('div');d.className='tv-life'+(i<tvState.guesses?' lost':'');el.appendChild(d);}
+  for(var i=0;i<3;i++){var d=document.createElement('div');d.className='tv-life'+(i<tvState.guesses?' lost':'');el.appendChild(d);}
 }
 
 function tvRenderClues(){
@@ -35013,8 +35093,14 @@ function tvGuess(btn){
     btn.className+=' tv-correct';
     document.querySelectorAll('.tv-opt').forEach(function(b){b.disabled=true;});
     tvState.done=true;
-    var pts=Math.max(1,5-tvState.guesses);
+    // Base points by guess number
+    var basePts=[100,75,50,25][tvState.guesses]||0;
+    // Speed bonus
+    var elapsed=Math.round((Date.now()-tvState.qStartTime)/1000);
+    var speedBonus=elapsed<10?25:elapsed<20?20:elapsed<30?15:elapsed<45?10:elapsed<60?5:0;
+    var pts=basePts+speedBonus;
     tvState.score+=pts;
+    tvState.roundData.push({player:p.name,guesses:tvState.guesses+1,basePts:basePts,speedBonus:speedBonus,pts:pts,elapsed:elapsed,won:true});
     if(tvState.guesses===0){
       tvState.streak++;
       if(tvState.streak>tvState.bestStreak)tvState.bestStreak=tvState.streak;
@@ -35024,20 +35110,22 @@ function tvGuess(btn){
     tvState.roundQ++;
     document.getElementById('tv-score').textContent=tvState.score;
     document.getElementById('tv-streak').textContent=tvState.streak;
-    tvShowReveal(true,pts);
+    tvShowReveal(true,pts,basePts,speedBonus,elapsed);
   } else {
     btn.className+=' tv-wrong';btn.disabled=true;
     var x=document.createElement('span');x.style.cssText='position:absolute;top:4px;right:6px;color:#ef5350;font-size:16px';x.textContent='X';btn.appendChild(x);
     tvState.guesses++;tvState.clueLevel=tvState.guesses;
     tvRenderLives();
-    if(tvState.guesses>=4){
+    if(tvState.guesses>=3){
       document.querySelectorAll('.tv-opt').forEach(function(b){b.disabled=true;});
       var cb=document.getElementById('tvopt-'+p.name.replace(/[\s\'.]/g,'_'));
       if(cb)cb.className+=' tv-correct';
       tvState.done=true;tvState.streak=0;tvState.roundQ++;
+      var elapsed=Math.round((Date.now()-tvState.qStartTime)/1000);
+      tvState.roundData.push({player:p.name,guesses:3,basePts:0,speedBonus:0,pts:0,elapsed:elapsed,won:false});
       document.getElementById('tv-score').textContent=tvState.score;
       document.getElementById('tv-streak').textContent=tvState.streak;
-      tvShowReveal(false,0);
+      tvShowReveal(false,0,0,0,elapsed);
     } else {
       document.getElementById('tv-result').innerHTML='<div class="tv-msg bad">WRONG - clue unlocked</div>';
       setTimeout(tvRenderClues,100);
@@ -35045,15 +35133,16 @@ function tvGuess(btn){
   }
 }
 
-function tvShowReveal(won,pts){
+function tvShowReveal(won,pts,basePts,speedBonus,elapsed){
   var p=tvState.current,attrs=tvGetAttrs(p.name);
   var cv=document.getElementById('tv-radar');
   if(cv&&attrs)tvDrawRadar(cv,attrs,false);
   var isEnd=tvState.roundQ>=TV_ROUND;
-  var msg=won?'<div class="tv-msg ok">CORRECT! +'+pts+' point'+(pts!==1?'s':'')+'</div>'
+  var speedStr=speedBonus>0?' <span style="color:#ffd740;font-size:13px">+'+speedBonus+' speed bonus</span>':'';
+  var msg=won?'<div class="tv-msg ok">CORRECT! +'+basePts+' pts'+speedStr+'</div>'
     :'<div class="tv-msg gold">The answer was '+p.name+'</div>';
-  var nextBtn=isEnd?'<button class="tv-next" onclick="tvEndRound()">SEE ROUND RESULTS</button>'
-    :'<button class="tv-next" onclick="tvNextQ()">NEXT PLAYER</button>';
+  var nextBtn=isEnd?'<button class="tv-next" onclick="tvEndRound()" style="max-width:380px;display:block;margin:0 auto">SEE ROUND RESULTS</button>'
+    :'<button class="tv-next" onclick="tvNextQ()" style="max-width:380px;display:block;margin:0 auto">NEXT PLAYER</button>';
 
   /* Build a player card matching the favs card style */
   var lp=typeof allPlayers!=='undefined'&&allPlayers[p.name];
@@ -35079,7 +35168,7 @@ function tvShowReveal(won,pts){
     }
   }
 
-  var card='<div class="feat" style="max-width:380px;margin:0 auto 12px;cursor:default">'
+  var card='<div class="feat" style="max-width:380px;margin:0 auto 12px;cursor:default;pointer-events:none">'
     +'<div class="feat-img">'
     +'<div class="feat-crest" style="background-image:url(\''+imgSrc+'\');background-size:120%;background-position:center top;background-repeat:no-repeat">'
     +(imgSrc?'':'<img src="'+silhouette+'" style="width:100%;height:100%;object-fit:cover;opacity:1" onerror="this.style.display=\'none\'">')
@@ -35089,8 +35178,7 @@ function tvShowReveal(won,pts){
     +'<div class="feat-body">'
     +'<div style="font-size:13px;color:#fff;text-align:center;margin-bottom:2px">'+(p.country||'')+'</div>'
     +'<div class="feat-name"><div class="fn">'+firstName+'</div><div class="ln">'+lastName+'</div></div>'
-    +(statsLine?'<div class="feat-stats" style="font-size:13px;color:#ccc;text-align:center;margin-bottom:8px">'+statsLine+'</div>':'')
-    +'<button class="btn-vm" onclick="if(typeof viewP===\'function\')viewP(\''+p.name.replace(/'/g,"\\'")+'\')" style="width:100%">VIEW MORE</button>'
+    +(statsLine?'<div class="feat-stats" style="font-size:13px;color:#ccc;text-align:center;margin-bottom:4px">'+statsLine+'</div>':'')
     +'</div>'
     +'</div>';
 
@@ -35114,32 +35202,143 @@ function tvNextQ(){
 
 function tvEndRound(){
   var root=document.getElementById('trivia-root');
-  var grade=tvState.score>=45?'A+':tvState.score>=35?'A':tvState.score>=25?'B':tvState.score>=15?'C':'D';
-  var msg=tvState.score>=45?'Perfect round!':tvState.score>=35?'Great knowledge!':tvState.score>=25?'Decent - keep scouting!':tvState.score>=15?'Getting there!':'Keep watching more football!';
+  var maxScore=TV_ROUND*125; // 100 base + 25 speed bonus max per question
+  var pct=Math.round(tvState.score/maxScore*100);
+  var grade=pct>=95?'A+':pct>=80?'A':pct>=65?'B':pct>=50?'C':'D';
+  var msg=pct>=95?'Perfect round!':pct>=80?'Great knowledge!':pct>=65?'Decent - keep scouting!':pct>=50?'Getting there!':'Keep watching more football!';
   var isMobile=window.innerWidth<=600;
   var wrap=isMobile?'max-width:480px;margin:0 auto':'max-width:600px;margin:0 auto';
-  var html='<div class="tv-header"><h1>MONEYBOL</h1><p>ROUND COMPLETE</p></div>'
+
+  // Submit to leaderboard if logged in
+  if(window.currentUser && window.firebaseSubmitScore){
+    window.firebaseSubmitScore(window.currentUser.uid, window.currentUser.name, tvState.score, tvState.roundData).catch(function(){});
+  }
+
+  var html='<div class="tv-header"><img src="assets/moneybol.png" alt="MONEYBOL" style="height:36px;width:auto;display:block;margin:0 auto 4px"><p>ROUND COMPLETE</p></div>'
     +'<div class="tv-reveal" style="'+wrap+';margin-top:16px">'
     +'<div style="font-size:'+( isMobile?'72':'96')+'px;font-weight:700;color:var(--g);line-height:1">'+grade+'</div>'
     +'<div style="font-size:13px;color:#555;letter-spacing:1px;margin:6px 0">ROUND SCORE</div>'
-    +'<div style="font-size:'+(isMobile?'48':'64')+'px;font-weight:700;color:#f0f0f0;line-height:1">'+tvState.score+'<span style="font-size:20px;color:#555"> / '+(TV_ROUND*5)+'</span></div>'
+    +'<div style="font-size:'+(isMobile?'48':'64')+'px;font-weight:700;color:#f0f0f0;line-height:1">'+tvState.score+'<span style="font-size:20px;color:#555"> / '+maxScore+'</span></div>'
     +'<div style="margin:16px 0;display:grid;grid-template-columns:1fr 1fr;gap:8px">'
     +'<div class="tv-stat"><div class="tv-stat-val">'+TV_ROUND+'</div><div class="tv-stat-lbl">QUESTIONS</div></div>'
     +'<div class="tv-stat"><div class="tv-stat-val">'+tvState.bestStreak+'</div><div class="tv-stat-lbl">BEST STREAK</div></div>'
     +'<div class="tv-stat"><div class="tv-stat-val">'+tvState.score+'</div><div class="tv-stat-lbl">TOTAL PTS</div></div>'
-    +'<div class="tv-stat"><div class="tv-stat-val">'+Math.round(tvState.score/(TV_ROUND*5)*100)+'%</div><div class="tv-stat-lbl">ACCURACY</div></div>'
+    +'<div class="tv-stat"><div class="tv-stat-val">'+pct+'%</div><div class="tv-stat-lbl">ACCURACY</div></div>'
     +'</div>'
-    +'<div style="font-size:14px;color:#555;margin-bottom:16px">'+msg+'</div>'
+    +'<div style="font-size:14px;color:#555;margin-bottom:24px">'+msg+'</div>'
     +'</div>'
-    +'<div style="'+wrap+'">'
-    +'<button class="tv-next" onclick="tvNewRound()">PLAY ANOTHER ROUND</button>'
+    +'<div style="'+wrap+';margin-top:20px;padding-bottom:24px">'
+    +'<button class="tv-next" onclick="go(\'leaderboard\')">VIEW LEADERBOARD</button>'
+    +'<button class="tv-next" onclick="tvNewRound()" style="margin-top:8px;background:#1a1a1a;border:1.5px solid #2a2a2a;color:#f0f0f0">PLAY ANOTHER ROUND</button>'
     +'<button onclick="go(\'home\')" style="width:100%;padding:12px;margin-top:8px;background:transparent;border:1.5px solid #2a2a2a;border-radius:8px;font-family:inherit;font-size:14px;font-weight:700;letter-spacing:1.5px;color:#555;cursor:pointer">BACK TO HOME</button>'
     +'</div>';
   root.innerHTML=html;
 }
 
 function tvNewRound(){
-  tvState.roundQ=0;tvState.score=0;tvState.streak=0;tvState.bestStreak=0;tvState.used=[];
+  tvState.roundQ=0;tvState.score=0;tvState.streak=0;tvState.bestStreak=0;tvState.used=[];tvState.roundData=[];
   initTrivia();
+}
+
+/* ===================== LEADERBOARD ===================== */
+var lbCurrentTab='all';
+
+function lbSetTab(tab){
+  lbCurrentTab=tab;
+  var all=document.getElementById('lb-tab-all');
+  var today=document.getElementById('lb-tab-today');
+  if(!all||!today)return;
+  if(tab==='all'){
+    all.style.background='var(--g)';all.style.color='#000';
+    today.style.background='transparent';today.style.color='#555';
+  } else {
+    today.style.background='var(--g)';today.style.color='#000';
+    all.style.background='transparent';all.style.color='#555';
+  }
+  lbLoad();
+}
+
+function lbMedal(rank){
+  if(rank===1)return'🥇';
+  if(rank===2)return'🥈';
+  if(rank===3)return'🥉';
+  return'<span style="color:#555;font-weight:700;font-size:14px">#'+rank+'</span>';
+}
+
+function lbTimeAgo(ts){
+  var diff=Math.floor((Date.now()-ts)/1000);
+  if(diff<60)return'just now';
+  if(diff<3600)return Math.floor(diff/60)+'m ago';
+  if(diff<86400)return Math.floor(diff/3600)+'h ago';
+  return Math.floor(diff/86400)+'d ago';
+}
+
+function lbLoad(){
+  var list=document.getElementById('lb-list');
+  if(!list)return;
+  list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Loading rankings...</div>';
+
+  if(!window.firebaseGetLeaderboard){
+    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Sign in to view the leaderboard.</div>';
+    return;
+  }
+
+  window.firebaseGetLeaderboard(lbCurrentTab).then(function(rows){
+    if(!rows.length){
+      list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">No scores yet — be the first to play!</div>';
+      return;
+    }
+
+    // Show current user's best
+    var myBest=null;
+    if(window.currentUser){
+      var myRows=rows.filter(function(r){return r.uid===window.currentUser.uid;});
+      if(myRows.length){
+        myBest=myRows.reduce(function(a,b){return b.score>a.score?b:a;});
+      }
+    }
+    var myEl=document.getElementById('lb-my-score');
+    if(myEl){
+      if(myBest){
+        myEl.style.display='flex';
+        document.getElementById('lb-my-name').textContent=myBest.displayName||'You';
+        document.getElementById('lb-my-pts').textContent=myBest.score;
+      } else {
+        myEl.style.display='none';
+      }
+    }
+
+    var html='';
+    rows.forEach(function(row,i){
+      var rank=i+1;
+      var isMe=window.currentUser&&row.uid===window.currentUser.uid;
+      var bg=isMe?'background:#1a2a1a;border-color:#2a3a2a':'background:#1e1e1e;border-color:#2a2a2a';
+      var maxScore=TV_ROUND*125;
+      var pct=Math.min(100,Math.round(row.score/maxScore*100));
+      html+='<div style="'+bg+';border:1px solid;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:16px">'
+        +'<div style="width:32px;text-align:center;flex-shrink:0">'+lbMedal(rank)+'</div>'
+        +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:14px;font-weight:600;color:'+(isMe?'var(--g)':'#fff')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(row.displayName||'Anonymous')+(isMe?' (you)':'')+'</div>'
+          +'<div style="margin-top:5px;background:#2a2a2a;border-radius:4px;height:4px;overflow:hidden"><div style="height:4px;background:var(--g);width:'+pct+'%;border-radius:4px"></div></div>'
+        +'</div>'
+        +'<div style="text-align:right;flex-shrink:0">'
+          +'<div style="font-size:22px;font-weight:900;color:var(--g)">'+row.score+'</div>'
+          +'<div style="font-size:10px;color:#555;letter-spacing:1px">'+lbTimeAgo(row.playedAt)+'</div>'
+        +'</div>'
+      +'</div>';
+    });
+    list.innerHTML=html;
+  }).catch(function(err){
+    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Could not load leaderboard.</div>';
+  });
+}
+
+function initLeaderboard(){
+  lbCurrentTab='all';
+  var all=document.getElementById('lb-tab-all');
+  var today=document.getElementById('lb-tab-today');
+  if(all){all.style.background='var(--g)';all.style.color='#000';}
+  if(today){today.style.background='transparent';today.style.color='#555';}
+  lbLoad();
 }
 </script>

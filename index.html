@@ -10,7 +10,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, setPersistence, inMemoryPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC1fMCgCIAKbQtibxhLtt0PvG4GnzW7fcg",
@@ -66,8 +66,6 @@
   };
 
   // Leaderboard: submit a round score
-  import { collection, addDoc, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
   window.firebaseSubmitScore = async (uid, displayName, score, roundData) => {
     await addDoc(collection(db, 'leaderboard'), {
       uid, displayName, score,
@@ -77,20 +75,26 @@
   };
 
   window.firebaseGetLeaderboard = async (period) => {
-    // period: 'all' | 'today'
-    let q;
+    console.log('[LB] firebaseGetLeaderboard called, period:', period);
+    const user = auth.currentUser;
+    console.log('[LB] auth.currentUser:', user);
+    if(!user) throw new Error('Not authenticated');
+    const snap = await getDocs(collection(db, 'leaderboard'));
+    console.log('[LB] snap size:', snap.size);
+    const rows = [];
+    snap.forEach(d => rows.push({id: d.id, ...d.data()}));
+    console.log('[LB] rows:', rows);
+
     if(period === 'today'){
       const start = new Date(); start.setHours(0,0,0,0);
-      q = query(collection(db,'leaderboard'), where('playedAt','>=',start.getTime()), orderBy('playedAt','desc'));
-    } else {
-      q = query(collection(db,'leaderboard'), orderBy('score','desc'), limit(50));
+      return rows
+        .filter(r => r.playedAt >= start.getTime())
+        .sort((a,b) => b.score - a.score)
+        .slice(0, 50);
     }
-    const snap = await getDocs(q);
-    const rows = [];
-    snap.forEach(d => rows.push({id:d.id, ...d.data()}));
-    // For 'today' sort by score desc client-side
-    if(period==='today') rows.sort((a,b)=>b.score-a.score);
-    return rows.slice(0,50);
+    return rows
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 50);
   };
 
   // Auth state listener — fires on page load and on sign in/out
@@ -1495,14 +1499,14 @@ table.ht tbody tr:hover{background:#232323}
     <div class="sb-item" id="nav-favs" onclick="go('favs')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21z"/></svg>FAVS
     </div>
-    <div class="sb-item" id="nav-about" onclick="go('about')">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ABOUT
-    </div>
     <div class="sb-item" id="nav-trivia" onclick="go('trivia')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3c4.86-2.34 8-7 8-11.5C20 5.81 16.19 2 11.5 2zm1 14.5h-2v-2h2v2zm0-4h-2c0-3.25 3-3 3-5 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.21 1.79-4 4-4s4 1.79 4 4c0 2.5-3 2.75-3 5z"/></svg>TRIVIA
     </div>
     <div class="sb-item" id="nav-leaderboard" onclick="go('leaderboard')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M7.5 21H2V9h5.5v12zm7.25-18h-5.5v18h5.5V3zM22 11h-5.5v10H22V11z"/></svg>RANKINGS
+    </div>
+    <div class="sb-item" id="nav-about" onclick="go('about')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>ABOUT
     </div>
   </nav>
   <div class="sb-user" id="sb-user">
@@ -2197,7 +2201,7 @@ table.ht tbody tr:hover{background:#232323}
 
 <!-- LEADERBOARD -->
 <div class="pg" id="pg-leaderboard">
-  <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span><span class="tb-title">RANKINGS</span></div>
+  <div class="topbar"><span class="tb-bk" onclick="go('home')">&lt; BACK</span></div>
   <div style="max-width:700px;margin:0 auto;padding:24px 20px 40px">
 
     <!-- Header -->
@@ -31361,7 +31365,7 @@ function go(id, addToStack=true){
   el.classList.add('on');
   const mainScroll = document.querySelector('.main');
   if(mainScroll) mainScroll.scrollTop = 0;
-  ['home','lists','favs','about','trivia','leaderboard'].forEach((pg,i)=>{
+  ['home','lists','favs','trivia','leaderboard','about'].forEach((pg,i)=>{
     const navEl = document.querySelectorAll('.sb-item')[i];
     if(navEl) navEl.classList.toggle('on', pg===id || (pg==='lists' && id==='listresults'));
   });
@@ -35278,6 +35282,11 @@ function lbLoad(){
   if(!list)return;
   list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Loading rankings...</div>';
 
+  if(!window.currentUser){
+    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Sign in to view the leaderboard.</div>';
+    return;
+  }
+
   if(!window.firebaseGetLeaderboard){
     list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Sign in to view the leaderboard.</div>';
     return;
@@ -35329,7 +35338,8 @@ function lbLoad(){
     });
     list.innerHTML=html;
   }).catch(function(err){
-    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Could not load leaderboard.</div>';
+    console.error('[LB] Error loading leaderboard:', err);
+    list.innerHTML='<div style="text-align:center;color:#555;padding:40px;font-size:14px">Could not load leaderboard.<br><span style="font-size:11px;color:#444">'+err.message+'</span></div>';
   });
 }
 

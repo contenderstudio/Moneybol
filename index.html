@@ -915,6 +915,7 @@ table.ht tbody tr:hover{background:#232323}
   .ai-chips-label{font-size:16px}
   .ai-chip-btn{font-size:14px;padding:8px 13px;border-radius:18px}
   .ai-panel{margin:0 12px 12px;padding:14px}
+  .trivia-home-card{margin:8px 12px 12px !important;flex:none !important}
   .panel-lbl{margin-bottom:12px;letter-spacing:1.4px;font-size:15px}
   .ai-btn{padding:18px 14px;font-size:17px;border-radius:6px}
   .rv-label{margin:0 12px 10px;font-size:15px}
@@ -1632,12 +1633,12 @@ table.ht tbody tr:hover{background:#232323}
       </div>
 
       <!-- Trivia promo card -->
-      <div onclick="go('trivia')" style="margin-top:14px;background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:20px;cursor:pointer;display:flex;flex-direction:column;flex:1">
+      <div onclick="go('trivia')" style="margin-top:14px;background:#212121;border:1px solid #2e2e2e;border-radius:10px;padding:20px;cursor:pointer;display:flex;flex-direction:column;flex:1" class="trivia-home-card">
         <div class="panel-lbl">TRIVIA</div>
         <div style="flex:1;display:flex;align-items:center;justify-content:center;text-align:center;margin-top:-10px">
-          <div style="font-size:18px;font-weight:700;color:#fff;line-height:1.8;text-align:center">Test your<br>Footy Knowledge</div>
+          <div style="font-size:18px;font-weight:700;color:#fff;line-height:1.8;text-align:center;padding-bottom:12px">Test your<br>Footy Knowledge</div>
         </div>
-        <button onclick="event.stopPropagation();go('trivia')" class="ai-btn" style="background:var(--g);color:#000;margin-top:0" onmouseover="this.style.opacity='.85';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">PLAY TRIVIA</button>
+        <button onclick="event.stopPropagation();go('trivia')" class="ai-btn" style="background:var(--g);color:#000;font-weight:900;margin-top:0" onmouseover="this.style.opacity='.85';this.style.transform='translateY(-1px)'" onmouseout="this.style.opacity='1';this.style.transform='none'">PLAY TRIVIA</button>
       </div>
     </div>
 

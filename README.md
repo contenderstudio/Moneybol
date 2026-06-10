@@ -2,6 +2,9 @@
 
 Contender Studio is a sports design consultancy specializing in brand identity, NIL, and digital experiences. We design the future of sport—helping athletic brands connect through game-changing experiences.
 
+
+<h2 tabindex="-1" class="heading-element" dir="auto">What is MoneyBol</h1>
+
 MoneyBol is an experimental AI-assisted football analytics intelligence platform. Inspired by the principles behind “Moneyball”, using data and analytics to uncover undervalued talent and support smarter recruitment decisions.
 
 Combining AI, open football data, and strategic design thinking, MoneyBol transforms complex scouting and player analysis into a modern, accessible experience for clubs, academies, agents, players, and football enthusiasts.

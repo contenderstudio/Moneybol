@@ -11,6 +11,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as fbSignOut, onAuthStateChanged, setPersistence, inMemoryPersistence, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, addDoc, query, orderBy, limit, getDocs, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyC1fMCgCIAKbQtibxhLtt0PvG4GnzW7fcg",
@@ -18,10 +19,12 @@
     projectId: "moneybol",
     storageBucket: "moneybol.firebasestorage.app",
     messagingSenderId: "361270372733",
-    appId: "1:361270372733:web:6e16591904afb984f70414"
+    appId: "1:361270372733:web:6e16591904afb984f70414",
+    measurementId: "G-LG7W091KLX"
   };
 
   const app  = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db   = getFirestore(app);
   setPersistence(auth, inMemoryPersistence).catch(err => {
